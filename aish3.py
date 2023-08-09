@@ -45,7 +45,9 @@ def run(fullscreen, width, height):
     sdl2.ext.init()
     ttf.TTF_Init()
 
-    window = sdl2.ext.Window("AISH", size=(width, height), flags=sdl2.SDL_WINDOW_ALLOW_HIGHDPI)
+    window = sdl2.ext.Window("AISH", size=(width, height), 
+                             flags=sdl2.SDL_WINDOW_ALLOW_HIGHDPI | 
+                             sdl2.SDL_WINDOW_RESIZABLE)
 
     if fullscreen:
         sdl2.SDL_SetWindowFullscreen(window.window, sdl2.SDL_WINDOW_FULLSCREEN)
@@ -80,6 +82,20 @@ def run(fullscreen, width, height):
                 if event.type == sdl2.SDL_QUIT:
                     running = False
                     break
+                elif event.type == sdl2.SDL_WINDOWEVENT and \
+                    event.window.event == sdl2.SDL_WINDOWEVENT_SIZE_CHANGED:
+                        # Update renderer viewport to new window size
+                        new_width = event.window.data1
+                        new_height = event.window.data2
+
+                        print("SDL_WINDOWEVENT_SIZE_CHANGED")
+
+                        sdl2.SDL_RenderSetLogicalSize(renderer.renderer, new_width, new_height)
+
+                        renderer.clear()
+                        gui.draw()
+                        renderer.present()
+
                 else:
                     gui.handle_event(event)
 
