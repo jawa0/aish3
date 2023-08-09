@@ -19,7 +19,7 @@ This is not meant to replace front-end developers. Instead it's meant so that an
 |Cmd+N|Create a new GPT-4 chat|
 |Cmd+G|Send messages to GPT-4 for chat completion|
 |Cmd+S|Save workspace to aish_workspace.json|
-|Cmd+L|Load workspace from aish_workspace.json (not implemented)
+|Cmd+L|Load workspace from aish_workspace.json
 |TAB|Focus next control|
 |Shift+TAB|Focus previous control|
 |Enter|Move focus down into children of currently focused control|
