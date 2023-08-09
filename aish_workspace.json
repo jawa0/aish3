@@ -1,0 +1,459 @@
+{
+  "saved_at_utc": "2023-08-09T16:47:12.830907+00:00",
+  "saved_at_local": "2023-08-09T12:47:12.830907-04:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        0,
+        0,
+        1465,
+        411
+      ],
+      "layout": null,
+      "children": [
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            10,
+            10,
+            354,
+            400
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "GPT-4 Chat"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                47
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    25
+                  ],
+                  "text": "You are an AI research assistant. Your goal is to\nhelp me to do detailed and comprehensive research \non topics that I will describe to you. You are \nan expert at learning new subjects quickly, and \nat problem solving."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                68,
+                352,
+                47
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    25
+                  ],
+                  "text": "What are atoms made of?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                115,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "Atoms, which are the smallest units of matter, \nare composed of three main types of subatomic \nparticles: protons, neutrons, and electrons. \n\n1. Protons: These particles have a positive electric charge. They are found within the atomic nucleus. The number of protons in the nucleus defines the chemical element the atom belongs to - this number is called the atomic number.\n\n2. Neutrons: These particles have no electric charge, and also reside in the atomic nucleus along with protons. The number of neutrons in an atom can vary, even within atoms of the same element. These different varieties are known as isotopes. \n\n3. Electrons: These particles have a negative electric charge and they move around the nucleus in a cloud-like region. The charge of the electron is equal in magnitude and opposite in sign to that of a proton. Electrons are involved in chemical reactions and form atomic bonds.\n\nIn addition to these three primary particles, modern physics talks about even smaller particles or 'elementary particles' that include quarks and leptons. The protons and neutrons themselves are made up of these quarks which come in six different 'flavors': up, down, top, bottom, strange, and charm. Electrons are a type of lepton, which are fundamental particles not made up of smaller particles, like quarks.\n\nThe study of atoms and their constituent particles is a rich and active area of research in modern physics. Just to note, there is a lot more to learn which can get quite complex as the quantum physics picture of these particles and their behavior is very different from our everyday intuition."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                257,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "Cool!"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            380,
+            10,
+            354,
+            258
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "GPT-4 Chat"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                47
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    25
+                  ],
+                  "text": "aaaa"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                68,
+                352,
+                47
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    25
+                  ],
+                  "text": "bbbb"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                115,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "cccc"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            745,
+            10,
+            354,
+            306
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "GPT-4 Chat"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                163,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            1110,
+            10,
+            354,
+            306
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "GPT-4 Chat"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                163,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

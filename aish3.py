@@ -1,0 +1,100 @@
+# (C) 2023 by Jabavu Adams. All Rights Reserved.
+
+# @todo log chat gpt reqeusts and responses
+# @todo animated control resizing - jarring when textareas shrink on chat completion
+# @todo make chat completion wait asynch. Show some kind of busy indicator
+# @todo when cycling focus in LLMChatContainer, enlarge focused container, shrink others.
+# @todo token streaming output from gpt
+# @todo selected text should have a more drab background colour if TextArea is not focused
+# @todo move to beginning/end of line
+# @todo move to prev/next word
+# @todo TextArea/TextEditBuffer word wrap
+# @todo focus controls using mouse click
+# @todo @bug weird behaviour when deleting past start of buffer
+# @todo tabs don't just insert spaces, but move to a multiple of tab_spaces
+# @todo hitting line down on last line goes to end of line doesn't affect desired_col
+# @todo hitting line up on first line goes to start of line doesn't affect desired_col
+# @todo flashing cursor
+# @todo key repeat
+# @todo copy text to clipboard
+# @todo @bug ONLY FOR VARIABLE-WIDTH FONT: k and w misalignment between letters and cursor after drawing red boxes
+
+import sdl2
+import sdl2.ext
+import sdl2.sdlttf as ttf
+import argparse
+from gpt import makeGPTRequest
+from gui import GUI
+from llm_chat_container import LLMChatContainer
+from gui_layout import RowLayout
+
+
+def run(fullscreen, width, height):
+    sdl2.ext.init()
+    ttf.TTF_Init()
+
+    window = sdl2.ext.Window("AISH", size=(width, height), flags=sdl2.SDL_WINDOW_ALLOW_HIGHDPI)
+
+    if fullscreen:
+        sdl2.SDL_SetWindowFullscreen(window.window, sdl2.SDL_WINDOW_FULLSCREEN)
+
+    window.show()
+
+    renderer = sdl2.ext.Renderer(window, 
+                                    flags=sdl2.SDL_RENDERER_ACCELERATED | 
+                                    sdl2.SDL_RENDERER_PRESENTVSYNC)
+
+    WHITE = sdl2.ext.Color(255, 255, 255)
+    font_path = "./res/fonts/FiraCode-Regular.ttf"
+    # font_path = "./res/fonts/Menlo-Regular.ttf"
+    font_size = 12
+    font_manager = sdl2.ext.FontManager(font_path, size=font_size, color=WHITE)
+
+    
+    gui = GUI(renderer, font_manager)
+
+    chat1 = gui.create_control("LLMChatContainer", x=10, y=10)
+    chat2 = gui.create_control("LLMChatContainer", x=380, y=10)
+
+    gui.content().add_child(chat1)
+    gui.content().add_child(chat2)
+    gui.set_focus(chat1)
+
+    running = True
+    while running:
+        events = sdl2.ext.get_events()
+        if events:
+            for event in events:
+                if event.type == sdl2.SDL_QUIT:
+                    running = False
+                    break
+                else:
+                    gui.handle_event(event)
+
+        else:
+            renderer.clear()
+            gui.draw()
+            renderer.present()
+
+            # @test repositioning layout updates            
+            # x, y = gui.get_position()
+            # gui.set_position(x + 1, y + 1)
+
+            # @test resizing layout updates
+            # w, h = text_area2.get_size()
+            # text_area2.set_size(w + 1, h + 1)
+            
+
+    ttf.TTF_Quit()
+    sdl2.ext.quit()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='AISH window application.')
+    parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
+    parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
+    parser.add_argument('--height', type=int, default=800, help='window height (default: 800)')
+
+    args = parser.parse_args()
+
+    run(args.fullscreen, args.width, args.height)
