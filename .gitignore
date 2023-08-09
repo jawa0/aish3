@@ -1,0 +1,15 @@
+.DS_Store
+
+# API keys
+.env
+
+# Python
+__pycache__
+*.pyc
+
+# pyinstaller
+build
+dist
+*.spec
+
+results.txt
