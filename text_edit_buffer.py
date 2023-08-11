@@ -17,14 +17,14 @@ class TextEditBuffer(object):
 
     # When constructing TextEditBuffer with non-empty text,
     # POINT is not moved to the end. It will be 0.
-    def __init__(self, initial_text="", tab_spaces=4, **kwargs):
-        self.TEXT_BUFFER = initial_text
+    def __init__(self, text="", tab_spaces=4, **kwargs):
+        self.TEXT_BUFFER = text
         self.TAB_SPACES = tab_spaces
 
         # @note: POINT has no knowledge of expanded tabs. It's an index into the
         # un-expanded TEXT_BUFFER. It's between 0 and len(TEXT_BUFFER). @note that
         # this means it can point one char past the end of the buffer.
-        self.POINT = len(initial_text)
+        self.POINT = len(text)
         self.MARK = None
         self.desired_col = 0
 
@@ -180,6 +180,14 @@ class TextEditBuffer(object):
         # # If we're at the start of a word, move back until a space or the start of the buffer is found.
         # while self.POINT > 0 and self.TEXT_BUFFER[self.POINT - 1].isalnum():
         #     self.POINT -= 1
+
+
+    def move_point_word_right(self):    # @todo handle all whitespace and runs of it
+        i = self.TEXT_BUFFER.find(' ', self.POINT) + 1
+        if i == -1 or i == len(self.TEXT_BUFFER):
+            self.set_point(len(self.TEXT_BUFFER))
+        else:
+            self.set_point(i)
 
 
     def move_point_right(self):
