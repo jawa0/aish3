@@ -35,10 +35,12 @@ import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
 import argparse
+import time
 from gpt import makeGPTRequest
 from gui import GUI
 from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
+from draw import draw_text
 
 
 def run(fullscreen, width, height):
@@ -82,6 +84,7 @@ def run(fullscreen, width, height):
     # gui.set_focus(chat1)
 
     running = True
+    fps_smoothed = 0.0
     while running:
         events = sdl2.ext.get_events()
         if events:
@@ -107,18 +110,17 @@ def run(fullscreen, width, height):
                     gui.handle_event(event)
 
         else:
+            t0 = time.time()
             renderer.clear()
             gui.draw()
+
+            t1 = time.time()
+            elapsed = t1 - t0
+            fps = 1.0 / elapsed
+            fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
+            draw_text(renderer, font_manager, f"FPS: {fps_smoothed:.2f}", width - 100, 10)
+
             renderer.present()
-
-            # @test repositioning layout updates            
-            # x, y = gui.get_position()
-            # gui.set_position(x + 1, y + 1)
-
-            # @test resizing layout updates
-            # w, h = text_area2.get_size()
-            # text_area2.set_size(w + 1, h + 1)
-            
 
     ttf.TTF_Quit()
     sdl2.ext.quit()
