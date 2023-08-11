@@ -1,36 +1,46 @@
-Run the application
+AISH(3) -- AI Shell 
 ==
-This is a Python command-line (CLI) application.
+
+_Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire" in English._
+
+
+_In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common informal exclamation often used to express frustration, annoyance, or mild surprise, somewhat equivalent to "Oh no!", "Darn!", or "Ugh!" in English._
+
+
+This is a Python command-line (CLI) application. It doesn't do much right now, except submit chat completions to GPT-4, and provide a GUI framework using text and rectangles. The eventual goal is to rapidly prototype GUI + LLM ideas. The first goal is to have a replacement for the ChatGPT web-interface and Playgrounds.
+
+### Running it
 
 `python aish3.py`
 
 If you want to make GPT API requests, you'll need to provide a couple of environment variables in a .env file:
 
-  OPENAI_ORGANIZATION = "..."
-  OPENAI_API_KEY="..."
+    OPENAI_ORGANIZATION = "..."
+    OPENAI_API_KEY="..."
 
-It doesn't do much right now, except provide a GUI framework using text, and rectangles. The goal is to rapidly prototype GUI + LLM ideas. If I stick to using only text and rectangles, the hope is that this can be auto-translated to other platforms and languages.
-
-This is not meant to replace front-end developers. Instead it's meant so that any of us can build working prototypes almost like functional wireframes. My first personal goal is to have a replacement for the ChatGPT web-interface and Playgrounds.
+### Keyboard Commands
 
 |Command|Description|
 |-------|-----------|
 |Cmd+Q|Quit|
 |Cmd+N|Create a new GPT-4 chat|
 |Cmd+G|Send messages to GPT-4 for chat completion|
+|Cmd+U|Add another "user" message text field|
 |Cmd+S|Save workspace to aish_workspace.json|
 |Cmd+L|Load workspace from aish_workspace.json
+|Cmd+V|Paste text from clipboard into focused TextArea|
 |TAB|Focus next control|
 |Shift+TAB|Focus previous control|
 |Enter|Move focus down into children of currently focused control|
 |Esc|Move focus up to parent contaioer|
 |Ctrl+TAB|Insert TAB char into currently focused TextArea|
 |Arrow L/R/U/D|Move within TextArea|
-|Cmd+V|Paste text from clipboard into focused TextArea|
+|Shift+Arrow L/R/U/D|Extend selection within TextArea|
+|Mouse Wheel Up/Down|Scroll focused TextArea|
 |Delete|Remove previous char in TextArea|
 |Other keys|Insert text char into focused TextArea|
-|Mouse Wheel Up/Down|Scroll focused TextArea|
-|Cmd+U|Add another "user" message text field|
+|Cmd+Up|Move to beginning of focused TextArea|
+|Cmd+Down|Move to end of focused TextArea|
 
 NOTES:
 
