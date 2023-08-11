@@ -35,7 +35,8 @@ class TextArea(GUIControl):
     def __init__(self, row_spacing=18, text_buffer=None, **kwargs):
         # print(f'TextArea.__init__() called')
         super().__init__(**kwargs)
-        self.text_buffer = text_buffer or TextEditBuffer()
+        text = kwargs.get('text', '')
+        self.text_buffer = text_buffer or TextEditBuffer(text=text)
         self.is_editable = True
         self.row_spacing = row_spacing
         self.y_scroll = 0
@@ -89,7 +90,12 @@ class TextArea(GUIControl):
                         self.text_buffer.set_mark()
                 else:
                     self.text_buffer.clear_mark()
-                self.text_buffer.move_point_right()
+
+                if event.key.keysym.mod & sdl2.KMOD_ALT:  # Option/Alt
+                    # move to start of word
+                    self.text_buffer.move_point_word_right()
+                else:
+                    self.text_buffer.move_point_right()
                 return True
             elif event.key.keysym.sym == sdl2.SDLK_UP:  # up arrow key
                 if event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI):

@@ -67,11 +67,18 @@ def run(fullscreen, width, height):
     
     gui = GUI(renderer, font_manager)
 
-    chat1 = gui.create_control("LLMChatContainer", x=10, y=10)
-    chat2 = gui.create_control("LLMChatContainer", x=380, y=10)
+    chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
+    chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
+
+    label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
+
+    text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
 
     gui.content().add_child(chat1)
     gui.content().add_child(chat2)
+    gui.content().add_child(label)
+    gui.content().add_child(text)
+
     gui.set_focus(chat1)
 
     running = True
