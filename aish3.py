@@ -79,7 +79,7 @@ def run(fullscreen, width, height):
     gui.content().add_child(label)
     gui.content().add_child(text)
 
-    gui.set_focus(chat1)
+    # gui.set_focus(chat1)
 
     running = True
     while running:
