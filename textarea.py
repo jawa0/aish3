@@ -63,17 +63,20 @@ class TextArea(GUIControl):
             #         return True
 
         elif event.type == sdl2.SDL_KEYDOWN:
+            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            keySymbol = event.key.keysym.sym
+
             # Cmd+A selects all text
-            if event.key.keysym.sym == sdl2.SDLK_a and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
+            if keySymbol == sdl2.SDLK_a and (cmdPressed):
                 self.text_buffer.set_mark(mark_position=0)
                 self.text_buffer.move_point_to_end()
                 return True
-            if event.key.keysym.sym == sdl2.SDLK_RETURN:
+            if keySymbol == sdl2.SDLK_RETURN:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_LEFT:  # left arrow key
+            elif keySymbol == sdl2.SDLK_LEFT:  # left arrow key
                 if event.key.keysym.mod & sdl2.KMOD_SHIFT:
                     if self.text_buffer.get_selection() is None:
                         self.text_buffer.set_mark()
@@ -84,7 +87,7 @@ class TextArea(GUIControl):
                     self.text_buffer.clear_mark()
                 self.text_buffer.move_point_left()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_RIGHT:  # right arrow key
+            elif keySymbol == sdl2.SDLK_RIGHT:  # right arrow key
                 if event.key.keysym.mod & sdl2.KMOD_SHIFT:
                     if self.text_buffer.get_selection() is None:
                         self.text_buffer.set_mark()
@@ -97,8 +100,8 @@ class TextArea(GUIControl):
                 else:
                     self.text_buffer.move_point_right()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_UP:  # up arrow key
-                if event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI):
+            elif keySymbol == sdl2.SDLK_UP:  # up arrow key
+                if cmdPressed:
                     # move to start of buffer
                     self.text_buffer.move_point_to_start()
                 else:
@@ -109,8 +112,8 @@ class TextArea(GUIControl):
                         self.text_buffer.clear_mark()
                     self.text_buffer.move_point_up()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_DOWN:  # down arrow key
-                if event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI):
+            elif keySymbol == sdl2.SDLK_DOWN:  # down arrow key
+                if cmdPressed:
                     # move to end of buffer
                     self.text_buffer.move_point_to_end()
                 else:
@@ -123,13 +126,13 @@ class TextArea(GUIControl):
                         # @todo encapsulate in a controller
                         self.scroll_cursor_into_view()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_BACKSPACE:  # delete key
+            elif keySymbol == sdl2.SDLK_BACKSPACE:  # delete key
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 else:
                     self.text_buffer.delete_char()
                 return True
-            elif event.key.keysym.sym == sdl2.SDLK_TAB:  # tab key
+            elif keySymbol == sdl2.SDLK_TAB:  # tab key
                 # TAB focuses next control
                 # Shift+TAB focuses previous control
                 # Ctrl+TAB inserts a tab character
@@ -138,14 +141,13 @@ class TextArea(GUIControl):
                         self.text_buffer.delete_selection()
                     self.text_buffer.insert('\t')  # @todo how to access self.text_buffer through current control?
                     return True
-            elif (event.key.keysym.sym == sdl2.SDLK_SPACE and
+            elif (keySymbol == sdl2.SDLK_SPACE and
                 (event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL))):
                 self.text_buffer.set_mark()
                 return True
 
             # Check for Cmd+V (paste) on macOS
-            elif (event.key.keysym.sym == sdl2.SDLK_v and
-                (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))):
+            elif cmdPressed and keySymbol == sdl2.SDLK_v:
                 # Get the clipboard text
                 clipboard_text = sdl2.SDL_GetClipboardText()
                 if clipboard_text:
@@ -158,7 +160,30 @@ class TextArea(GUIControl):
                     # Free the clipboard text
                     # sdl2.SDL_free(clipboard_text)
                     return True
-        
+
+            # Copy & Cut
+            elif cmdPressed and keySymbol == (sdl2.SDLK_c or keySymbol == sdl2.SDLK_x):
+                # Is there a selection?
+                if self.text_buffer.get_selection() is not None:
+                    # Get the selected text
+                    start, end = self.text_buffer.get_selection()
+                    text = self.text_buffer.get_text()[start:end]
+                    
+                    # If we're cutting, then delete selection
+                    if keySymbol == sdl2.SDLK_x:
+                        self.text_buffer.delete_selection()
+                else:
+                    # Get all the text
+                    text = self.text_buffer.get_text()
+
+                    # If we're cutting, then delete all the text
+                    if keySymbol == sdl2.SDLK_x:
+                        self.text_buffer.set_text('')
+
+                # Set the clipboard text
+                sdl2.SDL_SetClipboardText(text.encode('utf-8'))
+                return True
+                    
         elif event.type == sdl2.SDL_TEXTINPUT:
             # event.text.text is a bytes object representing a string in UTF-8 encoding
             text = event.text.text.decode('utf-8')
