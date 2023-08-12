@@ -185,7 +185,7 @@ class LLMChatContainer(GUIContainer):
         self.focusRing.add(answer.text_area, set_focus=True)
 
         for u in self.utterances:
-            u.text_area.set_size(PANEL_WIDTH, 25)
+            u.text_area.set_size(PANEL_WIDTH, 60)
         self.utterances.append(answer)
         self.updateLayout
 
