@@ -36,6 +36,7 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
 |Ctrl+TAB|Insert TAB char into currently focused TextArea|
 |Arrow L/R/U/D|Move within TextArea|
 |Option/Alt+Arrow L/R|Move to start of previous / next word|
+|Cmd+L/R Arrow|Move to beginning/end of current line.|
 |Mouse Wheel Up/Down|Scroll focused TextArea|
 |Cmd+Up|Move to beginning of focused TextArea|
 |Cmd+Down|Move to end of focused TextArea|

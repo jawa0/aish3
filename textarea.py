@@ -78,30 +78,40 @@ class TextArea(GUIControl):
                 self.text_buffer.insert()
                 return True
             
-            elif keySymbol == sdl2.SDLK_LEFT:  # left arrow key
-                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # Is Shift held? Start selection if None
+            # left arrow key
+            elif keySymbol == sdl2.SDLK_LEFT:  
+                # Is Shift held? Start selection if None
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  
                     if self.text_buffer.get_selection() is None:
                         self.text_buffer.set_mark()
                 else:
                     self.text_buffer.clear_mark()
 
-                if event.key.keysym.mod & sdl2.KMOD_ALT:  # Option/Alt
+                # Option/Alt - start of current or previous word
+                if event.key.keysym.mod & sdl2.KMOD_ALT:
                     # move to start of word
                     self.text_buffer.move_point_word_left()
+                # Cmd - beginning of line
+                elif cmdPressed:
+                    self.text_buffer.move_point_start_of_line()
                 else:
                     self.text_buffer.move_point_left()
                 return True
             
-            elif keySymbol == sdl2.SDLK_RIGHT:  # right arrow key
+            # right arrow key
+            elif keySymbol == sdl2.SDLK_RIGHT:
                 if event.key.keysym.mod & sdl2.KMOD_SHIFT:
                     if self.text_buffer.get_selection() is None:
                         self.text_buffer.set_mark()
                 else:
                     self.text_buffer.clear_mark()
 
-                if event.key.keysym.mod & sdl2.KMOD_ALT:  # Option/Alt
-                    # move to start of word
+                # Option/Alt - start of next word
+                if event.key.keysym.mod & sdl2.KMOD_ALT:
                     self.text_buffer.move_point_word_right()
+                # Cmd - end of line
+                elif cmdPressed:
+                    self.text_buffer.move_point_end_of_line()
                 else:
                     self.text_buffer.move_point_right()
                 return True
