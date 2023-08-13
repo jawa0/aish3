@@ -160,34 +160,13 @@ class TextEditBuffer(object):
 
 
     def move_point_word_left(self):
-        # If we are inside a word, then move to the beginning of the current word.
-        # If we are at the start of a word, move to the start of the previous word.
-        # If there are no previous words, move to the start of the buffer.
-
-        # If we're already at the start of the buffer, do nothing.
-        if self.POINT == 0:
-            return
-
-        # Move back from the current position until a space or the start of the buffer is found.
-        while self.POINT > 0 and self.TEXT_BUFFER[self.POINT - 1].isalnum():
-            self.POINT -= 1
-        self.POINT += 1
-
-        # # If we're still within the buffer and at a space, move back to find the start of the previous word.
-        # while self.POINT > 0 and not self.TEXT_BUFFER[self.POINT - 1].isalnum():
-        #     self.POINT -= 1
-
-        # # If we're at the start of a word, move back until a space or the start of the buffer is found.
-        # while self.POINT > 0 and self.TEXT_BUFFER[self.POINT - 1].isalnum():
-        #     self.POINT -= 1
+        i = self._prev_word_point(self.POINT)
+        self.set_point(i)
 
 
     def move_point_word_right(self):    # @todo handle all whitespace and runs of it
-        i = self.TEXT_BUFFER.find(' ', self.POINT) + 1
-        if i == -1 or i == len(self.TEXT_BUFFER):
-            self.set_point(len(self.TEXT_BUFFER))
-        else:
-            self.set_point(i)
+        i = self._next_word_point(self.POINT)
+        self.set_point(i)
 
 
     def move_point_right(self):
@@ -235,3 +214,60 @@ class TextEditBuffer(object):
             return True   
 
         return False
+
+
+    # Find POINT for the start of the next word (to the right) of the given point.
+    def _next_word_point(self, point):
+        # Check characters from point forward
+        while point < len(self.TEXT_BUFFER):
+            # If we encounter a non-whitespace character immediately, continue scanning
+            if not self.TEXT_BUFFER[point].isspace():
+                point += 1
+            else:
+                # When we encounter our first whitespace, start scanning for the next non-whitespace character
+                while point < len(self.TEXT_BUFFER) and self.TEXT_BUFFER[point].isspace():
+                    point += 1
+                
+                # If a non-whitespace character is found after a whitespace character,
+                # return its position
+                if point < len(self.TEXT_BUFFER):
+                    return point
+
+        # Return the end of the buffer if no non-whitespace character is found
+        return len(self.TEXT_BUFFER)
+
+
+    # Find POINT for the start of the previous word (to the left) of the given point. If the
+    # given point is inside of a word, return the start of that word.
+    def _prev_word_point(self, point):
+        if point == len(self.TEXT_BUFFER):
+            point -= 1
+        elif point == 0:
+            return 0
+        
+        started_on_space = self.TEXT_BUFFER[point].isspace()
+        past_end_of_word = not started_on_space and not self.TEXT_BUFFER[point - 1].isspace()
+
+        # Check characters from point backward
+        point -= 1
+        while point > 0:
+            # If we aren't in a word, or haven't hit the rightmost boundary of a word,
+            # then continue scanning until we hit a non-blank character
+            if not past_end_of_word:
+                if not self.TEXT_BUFFER[point].isspace():
+                    past_end_of_word = True
+                else:
+                    point -= 1
+            else:
+                # Now we are in a word, so stop at the first (left-most) blank character
+                # we find.
+                if self.TEXT_BUFFER[point].isspace():
+                    if point < len(self.TEXT_BUFFER) - 1:
+                        return point + 1
+                    else:
+                        return point
+                else:
+                    point -= 1
+                
+        # Return the start of the buffer if no non-whitespace character is found
+        return 0

@@ -71,22 +71,27 @@ class TextArea(GUIControl):
                 self.text_buffer.set_mark(mark_position=0)
                 self.text_buffer.move_point_to_end()
                 return True
+            
             if keySymbol == sdl2.SDLK_RETURN:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
                 return True
+            
             elif keySymbol == sdl2.SDLK_LEFT:  # left arrow key
-                if event.key.keysym.mod & sdl2.KMOD_SHIFT:
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # Is Shift held? Start selection if None
                     if self.text_buffer.get_selection() is None:
                         self.text_buffer.set_mark()
-                elif event.key.keysym.mod & sdl2.KMOD_ALT:  # Option/Alt
+                else:
+                    self.text_buffer.clear_mark()
+
+                if event.key.keysym.mod & sdl2.KMOD_ALT:  # Option/Alt
                     # move to start of word
                     self.text_buffer.move_point_word_left()
                 else:
-                    self.text_buffer.clear_mark()
-                self.text_buffer.move_point_left()
+                    self.text_buffer.move_point_left()
                 return True
+            
             elif keySymbol == sdl2.SDLK_RIGHT:  # right arrow key
                 if event.key.keysym.mod & sdl2.KMOD_SHIFT:
                     if self.text_buffer.get_selection() is None:
@@ -100,6 +105,7 @@ class TextArea(GUIControl):
                 else:
                     self.text_buffer.move_point_right()
                 return True
+            
             elif keySymbol == sdl2.SDLK_UP:  # up arrow key
                 if cmdPressed:
                     # move to start of buffer
@@ -112,6 +118,7 @@ class TextArea(GUIControl):
                         self.text_buffer.clear_mark()
                     self.text_buffer.move_point_up()
                 return True
+            
             elif keySymbol == sdl2.SDLK_DOWN:  # down arrow key
                 if cmdPressed:
                     # move to end of buffer
@@ -126,12 +133,15 @@ class TextArea(GUIControl):
                         # @todo encapsulate in a controller
                         self.scroll_cursor_into_view()
                 return True
+                
+            
             elif keySymbol == sdl2.SDLK_BACKSPACE:  # delete key
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 else:
                     self.text_buffer.delete_char()
                 return True
+            
             elif keySymbol == sdl2.SDLK_TAB:  # tab key
                 # TAB focuses next control
                 # Shift+TAB focuses previous control
@@ -141,6 +151,7 @@ class TextArea(GUIControl):
                         self.text_buffer.delete_selection()
                     self.text_buffer.insert('\t')  # @todo how to access self.text_buffer through current control?
                     return True
+                
             elif (keySymbol == sdl2.SDLK_SPACE and
                 (event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL))):
                 self.text_buffer.set_mark()
