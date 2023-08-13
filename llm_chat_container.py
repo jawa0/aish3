@@ -162,8 +162,17 @@ class LLMChatContainer(GUIContainer):
                     return True  # event was handled
                 
                 # Cmd+Backspace/Delete deletes the currently focused message
+                # If the whole LLMChatContainer is focused, then delete this chat.
                 elif keySymbol == sdl2.SDLK_BACKSPACE:
                     focused_control = self.gui.get_focus()
+                    if focused_control is self:
+                        if self.parent:
+                            if self.parent.focusRing:
+                                self.parent.focusRing.focus_next()
+                                self.parent.focusRing.remove(self)
+                            self.parent.remove_child(self)
+                        return True
+
                     ancestors = self.gui.get_ancestor_chain(focused_control)
                     if self in ancestors and isinstance(focused_control, TextArea) and len(self.utterances) > 1:
                         chat_message = focused_control.parent
