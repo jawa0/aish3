@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-08-09T16:47:12.830907+00:00",
-  "saved_at_local": "2023-08-09T12:47:12.830907-04:00",
+  "saved_at_utc": "2023-08-13T18:32:15.251739+00:00",
+  "saved_at_local": "2023-08-13T14:32:15.251739-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -8,8 +8,8 @@
       "bounding_rect": [
         0,
         0,
-        1465,
-        411
+        735,
+        529
       ],
       "layout": null,
       "children": [
@@ -17,9 +17,9 @@
           "class": "LLMChatContainer",
           "bounding_rect": [
             10,
-            10,
+            200,
             354,
-            400
+            328
           ],
           "layout": "ColumnLayout",
           "children": [
@@ -39,7 +39,7 @@
                 1,
                 21,
                 352,
-                47
+                82
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -59,9 +59,9 @@
                     1,
                     21,
                     350,
-                    25
+                    60
                   ],
-                  "text": "You are an AI research assistant. Your goal is to\nhelp me to do detailed and comprehensive research \non topics that I will describe to you. You are \nan expert at learning new subjects quickly, and \nat problem solving."
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing,  and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. "
                 }
               ]
             },
@@ -69,9 +69,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                68,
+                103,
                 352,
-                47
+                82
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -91,9 +91,9 @@
                     1,
                     21,
                     350,
-                    25
+                    60
                   ],
-                  "text": "What are atoms made of?"
+                  "text": "I want to start tracking mouse clicks and drags in\nthe program I'm writing. What are all the\nSDL2/pySDL functions to do with mouse clikcs and \nmouse movement?"
                 }
               ]
             },
@@ -101,7 +101,7 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                115,
+                185,
                 352,
                 142
               ],
@@ -125,39 +125,7 @@
                     350,
                     120
                   ],
-                  "text": "Atoms, which are the smallest units of matter, \nare composed of three main types of subatomic \nparticles: protons, neutrons, and electrons. \n\n1. Protons: These particles have a positive electric charge. They are found within the atomic nucleus. The number of protons in the nucleus defines the chemical element the atom belongs to - this number is called the atomic number.\n\n2. Neutrons: These particles have no electric charge, and also reside in the atomic nucleus along with protons. The number of neutrons in an atom can vary, even within atoms of the same element. These different varieties are known as isotopes. \n\n3. Electrons: These particles have a negative electric charge and they move around the nucleus in a cloud-like region. The charge of the electron is equal in magnitude and opposite in sign to that of a proton. Electrons are involved in chemical reactions and form atomic bonds.\n\nIn addition to these three primary particles, modern physics talks about even smaller particles or 'elementary particles' that include quarks and leptons. The protons and neutrons themselves are made up of these quarks which come in six different 'flavors': up, down, top, bottom, strange, and charm. Electrons are a type of lepton, which are fundamental particles not made up of smaller particles, like quarks.\n\nThe study of atoms and their constituent particles is a rich and active area of research in modern physics. Just to note, there is a lot more to learn which can get quite complex as the quantum physics picture of these particles and their behavior is very different from our everyday intuition."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                257,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "User"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
-                    120
-                  ],
-                  "text": "Cool!"
+                  "text": "Here are the key SDL2, or PySDL2, functions \nrelated to mouse interactions:\n\n1. **SDL_GetMouseState**: This function returns \nthe current state of the mouse. It provides the \ncurrent X and Y coordinates of the mouse, as well \nas the state of all the mouse buttons.\n\n2. **SDL_GetRelativeMouseState**: This function \ngives you the current state of the mouse in terms \nof relative motion in X and Y directions, and \nalso the button state.\n\n3. **SDL_WarpMouseInWindow**: This function \nallows you to set the position of the mouse \ncursor relative to a specific window.\n\n4. **SDL_SetRelativeMouseMode**: This function \nsets the relative mouse mode which allows mouse \nmovement to be tracked even when the mouse leaves \nthe screen or is hidden.\n\n5. **SDL_GetMouseFocus**: This function returns \nthe window which currently has mouse focus.\n\nRegarding mouse events, you should handle in the \nmain event loop:\n\n- **SDL_MOUSEMOTION**: This event is posted when \nthe mouse moves.\n\n- **SDL_MOUSEBUTTONDOWN** and \n**SDL_MOUSEBUTTONUP**: These events are posted \nwhen a mouse button is pressed and released, \nrespectively.\n\n- **SDL_MOUSEWHEEL**: This event is posted when \nthe mouse wheel is scrolled. \n\nUsing above functions and handling those events \nallow you to implement mouse clicks and drags \ntracking in your SDL2 or PySDL2 software."
                 }
               ]
             }
@@ -167,9 +135,9 @@
           "class": "LLMChatContainer",
           "bounding_rect": [
             380,
-            10,
+            200,
             354,
-            258
+            328
           ],
           "layout": "ColumnLayout",
           "children": [
@@ -189,7 +157,7 @@
                 1,
                 21,
                 352,
-                47
+                82
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -209,9 +177,9 @@
                     1,
                     21,
                     350,
-                    25
+                    60
                   ],
-                  "text": "aaaa"
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing,  and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. "
                 }
               ]
             },
@@ -219,9 +187,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                68,
+                103,
                 352,
-                47
+                82
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -241,9 +209,9 @@
                     1,
                     21,
                     350,
-                    25
+                    60
                   ],
-                  "text": "bbbb"
+                  "text": "Here is a definition for a function that finds the\nfirst non-whitespace character's index within a\ntext buffer, given an index to scan from.\n\n```python\n    def _next_word_point(self, point):\n        # Check characters from point forward\n        while point < len(self.TEXT_BUFFER):\n            # If we encounter a non-whitespace character immediately, continue scanning\n            if not self.TEXT_BUFFER[point].isspace():\n                point += 1\n            else:\n                # When we encounter our first whitespace, start scanning for the next non-whitespace character\n                while point < len(self.TEXT_BUFFER) and self.TEXT_BUFFER[point].isspace():\n                    point += 1\n                \n                # If a non-whitespace character is found after a whitespace character,\n                # return its position\n                if point < len(self.TEXT_BUFFER):\n                    return point\n\n        # Return the end of the buffer if no non-whitespace character is found\n        return len(self.TEXT_BUFFER)\n```\n\nI want you to write an equivalent function, but\nscanning in the other direction (from high to low)\nindices."
                 }
               ]
             },
@@ -251,7 +219,7 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                115,
+                185,
                 352,
                 142
               ],
@@ -275,183 +243,31 @@
                     350,
                     120
                   ],
-                  "text": "cccc"
+                  "text": "Sure, we have to make slight adjustments to suit the reverse scanning requirement. Here is how the modified function looks:\n\n```python\n    def _prev_word_point(self, point):\n        # Check characters from point backward\n        while point > 0:\n            # If we encounter a non-whitespace character immediately, continue scanning\n            if not self.TEXT_BUFFER[point].isspace():\n                point -= 1\n            else:\n                # When we encounter our first whitespace, start scanning for the next non-whitespace character\n                while point > 0 and self.TEXT_BUFFER[point].isspace():\n                    point -= 1\n                \n                # If a non-whitespace character is found after a whitespace character,\n                # return its position\n                if point >= 0:\n                    return point\n                    \n        # Return the start of the buffer if no non-whitespace character is found\n        return 0\n```\n\nThis function similarly scans for the previous non-whitespace character in the text buffer. Note that I've reversed the direction of the scan using `point > 0` and `point -= 1`. Also, the function returns 0 which represents the start of the buffer if no non-whitespace characters are found."
                 }
               ]
             }
           ]
         },
         {
-          "class": "LLMChatContainer",
+          "class": "Label",
           "bounding_rect": [
-            745,
             10,
-            354,
-            306
+            10,
+            120,
+            20
           ],
-          "layout": "ColumnLayout",
-          "children": [
-            {
-              "class": "Label",
-              "bounding_rect": [
-                1,
-                1,
-                350,
-                20
-              ],
-              "text": "GPT-4 Chat"
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                21,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "System"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                163,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "User"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            }
-          ]
+          "text": "This is a Label"
         },
         {
-          "class": "LLMChatContainer",
+          "class": "TextArea",
           "bounding_rect": [
-            1110,
             10,
-            354,
-            306
+            50,
+            300,
+            100
           ],
-          "layout": "ColumnLayout",
-          "children": [
-            {
-              "class": "Label",
-              "bounding_rect": [
-                1,
-                1,
-                350,
-                20
-              ],
-              "text": "GPT-4 Chat"
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                21,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "System"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                163,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "User"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            }
-          ]
+          "text": "This is a TextArea."
         }
       ]
     }
