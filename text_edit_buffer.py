@@ -20,11 +20,11 @@ class TextEditBuffer(object):
     def __init__(self, text="", tab_spaces=4, **kwargs):
         self.TEXT_BUFFER = text
         self.TAB_SPACES = tab_spaces
+        self.POINT = len(text)
 
         # @note: POINT has no knowledge of expanded tabs. It's an index into the
         # un-expanded TEXT_BUFFER. It's between 0 and len(TEXT_BUFFER). @note that
         # this means it can point one char past the end of the buffer.
-        self.POINT = len(text)
         self.MARK = None
         self.desired_col = 0
 
@@ -122,7 +122,19 @@ class TextEditBuffer(object):
 
 
     def set_point(self, point):
+        # Need to check if we changed rows. If not then update desired_col.
+        # If so, don't update it. This is because we use desired_col to
+        # keep track of which column we should be on when moving up and down,
+        # across lines with different lengths.
+
+        before_row, _ = self.get_row_col(self.POINT)
         self.POINT = min(max(0, point), len(self.TEXT_BUFFER))
+        after_row, after_col = self.get_row_col(self.POINT)
+
+        if after_row == before_row:
+            self.desired_col = after_col
+
+        print(f'POINT = {self.POINT} row = {after_row}  col = {after_col}  desired_col = {self.desired_col}')            
 
 
     def set_mark(self, mark_position=None):
@@ -156,7 +168,6 @@ class TextEditBuffer(object):
             self.POINT -= 1
             row, col = self.get_row_col(self.POINT)
             self.desired_col = col
-            print(f'POINT = {self.POINT} row = {row}  col = {col}  desired_col = {self.desired_col}')
 
 
     def move_point_word_left(self):
@@ -169,12 +180,22 @@ class TextEditBuffer(object):
         self.set_point(i)
 
 
+    def move_point_start_of_line(self):
+        row, col = self.get_row_col(self.POINT)
+        self.set_point(self.POINT - col)
+
+
+    def move_point_end_of_line(self):
+        row, col = self.get_row_col(self.POINT)
+        line = self.get_line(row)
+        self.set_point(self.POINT + len(line) - col)
+
+
     def move_point_right(self):
         if self.POINT < len(self.TEXT_BUFFER):
             self.POINT += 1
             row, col = self.get_row_col(self.POINT)
             self.desired_col = col
-            print(f'POINT = {self.POINT} row = {row}  col = {col}  desired_col = {self.desired_col}')
 
 
     def move_point_up(self):
@@ -188,7 +209,6 @@ class TextEditBuffer(object):
 
             new_point = self.POINT - col - 1 - len(to_line) + to_col  # The -1 is for the newline char
             self.set_point(new_point)
-            print(f'POINT = {self.POINT} row = {row}  col = {col}')
 
     
     def move_point_to_start(self):
