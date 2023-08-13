@@ -105,69 +105,73 @@ class GUI:
 
         if not handled:    
             if event.type == sdl2.SDL_KEYDOWN:
-                # Cmd+S saves GUI
-                if event.key.keysym.sym == sdl2.SDLK_s and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-                    self.save()
-                    return True  # event was handled
-                # Cmd+L loads GUI
-                if event.key.keysym.sym == sdl2.SDLK_l and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-                    self.load()
-                    return True  # event was handled
-                # Cmd+N add new LLM chat
-                if event.key.keysym.sym == sdl2.SDLK_n and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-                    self.content().sizeToChildren()
-                    chat = self.create_control("LLMChatContainer", y=10, x=10+self.content().bounding_rect.w)
-                    self.content().add_child(chat)
-                    # self.set_focus(chat)
-                    return True  # event was handled
-
-                # Cmd+R remove LLM chain
-                if event.key.keysym.sym == sdl2.SDLK_r and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-                    assert(self.chats is not None)
-                    control = self.get_focus()
-                    print(control)
-                    print(self.get_ancestor_chain(control))
-
-                    return True  # event was handled
-
-            elif event.key.keysym.sym == sdl2.SDLK_RETURN:
-                # Focus down into FocusRing of currently focused control...
-                focused = self._focused_control
-                if focused:
-                    if hasattr(focused, "focusRing"):
-                        self.push_focus_ring(focused.focusRing)
-                        focused.focusRing.focus_first()
-                        return True
-
-            elif event.key.keysym.sym == sdl2.SDLK_ESCAPE:
-                # Focus up into previous FocusRing on stack
-                self.pop_focus_ring()
-
-                oldFocusRing = self.get_focus_ring()
-                assert(oldFocusRing is not None)
-                oldFocusRing.focus(oldFocusRing.get_focus())
-                return True
-
-            elif event.key.keysym.sym == sdl2.SDLK_TAB:
-                # TAB focuses next control in focus ring
-                # Shift+TAB focuses previous control
-
-                focusRing = self.get_focus_ring()
-                assert(focusRing is not None)
-
-                if event.key.keysym.mod & sdl2.KMOD_LCTRL:
-                    # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
-                    pass
-                else:
-                    if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # if shift was also held
-                        if focusRing.focus_previous():
-                            return True  # event was handled
-                    else:
-                        if focusRing.focus_next():
-                            return True  # event was handled
+                return self.handle_keydown(event)            
                 
         return handled
     
+
+    def handle_keydown(self, event):
+        # Cmd+S saves GUI
+        if event.key.keysym.sym == sdl2.SDLK_s and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
+            self.save()
+            return True  # event was handled
+        # Cmd+L loads GUI
+        if event.key.keysym.sym == sdl2.SDLK_l and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
+            self.load()
+            return True  # event was handled
+        # Cmd+N add new LLM chat
+        if event.key.keysym.sym == sdl2.SDLK_n and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
+            self.content().sizeToChildren()
+            chat = self.create_control("LLMChatContainer", y=10, x=10+self.content().bounding_rect.w)
+            self.content().add_child(chat)
+            # self.set_focus(chat)
+            return True  # event was handled
+
+        # Cmd+R remove LLM chain
+        if event.key.keysym.sym == sdl2.SDLK_r and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
+            assert(self.chats is not None)
+            control = self.get_focus()
+            print(control)
+            print(self.get_ancestor_chain(control))
+
+            return True  # event was handled
+
+        elif event.key.keysym.sym == sdl2.SDLK_RETURN:
+            # Focus down into FocusRing of currently focused control...
+            focused = self._focused_control
+            if focused:
+                if hasattr(focused, "focusRing"):
+                    self.push_focus_ring(focused.focusRing)
+                    focused.focusRing.focus_first()
+                    return True
+
+        elif event.key.keysym.sym == sdl2.SDLK_ESCAPE:
+            # Focus up into previous FocusRing on stack
+            self.pop_focus_ring()
+
+            oldFocusRing = self.get_focus_ring()
+            assert(oldFocusRing is not None)
+            oldFocusRing.focus(oldFocusRing.get_focus())
+            return True
+
+        elif event.key.keysym.sym == sdl2.SDLK_TAB:
+            # TAB focuses next control in focus ring
+            # Shift+TAB focuses previous control
+
+            focusRing = self.get_focus_ring()
+            assert(focusRing is not None)
+
+            if event.key.keysym.mod & sdl2.KMOD_LCTRL:
+                # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
+                pass
+            else:
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # if shift was also held
+                    if focusRing.focus_previous():
+                        return True  # event was handled
+                else:
+                    if focusRing.focus_next():
+                        return True  # event was handled
+
 
     def draw(self):
         if self._content:
