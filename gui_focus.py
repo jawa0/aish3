@@ -34,7 +34,7 @@ class FocusRing():
     # Add a control to the FocusRing
     def add(self, control, set_focus=False):
         if control in self._controls:
-            raise Exception("Control already in focus loop")
+            raise Exception("Control already in focus ring")
         
         self._controls.append(control)
         control.containing_focus_ring = weakref.ref(self)
@@ -42,9 +42,20 @@ class FocusRing():
             self.focus(control)
 
 
+    # Remove a control from the FocusRing
+    def remove(self, control):
+        if control not in self._controls:
+            raise Exception("Control not in focus ring")
+        
+        self._controls.remove(control)
+        control.containing_focus_ring = None
+        if self._focused_control == control:
+            self._focused_control = None
+
+
     def focus(self, control):
         if control not in self._controls:
-            raise Exception("Control not in focus loop")
+            raise Exception("Control not in focus ring")
         
         success = self.gui.set_focus(control, True)
         if success:

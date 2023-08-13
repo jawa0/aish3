@@ -144,8 +144,8 @@ class TextArea(GUIControl):
                         self.scroll_cursor_into_view()
                 return True
                 
-            
-            elif keySymbol == sdl2.SDLK_BACKSPACE:  # delete key
+            # delete key -- delete char, but send Cmd+Delete to parent
+            elif keySymbol == sdl2.SDLK_BACKSPACE and not cmdPressed:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 else:

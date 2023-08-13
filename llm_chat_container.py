@@ -143,19 +143,41 @@ class LLMChatContainer(GUIContainer):
 
     def handle_event(self, event):
         if event.type == sdl2.SDL_KEYDOWN:
-            # Cmd+G sends messages to GPT
-            if event.key.keysym.sym == sdl2.SDLK_g and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-                self.send()
-                return True
-            if event.key.keysym.sym == sdl2.SDLK_u and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)): 
+            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            keySymbol = event.key.keysym.sym
+
+            if cmdPressed:
+                # Cmd+G sends messages to GPT
+                if keySymbol == sdl2.SDLK_g:
+                    self.send()
+                    return True
+                
                 # Cmd+U creates a new user message
-                user = self.ChatMessageUI(role="User", renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
-                self.add_child(user, add_to_focus_ring=False)
-                self.utterances.append(user)
-                self.focusRing.add(user.text_area)
-                self.focusRing.focus(user.text_area)
-                return True  # event was handled
-            if event.key.keysym.sym == sdl2.SDLK_RETURN:
+                elif keySymbol == sdl2.SDLK_u: 
+                    user = self.ChatMessageUI(role="User", renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
+                    self.add_child(user, add_to_focus_ring=False)
+                    self.utterances.append(user)
+                    self.focusRing.add(user.text_area)
+                    self.focusRing.focus(user.text_area)
+                    return True  # event was handled
+                
+                # Cmd+Backspace/Delete deletes the currently focused message
+                elif keySymbol == sdl2.SDLK_BACKSPACE:
+                    focused_control = self.gui.get_focus()
+                    ancestors = self.gui.get_ancestor_chain(focused_control)
+                    if self in ancestors and isinstance(focused_control, TextArea) and len(self.utterances) > 1:
+                        chat_message = focused_control.parent
+                        assert(chat_message is not None and isinstance(chat_message, self.ChatMessageUI))
+
+                        # @todo wrap in a remove message method
+                        self.focusRing.focus_next()
+                        self.focusRing.remove(chat_message.text_area)
+                        self.utterances.remove(chat_message)
+                        self.remove_child(chat_message)
+                        return True
+
+            
+            if keySymbol == sdl2.SDLK_RETURN:
                 # Delegate to GUIContainer
                 handled = super().handle_event(event)
                 if handled:
