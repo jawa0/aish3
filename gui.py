@@ -71,6 +71,8 @@ class GUI:
         # May be self.content or any depth of descendant of self.content
         self._focused_control = None
 
+        self._strokes = {}
+
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -105,7 +107,33 @@ class GUI:
 
         if not handled:    
             if event.type == sdl2.SDL_KEYDOWN:
-                return self.handle_keydown(event)            
+                return self.handle_keydown(event)
+            
+            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+                # Do we have a stroke for this button?
+                if event.button.button not in self._strokes:
+                    # We do not.  Add this event to the stroke.
+                    stroke = [(event.button.x, event.button.y)]                    
+                    self._strokes[event.button.button] = stroke
+                    print(f"STROKE (button {event.button.button}) start at {stroke[0]}")
+                    return True
+
+            elif event.type == sdl2.SDL_MOUSEBUTTONUP:
+                # Do we have a stroke for this button?
+                if event.button.button in self._strokes:
+                    # We do.  Remove this stroke.
+                    del self._strokes[event.button.button]
+                    print(f"STROKE (button {event.button.button}) end")
+                    return True
+
+            elif event.type == sdl2.SDL_MOUSEMOTION:
+                # Do we have a stroke for this button?
+                # @bug @todo only seems to work for L button
+                # Maybe macOS two finger swipe is showing up as a trackpad gesture that gets handled first?
+                if event.button.button in self._strokes:
+                    print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
+                    self._strokes[event.button.button].append((event.motion.x, event.motion.y))
+                    return True
                 
         return handled
     
@@ -176,6 +204,18 @@ class GUI:
     def draw(self):
         if self._content:
             self._content.draw()
+
+        # @debug Draw strokes
+        for stroke in self._strokes:
+            points = self._strokes[stroke]
+            
+            # Convert the list of points to a ctypes array of SDL_Point structures
+            point_array = (sdl2.SDL_Point * len(points))(*points)
+
+            if len(points) > 1:
+                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
+                sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
+                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
 
 
     def push_focus_ring(self, focusRing):
