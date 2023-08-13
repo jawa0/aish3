@@ -35,12 +35,13 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
 |Esc|Move focus up to parent contaioer|
 |Ctrl+TAB|Insert TAB char into currently focused TextArea|
 |Arrow L/R/U/D|Move within TextArea|
-|Shift+Arrow L/R/U/D|Extend selection within TextArea|
+|Option/Alt+Arrow L/R|Move to start of previous / next word|
 |Mouse Wheel Up/Down|Scroll focused TextArea|
-|Delete|Remove previous char in TextArea|
-|Other keys|Insert text char into focused TextArea|
 |Cmd+Up|Move to beginning of focused TextArea|
 |Cmd+Down|Move to end of focused TextArea|
+|Shift+Movement Command|Extend selection within TextArea|
+|Delete|Remove previous char in TextArea|
+|Other keys|Insert text char into focused TextArea|
 
 NOTES:
 
