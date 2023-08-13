@@ -173,17 +173,19 @@ class LLMChatContainer(GUIContainer):
                             self.parent.remove_child(self)
                         return True
 
-                    ancestors = self.gui.get_ancestor_chain(focused_control)
-                    if self in ancestors and isinstance(focused_control, TextArea) and len(self.utterances) > 1:
-                        chat_message = focused_control.parent
-                        assert(chat_message is not None and isinstance(chat_message, self.ChatMessageUI))
+                    chat_message = focused_control.parent
+                    if chat_message is not None and isinstance(chat_message, self.ChatMessageUI):
+                        ancestors = self.gui.get_ancestor_chain(chat_message)
+                        assert(self in ancestors)
 
-                        # @todo wrap in a remove message method
-                        self.focusRing.focus_next()
-                        self.focusRing.remove(chat_message.text_area)
-                        self.utterances.remove(chat_message)
-                        self.remove_child(chat_message)
-                        return True
+                        # Can't delete first, System message
+                        if len(self.utterances) > 1 and chat_message != self.utterances[0]:
+                            # @todo wrap in a remove message method
+                            self.focusRing.focus_previous()
+                            self.focusRing.remove(chat_message.text_area)
+                            self.utterances.remove(chat_message)
+                            self.remove_child(chat_message)
+                            return True
 
             
             if keySymbol == sdl2.SDLK_RETURN:
