@@ -40,6 +40,7 @@ class TextArea(GUIControl):
         self.is_editable = True
         self.row_spacing = row_spacing
         self.y_scroll = 0
+        self.combined_text_texture = None
 
 
     def __json__(self):
@@ -70,12 +71,14 @@ class TextArea(GUIControl):
             if keySymbol == sdl2.SDLK_a and (cmdPressed):
                 self.text_buffer.set_mark(mark_position=0)
                 self.text_buffer.move_point_to_end()
+                self.set_needs_redraw()
                 return True
             
             if keySymbol == sdl2.SDLK_RETURN:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
+                self.set_needs_redraw()
                 return True
             
             # left arrow key
@@ -96,6 +99,8 @@ class TextArea(GUIControl):
                     self.text_buffer.move_point_start_of_line()
                 else:
                     self.text_buffer.move_point_left()
+
+                self.set_needs_redraw()    
                 return True
             
             # right arrow key
@@ -114,6 +119,8 @@ class TextArea(GUIControl):
                     self.text_buffer.move_point_end_of_line()
                 else:
                     self.text_buffer.move_point_right()
+
+                self.set_needs_redraw()    
                 return True
             
             elif keySymbol == sdl2.SDLK_UP:  # up arrow key
@@ -127,6 +134,8 @@ class TextArea(GUIControl):
                     else:
                         self.text_buffer.clear_mark()
                     self.text_buffer.move_point_up()
+
+                self.set_needs_redraw()    
                 return True
             
             elif keySymbol == sdl2.SDLK_DOWN:  # down arrow key
@@ -142,6 +151,8 @@ class TextArea(GUIControl):
                     if self.text_buffer.move_point_down():  
                         # @todo encapsulate in a controller
                         self.scroll_cursor_into_view()
+
+                self.set_needs_redraw()        
                 return True
                 
             # delete key -- delete char, but send Cmd+Delete to parent
@@ -150,6 +161,8 @@ class TextArea(GUIControl):
                     self.text_buffer.delete_selection()
                 else:
                     self.text_buffer.delete_char()
+
+                self.set_needs_redraw()    
                 return True
             
             elif keySymbol == sdl2.SDLK_TAB:  # tab key
@@ -160,11 +173,15 @@ class TextArea(GUIControl):
                     if self.text_buffer.get_selection() is not None:
                         self.text_buffer.delete_selection()
                     self.text_buffer.insert('\t')  # @todo how to access self.text_buffer through current control?
+
+                    self.set_needs_redraw()
                     return True
                 
             elif (keySymbol == sdl2.SDLK_SPACE and
                 (event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL))):
                 self.text_buffer.set_mark()
+
+                self.set_needs_redraw()
                 return True
 
             # Check for Cmd+V (paste) on macOS
@@ -180,6 +197,8 @@ class TextArea(GUIControl):
                     self.text_buffer.insert(text)
                     # Free the clipboard text
                     # sdl2.SDL_free(clipboard_text)
+
+                    self.set_needs_redraw()
                     return True
 
             # Copy & Cut
@@ -203,6 +222,7 @@ class TextArea(GUIControl):
 
                 # Set the clipboard text
                 sdl2.SDL_SetClipboardText(text.encode('utf-8'))
+                self.set_needs_redraw()
                 return True
                     
         elif event.type == sdl2.SDL_TEXTINPUT:
@@ -211,10 +231,17 @@ class TextArea(GUIControl):
             if self.text_buffer.get_selection() is not None:
                 self.text_buffer.delete_selection()
             self.text_buffer.insert(text)
+            self.set_needs_redraw()
             return True
     
         return self.parent_handle_event(event)
     
+
+    def set_needs_redraw(self):
+        if self.combined_text_texture is not None:
+            sdl2.SDL_DestroyTexture(self.combined_text_texture)
+            self.combined_text_texture = None
+
 
     def draw(self):
         lines = self.text_buffer.get_lines()
@@ -229,51 +256,49 @@ class TextArea(GUIControl):
             sel_rc0 = self.text_buffer.get_row_col(i_start)
             sel_rc1 = self.text_buffer.get_row_col(i_end)
 
-        # Draw the text
-        surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
+        if self.combined_text_texture is None:
+            surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
 
-        for i, line in enumerate(lines):
-            if len(line.strip()) != 0:
-                if selected is not None:
-                    # Figure out where the selection starts and ends, line by line since
-                    # we can have multiline selections, and we are drawing the text a line
-                    # at a time.
+            # Draw the text
+            for i, line in enumerate(lines):
+                if len(line.strip()) != 0:
+                    if selected is not None:
+                        # Figure out where the selection starts and ends, line by line since
+                        # we can have multiline selections, and we are drawing the text a line
+                        # at a time.
 
-                    c_start = None
-                    if i < sel_rc0[0]:          # current line is before (not in) selection
-                        pass
-                    elif i == sel_rc0[0]:       # current line is first line of selection
-                        c_start = sel_rc0[1]
-                    elif i <= sel_rc1[0]:       # current line is internal to selection or last
-                        c_start = 0
+                        c_start = None
+                        if i < sel_rc0[0]:          # current line is before (not in) selection
+                            pass
+                        elif i == sel_rc0[0]:       # current line is first line of selection
+                            c_start = sel_rc0[1]
+                        elif i <= sel_rc1[0]:       # current line is internal to selection or last
+                            c_start = 0
 
 
-                    c_end = None
-                    if i > sel_rc1[0]:
-                        pass
-                    elif i < sel_rc1[0]:
-                        c_end = len(line)
-                    elif i == sel_rc1[0]:
-                        c_end = sel_rc1[1]
+                        c_end = None
+                        if i > sel_rc1[0]:
+                            pass
+                        elif i < sel_rc1[0]:
+                            c_end = len(line)
+                        elif i == sel_rc1[0]:
+                            c_end = sel_rc1[1]
 
-                    draw_text(self.renderer, self.font_manager, 
-                              line, 
-                              wr.x, y, bounding_rect=wr,
-                              dst_surface=surf, 
-                              selection_start=c_start, selection_end=c_end)
-                else:
-                    draw_text(self.renderer, self.font_manager, line, wr.x, y, bounding_rect=wr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_manager, 
+                                line, 
+                                wr.x, y, bounding_rect=wr,
+                                dst_surface=surf, 
+                                selection_start=c_start, selection_end=c_end)
+                    else:
+                        draw_text(self.renderer, self.font_manager, line, wr.x, y, bounding_rect=wr, dst_surface=surf)
 
-            y += self.row_spacing
+                y += self.row_spacing
 
-        combined_text_surface = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
-        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, combined_text_surface, None, wr)
+            self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
+            sdl2.SDL_FreeSurface(surf)
 
-        # Free the texture
-        sdl2.SDL_DestroyTexture(combined_text_surface)
-
-        # Delete surf
-        sdl2.SDL_FreeSurface(surf)
+        assert(self.combined_text_texture is not None)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, wr)
 
         # Draw the bounding rectangle after all text has been drawn
         # Save the current color
@@ -301,6 +326,7 @@ class TextArea(GUIControl):
 
     def scroll_by(self, dy):
         self.y_scroll = max(0, self.y_scroll + dy)  # adjust y_scroll by dy
+        self.set_needs_redraw()
 
 
     def is_cursor_on_last_line(self, text_buffer):
