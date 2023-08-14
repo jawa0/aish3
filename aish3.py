@@ -118,7 +118,9 @@ def run(fullscreen, width, height):
             elapsed = t1 - t0
             fps = 1.0 / elapsed
             fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
-            draw_text(renderer, font_manager, f"FPS: {fps_smoothed:.2f}", width - 100, 10)
+            fps_str = f"FPS: {fps_smoothed:.2f}"
+            draw_text(renderer, font_manager, fps_str, width - 100, 10)
+            print(fps_str)
 
             renderer.present()
 
