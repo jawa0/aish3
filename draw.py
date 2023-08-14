@@ -62,7 +62,8 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         # then copy the texture to the renderer. The surface and texture can then be freed.
 
         text_surface = font_manager.render(char)
-        # text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
+        if dst_surface is None:
+            text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
 
         text_rect = sdl2.SDL_Rect(x, y, text_surface.w, text_surface.h)
 
@@ -111,8 +112,10 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
             # Finally, draw the text char by copying the texture with the char to our
             # destination surface.
 
-            # sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
-            sdl2.SDL_BlitSurface(text_surface, src_rect, dst_surface, dst_rect2)
+            if dst_surface is None:
+                sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
+            else:
+                sdl2.SDL_BlitSurface(text_surface, src_rect, dst_surface, dst_rect2)
 
         if char == '\n':
             x = 0

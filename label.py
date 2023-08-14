@@ -26,24 +26,50 @@ class Label(GUIControl):
 
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
-        instance.text = json["text"]
+        instance._text = json["text"]
         return instance
 
     def __init__(self, text="", **kwargs):
         super().__init__(can_focus=False, **kwargs)
-        self.text = text
+        self._text = text
+        self.combined_text_texture = None
 
 
     def __json__(self):
         json = super().__json__()
         json["class"] = self.__class__.__name__
-        json["text"] = self.text
+        json["text"] = self._text
         return json
+
+
+    def get_text(self):
+        return self._text
+    
+
+    def set_text(self, text):
+        self._text = text
+        self.set_needs_redraw()
+
+
+    def set_needs_redraw(self):
+        if self.combined_text_texture is not None:
+            sdl2.SDL_DestroyTexture(self.combined_text_texture)
+            self.combined_text_texture = None
 
 
     def draw(self):
         r = self.get_world_rect()
-        draw_text(self.renderer, self.font_manager, self.text, r.x, r.y, r)
+
+        if self.combined_text_texture is None:
+            surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
+
+            draw_text(self.renderer, self.font_manager, self._text, r.x, r.y, bounding_rect=r, dst_surface=surf)
+
+            self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
+            sdl2.SDL_FreeSurface(surf)
+
+        assert(self.combined_text_texture is not None)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, r)
 
 
 GUI.register_control_type("Label", Label)
