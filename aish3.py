@@ -120,7 +120,7 @@ def run(fullscreen, width, height):
             fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
             fps_str = f"FPS: {fps_smoothed:.2f}"
             draw_text(renderer, font_manager, fps_str, width - 100, 10)
-            print(fps_str)
+            # print(fps_str)
 
             renderer.present()
 

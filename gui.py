@@ -72,6 +72,7 @@ class GUI:
         self._focused_control = None
 
         self._strokes = {}
+        self._content_pan = (0, 0)
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -132,7 +133,15 @@ class GUI:
                 # Maybe macOS two finger swipe is showing up as a trackpad gesture that gets handled first?
                 if event.button.button in self._strokes:
                     print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
+
+                    xy0 = self._strokes[event.button.button][-1]
                     self._strokes[event.button.button].append((event.motion.x, event.motion.y))
+                    xy1 = self._strokes[event.button.button][-1]
+
+                    dx = xy1[0] - xy0[0]
+                    dy = xy1[1] - xy0[1]
+
+                    self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
                     return True
                 
         return handled
@@ -416,12 +425,17 @@ class GUIControl:
     def get_world_rect(self):
         if self.parent:
             parent_rect = self.parent.get_world_rect()
-            return sdl2.SDL_Rect(parent_rect.x + self.bounding_rect.x,
+            wr = sdl2.SDL_Rect(parent_rect.x + self.bounding_rect.x,
                                  parent_rect.y + self.bounding_rect.y,
                                  self.bounding_rect.w,
                                  self.bounding_rect.h)
         else:
-            return self.bounding_rect
+            wr = self.bounding_rect
+            wr = sdl2.SDL_Rect(wr.x + self.gui._content_pan[0],
+                           wr.y + self.gui._content_pan[1],
+                           wr.w,
+                           wr.h)
+        return wr
         
 
     def _set_focus(self, has_focus):
