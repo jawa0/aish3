@@ -139,32 +139,45 @@ class GUI:
     
 
     def handle_keydown(self, event):
-        # Cmd+S saves GUI
-        if event.key.keysym.sym == sdl2.SDLK_s and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-            self.save()
-            return True  # event was handled
-        # Cmd+L loads GUI
-        if event.key.keysym.sym == sdl2.SDLK_l and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-            self.load()
-            return True  # event was handled
-        # Cmd+N add new LLM chat
-        if event.key.keysym.sym == sdl2.SDLK_n and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-            self.content().sizeToChildren()
-            chat = self.create_control("LLMChatContainer", y=10, x=10+self.content().bounding_rect.w)
-            self.content().add_child(chat)
-            # self.set_focus(chat)
-            return True  # event was handled
+        keySym = event.key.keysym.sym
+        cmdPressed = event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
 
-        # Cmd+R remove LLM chain
-        if event.key.keysym.sym == sdl2.SDLK_r and (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)):
-            assert(self.chats is not None)
-            control = self.get_focus()
-            print(control)
-            print(self.get_ancestor_chain(control))
+        if cmdPressed:
+            # Cmd+S saves GUI
+            if keySym == sdl2.SDLK_s:
+                self.save()
+                return True  # event was handled
+            # Cmd+L loads GUI
+            if keySym == sdl2.SDLK_l:
+                self.load()
+                return True  # event was handled
+            
+            # Cmd+N add new LLM chat
+            if keySym == sdl2.SDLK_n:
+                self.content().sizeToChildren()
+                chat = self.create_control("LLMChatContainer", y=10, x=10+self.content().bounding_rect.w)
+                self.content().add_child(chat)
+                # self.set_focus(chat)
+                return True  # event was handled
 
-            return True  # event was handled
+            # Cmd+R remove LLM chat
+            if keySym == sdl2.SDLK_r:
+                assert(self.chats is not None)
+                control = self.get_focus()
+                print(control)
+                print(self.get_ancestor_chain(control))
 
-        elif event.key.keysym.sym == sdl2.SDLK_RETURN:
+                return True  # event was handled
+            
+            # Cmd+T creaes a new TextArea
+            if keySym == sdl2.SDLK_t:
+                self.content().sizeToChildren()
+                textArea = self.create_control("TextArea", w=160, h=80, y=10, x=10+self.content().bounding_rect.w)
+                self.content().add_child(textArea)
+                self.set_focus(textArea)
+                return True
+
+        if keySym == sdl2.SDLK_RETURN:
             # Focus down into FocusRing of currently focused control...
             focused = self._focused_control
             if focused:
@@ -173,7 +186,7 @@ class GUI:
                     focused.focusRing.focus_first()
                     return True
 
-        elif event.key.keysym.sym == sdl2.SDLK_ESCAPE:
+        elif keySym == sdl2.SDLK_ESCAPE:
             # Focus up into previous FocusRing on stack
             self.pop_focus_ring()
 
@@ -182,7 +195,7 @@ class GUI:
             oldFocusRing.focus(oldFocusRing.get_focus())
             return True
 
-        elif event.key.keysym.sym == sdl2.SDLK_TAB:
+        elif keySym == sdl2.SDLK_TAB:
             # TAB focuses next control in focus ring
             # Shift+TAB focuses previous control
 
