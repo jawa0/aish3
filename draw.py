@@ -93,8 +93,9 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
             src_rect = None
             dst_rect = text_rect
             
-
         if do_draw_text:
+            dst_rect2 = sdl2.SDL_Rect(dst_rect.x - x0, dst_rect.y - y0, dst_rect.w, dst_rect.h)
+
             # If this character is part of a selection, then we want to draw it with a different background colour.
             # We'll draw a coloured rectangle behind the character, and then draw the character on top of it.
 
@@ -102,17 +103,15 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
                 selection_start <= i < selection_end:
                 
                 old_color = set_color(renderer, (0, 100, 200, 200))     # @todo @perf every char!
-                sdl2.SDL_RenderFillRect(renderer.sdlrenderer, dst_rect)
+                # sdl2.SDL_RenderFillRect(renderer.sdlrenderer, dst_rect2)
+                # sdl2.SDL_RenderFillRect(dst_surface, dst_rect2)
+                sdl2.SDL_FillRect(dst_surface, dst_rect2, sdl2.SDL_MapRGBA(dst_surface.contents.format, 0, 100, 200, 200))
                 set_color(renderer, old_color)
 
             # Finally, draw the text char by copying the texture with the char to our
             # destination surface.
+
             # sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
-
-
-            # print(src_rect)
-            # print(dst_rect)
-            dst_rect2 = sdl2.SDL_Rect(dst_rect.x - x0, dst_rect.y - y0, dst_rect.w, dst_rect.h)
             sdl2.SDL_BlitSurface(text_surface, src_rect, dst_surface, dst_rect2)
 
         if char == '\n':
