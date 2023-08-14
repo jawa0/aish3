@@ -73,6 +73,7 @@ class GUI:
 
         self._strokes = {}
         self._content_pan = (0, 0)
+        self._drag_control = None
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -116,7 +117,13 @@ class GUI:
                     # We do not.  Add this event to the stroke.
                     stroke = [(event.button.x, event.button.y)]                    
                     self._strokes[event.button.button] = stroke
-                    print(f"STROKE (button {event.button.button}) start at {stroke[0]}")
+                    # print(f"STROKE (button {event.button.button}) start at {stroke[0]}")
+
+                    # If it's the left mouse button, then check for a hit on a control.
+                    if event.button.button == sdl2.SDL_BUTTON_LEFT:
+                        hit_control = self.check_hit(event.button.x, event.button.y)
+                        if hit_control:
+                            self._drag_control = hit_control
                     return True
 
             elif event.type == sdl2.SDL_MOUSEBUTTONUP:
@@ -124,7 +131,11 @@ class GUI:
                 if event.button.button in self._strokes:
                     # We do.  Remove this stroke.
                     del self._strokes[event.button.button]
-                    print(f"STROKE (button {event.button.button}) end")
+                    # print(f"STROKE (button {event.button.button}) end")
+
+                    # If it's the let mouse button, then check if we're dragging and release drag.
+                    if self._drag_control and event.button.button == sdl2.SDL_BUTTON_LEFT:
+                        self._drag_control = None
                     return True
 
             elif event.type == sdl2.SDL_MOUSEMOTION:
@@ -132,7 +143,7 @@ class GUI:
                 # @bug @todo only seems to work for L button
                 # Maybe macOS two finger swipe is showing up as a trackpad gesture that gets handled first?
                 if event.button.button in self._strokes:
-                    print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
+                    # print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
 
                     xy0 = self._strokes[event.button.button][-1]
                     self._strokes[event.button.button].append((event.motion.x, event.motion.y))
@@ -141,7 +152,15 @@ class GUI:
                     dx = xy1[0] - xy0[0]
                     dy = xy1[1] - xy0[1]
 
-                    self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
+                    if self._drag_control:
+                        new_r = sdl2.SDL_Rect(self._drag_control.bounding_rect.x + dx,
+                                               self._drag_control.bounding_rect.y + dy,
+                                               self._drag_control.bounding_rect.w,
+                                               self._drag_control.bounding_rect.h)
+                        self._drag_control.bounding_rect = new_r
+                    else:
+                        self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
+
                     return True
                 
         return handled
@@ -227,17 +246,17 @@ class GUI:
         if self._content:
             self._content.draw()
 
-        # @debug Draw strokes
-        for stroke in self._strokes:
-            points = self._strokes[stroke]
+        # # @debug Draw strokes
+        # for stroke in self._strokes:
+        #     points = self._strokes[stroke]
             
-            # Convert the list of points to a ctypes array of SDL_Point structures
-            point_array = (sdl2.SDL_Point * len(points))(*points)
+        #     # Convert the list of points to a ctypes array of SDL_Point structures
+        #     point_array = (sdl2.SDL_Point * len(points))(*points)
 
-            if len(points) > 1:
-                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
-                sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
-                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+        #     if len(points) > 1:
+        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
+        #         sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
+        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
 
 
     def push_focus_ring(self, focusRing):
@@ -294,6 +313,21 @@ class GUI:
             return control._set_focus(False)
         
 
+    def check_hit(self, x, y):
+        p = sdl2.SDL_Point(x, y)
+        
+        q = list(self.content().children)
+        while len(q) > 0:
+            child = q.pop()
+            if sdl2.SDL_PointInRect(p, child.get_world_rect()):
+                return child
+            else:
+                if hasattr(child, "children"):
+                    q.extend(child.children)
+            # print(len(q))
+        return None
+    
+
     def save(self):        
         utc_now = datetime.datetime.now(pytz.utc)
         local_timezone = get_localzone()
@@ -344,6 +378,7 @@ class GUIControl:
         self.renderer = kwargs.get('renderer')
         self.font_manager = kwargs.get('font_manager')
         self.draw_bounds = kwargs.get('draw_bounds', False)
+        self._draggable = kwargs.get('draggable', False)
 
         assert(self.gui)
         assert(self.renderer)
@@ -379,6 +414,9 @@ class GUIControl:
             kwargs["y"] = y
             kwargs["w"] = w
             kwargs["h"] = h
+
+        if "draggable" in json and json["draggable"]:
+            kwargs["draggable"] = True
             
         instance = cls(**kwargs)
         return instance
