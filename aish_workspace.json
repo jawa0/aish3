@@ -302,16 +302,6 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1258,
-            10,
-            160,
-            80
-          ],
-          "text": "draw_cursor uses\nSDL_SetClipRect but\ndraw_text doesn't.\nDo we draw unnecessary\nchars?"
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
             1429,
             10,
             160,
