@@ -229,6 +229,7 @@ class TextArea(GUIControl):
             sel_rc0 = self.text_buffer.get_row_col(i_start)
             sel_rc1 = self.text_buffer.get_row_col(i_end)
 
+        # Draw the text
         for i, line in enumerate(lines):
             if len(line.strip()) != 0:
                 if selected is not None:

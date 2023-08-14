@@ -27,6 +27,7 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
 |Cmd+G|Send messages to GPT-4 for chat completion|
 |Cmd+U|Add another "user" message text field|
 |Cmd+Delete|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused)|
+|Cmd+T|Create a new TextArea (use it like a post-it note)|
 |Cmd+S|Save workspace to aish_workspace.json|
 |Cmd+L|Load workspace from aish_workspace.json
 |Cmd+V|Paste text from clipboard into focused TextArea|
