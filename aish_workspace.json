@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-08-14T14:26:07.904584+00:00",
-  "saved_at_local": "2023-08-14T10:26:07.904584-04:00",
+  "saved_at_utc": "2023-08-14T15:41:20.832803+00:00",
+  "saved_at_local": "2023-08-14T11:41:20.832803-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -8,7 +8,7 @@
       "bounding_rect": [
         0,
         0,
-        1248,
+        1590,
         529
       ],
       "layout": null,
@@ -211,7 +211,7 @@
                     350,
                     60
                   ],
-                  "text": "Here is a definition for a function that finds the\nfirst non-whitespace character's index within a\ntext buffer, given an index to scan from.\n\n```python\n    def _next_word_point(self, point):\n        # Check characters from point forward\n        while point < len(self.TEXT_BUFFER):\n            # If we encounter a non-whitespace character immediately, continue scanning\n            if not self.TEXT_BUFFER[point].isspace():\n                point += 1\n            else:\n                # When we encounter our first whitespace, start scanning for the next non-whitespace character\n                while point < len(self.TEXT_BUFFER) and self.TEXT_BUFFER[point].isspace():\n                    point += 1\n                \n                # If a non-whitespace character is found after a whitespace character,\n                # return its position\n                if point < len(self.TEXT_BUFFER):\n                    return point\n\n        # Return the end of the buffer if no non-whitespace character is found\n        return len(self.TEXT_BUFFER)\n```\n\nI want you to write an equivalent function, but\nscanning in the other direction (from high to low)\nindices."
+                  "text": "I have a text surface and texture in SDL2/PySDL. I \nwant to create a surface to 1) copy multiple text\ntextures into, and 2) eventually copy to my\nrenderer. How would I do this?"
                 }
               ]
             },
@@ -243,7 +243,7 @@
                     350,
                     120
                   ],
-                  "text": "Sure, we have to make slight adjustments to suit the reverse scanning requirement. Here is how the modified function looks:\n\n```python\n    def _prev_word_point(self, point):\n        # Check characters from point backward\n        while point > 0:\n            # If we encounter a non-whitespace character immediately, continue scanning\n            if not self.TEXT_BUFFER[point].isspace():\n                point -= 1\n            else:\n                # When we encounter our first whitespace, start scanning for the next non-whitespace character\n                while point > 0 and self.TEXT_BUFFER[point].isspace():\n                    point -= 1\n                \n                # If a non-whitespace character is found after a whitespace character,\n                # return its position\n                if point >= 0:\n                    return point\n                    \n        # Return the start of the buffer if no non-whitespace character is found\n        return 0\n```\n\nThis function similarly scans for the previous non-whitespace character in the text buffer. Note that I've reversed the direction of the scan using `point > 0` and `point -= 1`. Also, the function returns 0 which represents the start of the buffer if no non-whitespace characters are found."
+                  "text": "To copy multiple text textures into a surface, and then \ncopy it to the renderer, you can follow these \nsteps:\n\n1. Create a new surface. This can be done using \n\"SDL_CreateRGBSurfaceWithFormat\" which allows you \nto specify the width, height, depth, and pixel \nformat of new surface. \n\n2. For each of your text textures, you will need \nto create a surface it can be copied into. Use \n\"SDL_TextureToSurface\" to copy the texture to a \nsurface with matching dimensions.\n\n3. Once you have a surface copy of the texture, \nyou can use \"SDL_BlitSurface\" to then copy these \nsurface(s) onto the initial surface you created. \n\n4. Repeat steps 2 and 3 for each of your textures, \npositioning them carefully on the target surface.\n\n5. Finally, once you have copied all your \ndesired textures as surfaces onto your target \nsurface, you'll need to create a texture from this \nsurface. Use \"SDL_CreateTextureFromSurface\" to do \nthis.\n\n6. The texture can then be copied to your \nrenderer using \"SDL_RenderCopy\".\n\nIt should be noted that PySDL might not expose all \nthese SDL features. If that is the case, you might \nneed to consider using the SDL library directly or \nrefactor your design to be compatible with the \nPySDL capabilities. \n\nRemember that the surfaces and textures should be \nproperly destroyed after use to avoid memory leaks, \nespecially in a loop. Make sure to use \n\"SDL_FreeSurface\" for the surfaces and \n\"SDL_DestroyTexture\" for the textures when they are \nno longer needed."
                 }
               ]
             }
@@ -298,6 +298,26 @@
             80
           ],
           "text": "draw_text creates an\nSDL surface and a \ntexture for each char!"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1258,
+            10,
+            160,
+            80
+          ],
+          "text": "draw_cursor uses\nSDL_SetClipRect but\ndraw_text doesn't.\nDo we draw unnecessary\nchars?"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1429,
+            10,
+            160,
+            80
+          ],
+          "text": "We don't draw any text\nchars that don't at l\nleast partially overlap\nthe bounding_rect"
         }
       ]
     }

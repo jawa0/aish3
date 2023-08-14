@@ -38,10 +38,20 @@ def get_char_width(font_manager, char):
     return char_width
 
 
-def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, selection_start=None, selection_end=None):
+def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
     if len(text.strip()) == 0:
         return
     
+    # Keep track of initial x, and y since we will be updating x, y for each character.
+    # We need to know where each character is relative to the starting point in order
+    # to blit our various surfaces correctly.
+    x0 = x
+
+    if bounding_rect is not None:
+        y0 = bounding_rect.y
+    else:
+        y0 = y
+
     # Draw the text character by character, for now. While this is inefficient, it does
     # allow for the selection background colour to be drawn with simpler logic.
 
@@ -52,7 +62,7 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, selection_
         # then copy the texture to the renderer. The surface and texture can then be freed.
 
         text_surface = font_manager.render(char)
-        text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
+        # text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
 
         text_rect = sdl2.SDL_Rect(x, y, text_surface.w, text_surface.h)
 
@@ -97,7 +107,13 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, selection_
 
             # Finally, draw the text char by copying the texture with the char to our
             # destination surface.
-            sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
+            # sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
+
+
+            # print(src_rect)
+            # print(dst_rect)
+            dst_rect2 = sdl2.SDL_Rect(dst_rect.x - x0, dst_rect.y - y0, dst_rect.w, dst_rect.h)
+            sdl2.SDL_BlitSurface(text_surface, src_rect, dst_surface, dst_rect2)
 
         if char == '\n':
             x = 0
@@ -106,7 +122,7 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, selection_
             x += text_rect.w
 
         sdl2.SDL_FreeSurface(text_surface)
-        sdl2.SDL_DestroyTexture(text_texture)
+        # sdl2.SDL_DestroyTexture(text_texture)
 
 
 def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding_rect=None, y_scroll=0): 
