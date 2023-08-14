@@ -230,6 +230,8 @@ class TextArea(GUIControl):
             sel_rc1 = self.text_buffer.get_row_col(i_end)
 
         # Draw the text
+        surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
+
         for i, line in enumerate(lines):
             if len(line.strip()) != 0:
                 if selected is not None:
@@ -240,7 +242,7 @@ class TextArea(GUIControl):
                     c_start = None
                     if i < sel_rc0[0]:          # current line is before (not in) selection
                         pass
-                    elif i == sel_rc0[0]:       # current line is frist line of selection
+                    elif i == sel_rc0[0]:       # current line is first line of selection
                         c_start = sel_rc0[1]
                     elif i <= sel_rc1[0]:       # current line is internal to selection or last
                         c_start = 0
@@ -256,12 +258,22 @@ class TextArea(GUIControl):
 
                     draw_text(self.renderer, self.font_manager, 
                               line, 
-                              wr.x, y, wr, 
+                              wr.x, y, bounding_rect=wr,
+                              dst_surface=surf, 
                               selection_start=c_start, selection_end=c_end)
                 else:
-                    draw_text(self.renderer, self.font_manager, line, wr.x, y, wr)
+                    draw_text(self.renderer, self.font_manager, line, wr.x, y, bounding_rect=wr, dst_surface=surf)
 
             y += self.row_spacing
+
+        combined_text_surface = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, combined_text_surface, None, wr)
+
+        # Free the texture
+        sdl2.SDL_DestroyTexture(combined_text_surface)
+
+        # Delete surf
+        sdl2.SDL_FreeSurface(surf)
 
         # Draw the bounding rectangle after all text has been drawn
         # Save the current color
