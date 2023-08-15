@@ -123,8 +123,9 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         else:
             x += text_rect.w
 
+        if dst_surface is None:
+            sdl2.SDL_DestroyTexture(text_texture)
         sdl2.SDL_FreeSurface(text_surface)
-        # sdl2.SDL_DestroyTexture(text_texture)
 
 
 def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding_rect=None, y_scroll=0): 
