@@ -243,6 +243,14 @@ class TextArea(GUIControl):
             self.combined_text_texture = None
 
 
+    def set_size(self, w, h):
+        super().set_size(w, h)
+
+        # Mark dirty or else the cached text texture will be stretched
+        # to the new size.
+        self.set_needs_redraw()
+
+
     def draw(self):
         lines = self.text_buffer.get_lines()
         wr = self.get_world_rect()
