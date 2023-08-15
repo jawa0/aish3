@@ -74,6 +74,7 @@ class GUI:
         self._strokes = {}
         self._content_pan = (0, 0)
         self._drag_control = None
+        self._running_completions = {}
 
 
     class JSONEncoder(json.JSONEncoder):
