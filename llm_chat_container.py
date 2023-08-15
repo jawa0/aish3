@@ -72,10 +72,10 @@ class LLMChatContainer(GUIContainer):
 
 
         def get_role(self):
-            return self.label.text
+            return self.label.get_text()
         
         def set_role(self, role):
-            self.label.text = role
+            self.label.set_text(role)
 
         def get_text(self):
             return self.text_area.text_buffer.get_text()
@@ -211,16 +211,38 @@ class LLMChatContainer(GUIContainer):
         openai.api_key = OPENAI_API_KEY
         openai.organization = OPENAI_ORGANIZATION
 
-        response = openai.ChatCompletion.create(model="gpt-4", messages=messages)
-
-        answer = self.ChatMessageUI(role="Assistant", text=response['choices'][0]['message']['content'], renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
+        # Add Answer TextArea
+        answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
         self.add_child(answer, add_to_focus_ring=False)
         self.focusRing.add(answer.text_area, set_focus=True)
 
+        # Shrink previous messages
         for u in self.utterances:
             u.text_area.set_size(PANEL_WIDTH, 60)
         self.utterances.append(answer)
         self.updateLayout
+
+        completion = openai.ChatCompletion.create(model="gpt-4", messages=messages, stream=True)
+        self.gui._running_completions[self] = completion
+
+
+    def update_completion(self, completion):
+        assert(len(self.utterances) > 0)
+        answer = self.utterances[-1]
+        assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
+
+        try:
+            chunk = next(completion)
+        except StopIteration:
+            self.gui._running_completions[self] = None  # signal we're done without removing item
+            return
+        
+        # answer.label.set_text(chunk.choices[0].delta.role)
+        delta = chunk.choices[0].delta
+        if hasattr(delta, 'content'):
+            answer.text_area.text_buffer.move_point_to_end()
+            answer.text_area.text_buffer.insert(chunk.choices[0].delta.content)
+            answer.text_area.set_needs_redraw()
 
 
     def get_json(self):

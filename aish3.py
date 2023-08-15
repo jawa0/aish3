@@ -36,11 +36,11 @@ import sdl2.ext
 import sdl2.sdlttf as ttf
 import argparse
 import time
-from gpt import makeGPTRequest
 from gui import GUI
 from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
 from draw import draw_text
+from dotenv import load_dotenv
 
 
 def run(fullscreen, width, height):
@@ -109,6 +109,18 @@ def run(fullscreen, width, height):
                 else:
                     gui.handle_event(event)
 
+        # Pump chat completions...
+        for chat in gui._running_completions:
+            completion = gui._running_completions[chat]
+            chat.update_completion(completion)
+
+        # Remove finished completion callbacks
+        for chat, completion in list(gui._running_completions.items()):
+            if completion is None:
+                del gui._running_completions[chat]
+
+
+
         else:
             t0 = time.time()
             renderer.clear()
@@ -129,6 +141,9 @@ def run(fullscreen, width, height):
 
 
 if __name__ == "__main__":
+    # Load the .env file
+    load_dotenv()
+
     parser = argparse.ArgumentParser(description='AISH window application.')
     parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
     parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
