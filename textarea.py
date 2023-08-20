@@ -40,6 +40,7 @@ class TextArea(GUIControl):
         self.is_editable = True
         self.row_spacing = row_spacing
         self.y_scroll = 0
+        self.x_scroll = 0
         self.combined_text_texture = None
 
 
@@ -54,15 +55,9 @@ class TextArea(GUIControl):
 
         if event.type == sdl2.SDL_MOUSEWHEEL:
             # Here, we handle the vertical scrolling (event.wheel.y) 
-            # We will assume that each "tick" of the mouse wheel corresponds to 3 lines of text
-            self.scroll_by(event.wheel.y * -8)
+            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
             return True
         
-            # for control in self.children:
-            #     if isinstance(control, TextArea):
-            #         control.scroll_by(scroll_y)
-            #         return True
-
         elif event.type == sdl2.SDL_KEYDOWN:
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
             keySymbol = event.key.keysym.sym
@@ -157,7 +152,8 @@ class TextArea(GUIControl):
                         self.text_buffer.clear_mark()
                     if self.text_buffer.move_point_down():  
                         # @todo encapsulate in a controller
-                        self.scroll_cursor_into_view()
+                        # self.scroll_cursor_into_view()
+                        pass
 
                 self.set_needs_redraw()        
                 return True
@@ -261,7 +257,7 @@ class TextArea(GUIControl):
     def draw(self):
         lines = self.text_buffer.get_lines()
         wr = self.get_world_rect()
-        x = wr.x
+        x = wr.x - self.x_scroll
         y = wr.y - self.y_scroll
 
         # Determine start and end of selection
@@ -301,11 +297,11 @@ class TextArea(GUIControl):
 
                         draw_text(self.renderer, self.font_manager, 
                                 line, 
-                                wr.x, y, bounding_rect=wr,
+                                x, y, bounding_rect=wr,
                                 dst_surface=surf, 
                                 selection_start=c_start, selection_end=c_end)
                     else:
-                        draw_text(self.renderer, self.font_manager, line, wr.x, y, bounding_rect=wr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_manager, line, x, y, bounding_rect=wr, dst_surface=surf)
 
                 y += self.row_spacing
 
@@ -336,11 +332,12 @@ class TextArea(GUIControl):
             row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
             line = lines[row]
             if line is not None and col is not None:
-                draw_cursor(self.renderer, self.font_manager, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.y_scroll)
+                draw_cursor(self.renderer, self.font_manager, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
 
 
-    def scroll_by(self, dy):
+    def scroll_by(self, dx=0, dy=0):
         self.y_scroll = max(0, self.y_scroll + dy)  # adjust y_scroll by dy
+        self.x_scroll = max(0, self.x_scroll + dx)  # adjust x_scroll by dx
         self.set_needs_redraw()
 
 
@@ -349,9 +346,9 @@ class TextArea(GUIControl):
         return row >= (self.bounding_rect.h / self.row_spacing + self.y_scroll)
 
 
-    def scroll_cursor_into_view(self):
-        if self.is_cursor_on_last_line(self.text_buffer):
-            self.scroll_by(self.row_spacing)
+    # def scroll_cursor_into_view(self):
+    #     if self.is_cursor_on_last_line(self.text_buffer):
+    #         self.scroll_by(self.row_spacing)
 
 
 GUI.register_control_type("TextArea", TextArea)

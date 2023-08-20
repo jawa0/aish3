@@ -45,11 +45,12 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
     # Keep track of initial x, and y since we will be updating x, y for each character.
     # We need to know where each character is relative to the starting point in order
     # to blit our various surfaces correctly.
-    x0 = x
 
     if bounding_rect is not None:
+        x0 = bounding_rect.x
         y0 = bounding_rect.y
     else:
+        x0 = x
         y0 = y
 
     # Draw the text character by character, for now. While this is inefficient, it does
@@ -128,7 +129,7 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         sdl2.SDL_FreeSurface(text_surface)
 
 
-def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding_rect=None, y_scroll=0): 
+def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding_rect=None, x_scroll=0, y_scroll=0): 
     row, col_unexpanded = text_buffer.get_row_col(text_buffer.get_point())
     line_unexpanded = text_buffer.get_line(row, expand_tabs=False)
 
@@ -145,7 +146,7 @@ def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding
 
     old_color = set_color(renderer, (255, 255, 255, 255))
 
-    x_cursor = x + x_offset
+    x_cursor = x + x_offset - x_scroll
     y_cursor = y + row * row_spacing - y_scroll 
 
     if bounding_rect is None:
