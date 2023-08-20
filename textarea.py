@@ -67,14 +67,21 @@ class TextArea(GUIControl):
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
             keySymbol = event.key.keysym.sym
 
+            # Esc: If if there is a text selection, then clear selection.
+            if keySymbol == sdl2.SDLK_ESCAPE:
+                if self.text_buffer.get_selection() is not None:
+                    self.text_buffer.clear_mark()
+                    self.set_needs_redraw()
+                    return True
+                
             # Cmd+A selects all text
-            if keySymbol == sdl2.SDLK_a and (cmdPressed):
+            elif keySymbol == sdl2.SDLK_a and (cmdPressed):
                 self.text_buffer.set_mark(mark_position=0)
                 self.text_buffer.move_point_to_end()
                 self.set_needs_redraw()
                 return True
             
-            if keySymbol == sdl2.SDLK_RETURN:
+            elif keySymbol == sdl2.SDLK_RETURN:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
