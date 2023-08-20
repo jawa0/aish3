@@ -129,7 +129,14 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         sdl2.SDL_FreeSurface(text_surface)
 
 
-def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding_rect=None, x_scroll=0, y_scroll=0): 
+def draw_cursor(renderer, font_manager, 
+                text_buffer, 
+                row_spacing, 
+                x, y, 
+                bounding_rect=None, 
+                x_scroll=0, y_scroll=0,
+                dont_draw_just_calculate=False): 
+    
     row, col_unexpanded = text_buffer.get_row_col(text_buffer.get_point())
     line_unexpanded = text_buffer.get_line(row, expand_tabs=False)
 
@@ -150,7 +157,8 @@ def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding
     y_cursor = y + row * row_spacing - y_scroll 
 
     if bounding_rect is None:
-        sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
+        if not dont_draw_just_calculate:
+            sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
 
     elif bounding_rect.x <= x_cursor < bounding_rect.x + bounding_rect.w and (
         y_cursor + cursor_height >= bounding_rect.y  and
@@ -159,11 +167,14 @@ def draw_cursor(renderer, font_manager, text_buffer, row_spacing, x, y, bounding
         # Set the scissor rectangle to the bounding rectangle
         # This is so that the cursor doesn't draw outside the bounding rectangle.
         
-        sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, bounding_rect)
-        sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
-        sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, None)
+        if not dont_draw_just_calculate:
+            sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, bounding_rect)
+            sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
+            sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, None)
 
     set_color(renderer, old_color)
+    # print('draw_cursor', x_cursor, y_cursor)
+    return x_cursor, y_cursor
 
 
 def set_color(renderer, new_color):

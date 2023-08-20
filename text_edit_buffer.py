@@ -165,7 +165,7 @@ class TextEditBuffer(object):
             
     def move_point_left(self):
         if self.POINT > 0:
-            self.POINT -= 1
+            self.set_point(self.POINT - 1)
             row, col = self.get_row_col(self.POINT)
             self.desired_col = col
 
@@ -193,7 +193,7 @@ class TextEditBuffer(object):
 
     def move_point_right(self):
         if self.POINT < len(self.TEXT_BUFFER):
-            self.POINT += 1
+            self.set_point(self.POINT + 1)
             row, col = self.get_row_col(self.POINT)
             self.desired_col = col
 
