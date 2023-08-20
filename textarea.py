@@ -42,6 +42,7 @@ class TextArea(GUIControl):
         self.y_scroll = 0
         self.x_scroll = 0
         self.combined_text_texture = None
+        self.is_user_scrolling = False
 
 
     def __json__(self):
@@ -55,7 +56,11 @@ class TextArea(GUIControl):
 
         if event.type == sdl2.SDL_MOUSEWHEEL:
             # Here, we handle the vertical scrolling (event.wheel.y) 
+            
+            self.is_user_scrolling = True
             self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
+            self.is_user_scrolling = False
+
             return True
         
         elif event.type == sdl2.SDL_KEYDOWN:
@@ -244,6 +249,8 @@ class TextArea(GUIControl):
         if self.combined_text_texture is not None:
             sdl2.SDL_DestroyTexture(self.combined_text_texture)
             self.combined_text_texture = None
+            if not self.is_user_scrolling:
+                self.scroll_cursor_into_view()
 
 
     def set_size(self, w, h):
@@ -341,14 +348,31 @@ class TextArea(GUIControl):
         self.set_needs_redraw()
 
 
-    def is_cursor_on_last_line(self, text_buffer):
-        row, _ = text_buffer.get_row_col(text_buffer.get_point())
-        return row >= (self.bounding_rect.h / self.row_spacing + self.y_scroll)
+    def scroll_cursor_into_view(self):
+        # Where is the cursor?
+        wr = self.get_world_rect()
+        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_manager, 
+                                         self.text_buffer, 
+                                         self.row_spacing, 
+                                         wr.x, wr.y, wr, 
+                                         self.x_scroll, self.y_scroll,
+                                         dont_draw_just_calculate=True)  # !!!
+        
+        
+        cursor_bottom_y = y_cursor + self.row_spacing
+        rect_bottom_y = wr.y + wr.h
+        print(f'cursor_bottom_y: {cursor_bottom_y}, rect_bottom_y: {rect_bottom_y}')
 
+        if cursor_bottom_y >= rect_bottom_y:
+            y_correction = cursor_bottom_y - rect_bottom_y
+            # print(f'y_correction: {y_correction}')
+            self.scroll_by(dy=y_correction)
 
-    # def scroll_cursor_into_view(self):
-    #     if self.is_cursor_on_last_line(self.text_buffer):
-    #         self.scroll_by(self.row_spacing)
+        elif y_cursor < wr.y:
+            y_correction = y_cursor - wr.y
+            # print(f'y_correction: {y_correction}')
+            self.scroll_by(dy=y_correction)
+
 
 
 GUI.register_control_type("TextArea", TextArea)
