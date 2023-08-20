@@ -367,12 +367,18 @@ class TextArea(GUIControl):
             y_correction = cursor_bottom_y - rect_bottom_y
             # print(f'y_correction: {y_correction}')
             self.scroll_by(dy=y_correction)
-
         elif y_cursor < wr.y:
             y_correction = y_cursor - wr.y
             # print(f'y_correction: {y_correction}')
             self.scroll_by(dy=y_correction)
 
+        x_pad = 20  # Arbitrary
+        if x_cursor > wr.x + wr.w - x_pad:
+            x_correction = x_cursor - (wr.x + wr.w - x_pad)
+            self.scroll_by(dx=x_correction)
+        elif x_cursor < wr.x + x_pad:
+            x_correction = x_cursor - (wr.x + x_pad)
+            self.scroll_by(dx=x_correction)
 
 
 GUI.register_control_type("TextArea", TextArea)
