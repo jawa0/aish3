@@ -34,7 +34,7 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
 |TAB|Focus next control|
 |Shift+TAB|Focus previous control|
 |Enter|Move focus down into children of currently focused control|
-|Esc|If the currently focused control has selected tex, then clear the selection. Otherwise, move focus up to parent contaioer|
+|Esc|If the currently focused control has selected text, then clear the selection. Otherwise, move focus up to parent container|
 |Ctrl+TAB|Insert TAB char into currently focused TextArea|
 |Arrow L/R/U/D|Move within TextArea|
 |Option/Alt+Arrow L/R|Move to start of previous / next word|
