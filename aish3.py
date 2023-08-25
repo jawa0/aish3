@@ -41,6 +41,7 @@ from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
 from draw import draw_text
 from dotenv import load_dotenv
+import candlestick
 
 
 def run(fullscreen, width, height):
@@ -69,19 +70,21 @@ def run(fullscreen, width, height):
     
     gui = GUI(renderer, font_manager)
 
-    chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
-    chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
+    # chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
+    # chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
 
-    label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
+    # label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
 
-    text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
+    # text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
 
-    gui.content().add_child(chat1)
-    gui.content().add_child(chat2)
-    gui.content().add_child(label)
-    gui.content().add_child(text)
+    # gui.content().add_child(chat1)
+    # gui.content().add_child(chat2)
+    # gui.content().add_child(label)
+    # gui.content().add_child(text)
 
-    # gui.set_focus(chat1)
+    sticks = gui.create_control("CandlestickPlot", csv_filepath="./data/IB-hist-TQQQ-2022-02-08-5s.csv", 
+                                x=10, y=40, w=1380, h=600)
+    gui.content().add_child(sticks)
 
     running = True
     fps_smoothed = 0.0
