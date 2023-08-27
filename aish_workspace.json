@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-08-14T21:54:42.863759+00:00",
-  "saved_at_local": "2023-08-14T17:54:42.863759-04:00",
+  "saved_at_utc": "2023-08-27T14:23:56.713027+00:00",
+  "saved_at_local": "2023-08-27T10:23:56.713027-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -8,8 +8,8 @@
       "bounding_rect": [
         0,
         0,
-        1590,
-        529
+        735,
+        507
       ],
       "layout": null,
       "children": [
@@ -19,7 +19,7 @@
             10,
             200,
             354,
-            328
+            306
           ],
           "layout": "ColumnLayout",
           "children": [
@@ -39,7 +39,7 @@
                 1,
                 21,
                 352,
-                82
+                142
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -59,9 +59,9 @@
                     1,
                     21,
                     350,
-                    60
+                    120
                   ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing,  and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. "
+                  "text": ""
                 }
               ]
             },
@@ -69,9 +69,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                103,
+                163,
                 352,
-                82
+                142
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -91,41 +91,9 @@
                     1,
                     21,
                     350,
-                    60
-                  ],
-                  "text": "I want to start tracking mouse clicks and drags in\nthe program I'm writing. What are all the\nSDL2/pySDL functions to do with mouse clikcs and \nmouse movement?"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                185,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "Assistant"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
                     120
                   ],
-                  "text": "Here are the key SDL2, or PySDL2, functions \nrelated to mouse interactions:\n\n1. **SDL_GetMouseState**: This function returns \nthe current state of the mouse. It provides the \ncurrent X and Y coordinates of the mouse, as well \nas the state of all the mouse buttons.\n\n2. **SDL_GetRelativeMouseState**: This function \ngives you the current state of the mouse in terms \nof relative motion in X and Y directions, and \nalso the button state.\n\n3. **SDL_WarpMouseInWindow**: This function \nallows you to set the position of the mouse \ncursor relative to a specific window.\n\n4. **SDL_SetRelativeMouseMode**: This function \nsets the relative mouse mode which allows mouse \nmovement to be tracked even when the mouse leaves \nthe screen or is hidden.\n\n5. **SDL_GetMouseFocus**: This function returns \nthe window which currently has mouse focus.\n\nRegarding mouse events, you should handle in the \nmain event loop:\n\n- **SDL_MOUSEMOTION**: This event is posted when \nthe mouse moves.\n\n- **SDL_MOUSEBUTTONDOWN** and \n**SDL_MOUSEBUTTONUP**: These events are posted \nwhen a mouse button is pressed and released, \nrespectively.\n\n- **SDL_MOUSEWHEEL**: This event is posted when \nthe mouse wheel is scrolled. \n\nUsing above functions and handling those events \nallow you to implement mouse clicks and drags \ntracking in your SDL2 or PySDL2 software."
+                  "text": ""
                 }
               ]
             }
@@ -137,7 +105,7 @@
             380,
             200,
             354,
-            328
+            306
           ],
           "layout": "ColumnLayout",
           "children": [
@@ -157,7 +125,7 @@
                 1,
                 21,
                 352,
-                82
+                142
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -177,9 +145,9 @@
                     1,
                     21,
                     350,
-                    60
+                    120
                   ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing,  and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. "
+                  "text": ""
                 }
               ]
             },
@@ -187,9 +155,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 1,
-                103,
+                163,
                 352,
-                82
+                142
               ],
               "layout": "ColumnLayout",
               "children": [
@@ -209,41 +177,9 @@
                     1,
                     21,
                     350,
-                    60
-                  ],
-                  "text": "I have a text surface and texture in SDL2/PySDL. I \nwant to create a surface to 1) copy multiple text\ntextures into, and 2) eventually copy to my\nrenderer. How would I do this?"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                1,
-                185,
-                352,
-                142
-              ],
-              "layout": "ColumnLayout",
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    1,
-                    1,
-                    350,
-                    20
-                  ],
-                  "text": "Assistant"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    1,
-                    21,
-                    350,
                     120
                   ],
-                  "text": "To copy multiple text textures into a surface, and then \ncopy it to the renderer, you can follow these \nsteps:\n\n1. Create a new surface. This can be done using \n\"SDL_CreateRGBSurfaceWithFormat\" which allows you \nto specify the width, height, depth, and pixel \nformat of new surface. \n\n2. For each of your text textures, you will need \nto create a surface it can be copied into. Use \n\"SDL_TextureToSurface\" to copy the texture to a \nsurface with matching dimensions.\n\n3. Once you have a surface copy of the texture, \nyou can use \"SDL_BlitSurface\" to then copy these \nsurface(s) onto the initial surface you created. \n\n4. Repeat steps 2 and 3 for each of your textures, \npositioning them carefully on the target surface.\n\n5. Finally, once you have copied all your \ndesired textures as surfaces onto your target \nsurface, you'll need to create a texture from this \nsurface. Use \"SDL_CreateTextureFromSurface\" to do \nthis.\n\n6. The texture can then be copied to your \nrenderer using \"SDL_RenderCopy\".\n\nIt should be noted that PySDL might not expose all \nthese SDL features. If that is the case, you might \nneed to consider using the SDL library directly or \nrefactor your design to be compatible with the \nPySDL capabilities. \n\nRemember that the surfaces and textures should be \nproperly destroyed after use to avoid memory leaks, \nespecially in a loop. Make sure to use \n\"SDL_FreeSurface\" for the surfaces and \n\"SDL_DestroyTexture\" for the textures when they are \nno longer needed."
+                  "text": ""
                 }
               ]
             }
@@ -268,46 +204,6 @@
             100
           ],
           "text": "This is a TextArea."
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
-            745,
-            10,
-            160,
-            80
-          ],
-          "text": "TextArea.draw calls\ndraw.py draw_text"
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
-            774,
-            100,
-            160,
-            80
-          ],
-          "text": "In draw_text, we use\nSDL_RenderCopy to copy\nthe text texture to the\nrenderer."
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
-            799,
-            192,
-            160,
-            80
-          ],
-          "text": "draw_text creates an\nSDL surface and a \ntexture for each char!"
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
-            956,
-            96,
-            160,
-            80
-          ],
-          "text": "We don't draw any text\nchars that don't at l\nleast partially overlap\nthe bounding_rect"
         }
       ]
     }
