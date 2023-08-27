@@ -82,8 +82,9 @@ def run(fullscreen, width, height):
     # gui.content().add_child(label)
     # gui.content().add_child(text)
 
-    sticks = gui.create_control("CandlestickPlot", csv_filepath="./data/IB-hist-TQQQ-2022-02-08-5s.csv", 
-                                x=10, y=40, w=1380, h=600)
+    filename = "./data/IB-hist-TQQQ-2022-02-08-5s.csv"
+    # filename = "./data/IB-hist-TQQQ-2023-01-20-5s.csv"
+    sticks = gui.create_control("CandlestickPlot", csv_filepath=filename, x=10, y=40, w=1380, h=600)
     gui.content().add_child(sticks)
 
     running = True

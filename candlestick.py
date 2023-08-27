@@ -17,6 +17,7 @@ import csv
 import sdl2
 from draw import draw_cursor, draw_text, set_color
 from gui import GUI, GUIControl
+from math import ceil, floor, isclose
 
 
 class CandlestickPlot(GUIControl):
@@ -44,32 +45,64 @@ class CandlestickPlot(GUIControl):
 
         self.draw_bounds = True
         self.scroll = [0, 0]
-        self.top_pad = 10
-        self.bottom_pad = 10
+        self.top_pad = 15
+        self.bottom_pad = 15
+        self.left_pad = 55
+        self.right_pad = 10
 
             
     def draw(self):
         wr = self.get_world_rect()
+        y0 = wr.y + self.top_pad
 
-        # Draw the candlesticks
         assert(len(self.opens) == len(self.closes) == len(self.highs) == len(self.lows))
 
-        top_price = max(self.highs)
-        bottom_price = min(self.lows)
+        top_price = ceil(max(self.highs))
+        bottom_price = floor(min(self.lows))
         y_scale = (wr.h - self.top_pad - self.bottom_pad) / (top_price - bottom_price)
 
+        def y_from_price(price: float):
+            return int(0.5 + y0 + (top_price - price) * y_scale)
+            
         old_color = set_color(self.renderer, (255, 255, 255, 255))
 
+        # Draw the y-axis
+        sdl2.SDL_RenderDrawLine(self.renderer.sdlrenderer, wr.x + self.left_pad, wr.y + self.top_pad, wr.x + self.left_pad, wr.y + wr.h - self.bottom_pad)
+
+
+        p = bottom_price
+        while p <= top_price + 0.05:
+            y = y_from_price(p)
+            
+            draw_number = False
+            tick_width = 4
+
+            if isclose(p % 1.0, 0.0, abs_tol=0.01):
+                draw_number = True
+                tick_width = 12
+            elif isclose(p % 0.5, 0.0, abs_tol=0.01):
+                draw_number = True
+                tick_width = 8
+
+            if draw_number:
+                draw_text(self.renderer, self.font_manager, f'{p:0.1f}', wr.x + self.left_pad - 45, y - 8)
+
+            sdl2.SDL_RenderDrawLine(self.renderer.sdlrenderer, wr.x + self.left_pad, y, wr.x + self.left_pad - tick_width, y)
+
+            p += 0.1
+
+        # Draw the candlesticks
         candle_w = 4
         for i, row in enumerate(self.opens):
             # print(i)
-            x0 = wr.x + i * candle_w
-            y0 = wr.y + self.top_pad
+            x0 = wr.x + self.left_pad + i * candle_w - self.scroll[0]
+            if x0 < wr.x + self.left_pad:
+                continue
 
-            y_open = int(0.5 + y0 + (top_price - self.opens[i]) * y_scale)
-            y_close = int(0.5 + y0 + (top_price - self.closes[i]) * y_scale)
-            y_high = int(0.5 + y0 + (top_price - self.highs[i]) * y_scale)
-            y_low = int(0.5 + y0 + (top_price - self.lows[i]) * y_scale)
+            y_open = y_from_price(self.opens[i])
+            y_close = y_from_price(self.closes[i])
+            y_high = y_from_price(self.highs[i])
+            y_low = y_from_price(self.lows[i])
 
             # Draw the candlestick "wicks"
             set_color(self.renderer, (255, 255, 255, 255))
@@ -111,18 +144,15 @@ class CandlestickPlot(GUIControl):
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
 
 
-# def find_line_number(file_path, target_line):
-#     with open(file_path, 'r') as file:
-#         for num, line in enumerate(file, 1):
-#             if line.strip() == target_line:
-#                 return num
-#     return None
+    def handle_event(self, event):
+        if event.type == sdl2.SDL_MOUSEWHEEL:
+            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
+            return True
 
-# line_number = find_line_number('filename.csv', '# Date, Time, Open, High, Low, Close, Volume')
-# if line_number:
-#     print(f'The line number is: {line_number}')
-# else:
-#     print('The line was not found.')
 
+    def scroll_by(self, dx=0, dy=0):
+        self.scroll[0] = max(0, self.scroll[0] + dx)  # adjust x_scroll by dx
+        self.scroll[1] = max(0, self.scroll[1] + dy)  # adjust y_scroll by dy
+        # self.set_needs_redraw()
 
 GUI.register_control_type("CandlestickPlot", CandlestickPlot)
