@@ -56,7 +56,7 @@ class GUI:
             return None
 
 
-    def __init__(self, renderer, font_manager):        
+    def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json"):        
         self.renderer = renderer
         self.font_manager = font_manager
 
@@ -75,6 +75,9 @@ class GUI:
         self._content_pan = (0, 0)
         self._drag_control = None
         self._running_completions = {}
+
+        self.workspace_filename = workspace_filename
+        self.load()
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -335,7 +338,7 @@ class GUI:
         local_now = utc_now.astimezone(local_timezone)
 
         print("Saving GUI...")
-        with open("aish_workspace.json", "w") as f:
+        with open(self.workspace_filename, "w") as f:
             gui_json = {
                 "saved_at_utc": utc_now.isoformat(),
                 "saved_at_local": local_now.isoformat(),
@@ -352,7 +355,7 @@ class GUI:
 
         print("Loading GUI...")
         try:
-            with open("aish_workspace.json", "r") as f:
+            with open(self.workspace_filename, "r") as f:
                 gui_json = json.load(f)
                 content_json = gui_json["gui"]["content"]
                 gui_class = GUI.control_class(content_json["class"])
@@ -533,7 +536,14 @@ class GUIContainer(GUIControl):
         json = super().__json__()
         json["class"] = self.__class__.__name__
         json["layout"] =  self.layout.__class__.__name__ if self.layout else None
-        json["children"] =  [child.__json__() for child in self.children]
+
+
+        json["children"] = []
+        for child in self.children:
+            child_json = child.__json__()
+            assert(child_json is not None)
+            json["children"].append(child_json)
+        
         return json
 
 

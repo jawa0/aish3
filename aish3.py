@@ -44,7 +44,7 @@ from dotenv import load_dotenv
 import candlestick
 
 
-def run(fullscreen, width, height):
+def run(fullscreen, width, height, workspace_filename):
     sdl2.ext.init()
     ttf.TTF_Init()
 
@@ -68,19 +68,19 @@ def run(fullscreen, width, height):
     font_manager = sdl2.ext.FontManager(font_path, size=font_size, color=WHITE)
 
     
-    gui = GUI(renderer, font_manager)
+    gui = GUI(renderer, font_manager, workspace_filename=workspace_filename)
 
-    chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
-    chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
+    # chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
+    # chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
 
-    label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
+    # label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
 
-    text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
+    # text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
 
-    gui.content().add_child(chat1)
-    gui.content().add_child(chat2)
-    gui.content().add_child(label)
-    gui.content().add_child(text)
+    # gui.content().add_child(chat1)
+    # gui.content().add_child(chat2)
+    # gui.content().add_child(label)
+    # gui.content().add_child(text)
 
     # filename = "./data/test1.csv"
     # # filename = "./data/IB-hist-TQQQ-2023-01-20-5s.csv"
@@ -153,6 +153,7 @@ if __name__ == "__main__":
     parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
     parser.add_argument('--height', type=int, default=800, help='window height (default: 800)')
 
+    parser.add_argument('--workspace', default='aish_workspace.json', help='workspace file (default: aish_workspace.json)')
     args = parser.parse_args()
 
-    run(args.fullscreen, args.width, args.height)
+    run(args.fullscreen, args.width, args.height, args.workspace)

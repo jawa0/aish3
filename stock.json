@@ -1,0 +1,29 @@
+{
+  "saved_at_utc": "2023-08-28T00:10:29.518371+00:00",
+  "saved_at_local": "2023-08-27T20:10:29.518371-04:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        0,
+        0,
+        1391,
+        641
+      ],
+      "layout": null,
+      "children": [
+        {
+          "class": "CandlestickPlot",
+          "bounding_rect": [
+            10,
+            40,
+            1380,
+            600
+          ],
+          "csv_filepath": "./data/test1.csv"
+        }
+      ]
+    }
+  }
+}
