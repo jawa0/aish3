@@ -69,6 +69,7 @@ def run(fullscreen, width, height, workspace_filename):
 
     
     gui = GUI(renderer, font_manager, workspace_filename=workspace_filename)
+    # gui = GUI(renderer, font_manager, workspace_filename=None)
 
     # chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
     # chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
@@ -83,7 +84,6 @@ def run(fullscreen, width, height, workspace_filename):
     # gui.content().add_child(text)
 
     # filename = "./data/test1.csv"
-    # # filename = "./data/IB-hist-TQQQ-2023-01-20-5s.csv"
     # sticks = gui.create_control("CandlestickPlot", csv_filepath=filename, x=10, y=40, w=1380, h=600)
     # gui.content().add_child(sticks)
 

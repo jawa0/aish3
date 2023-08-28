@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import ctypes
 import datetime
 import json
 import pytz
@@ -171,6 +172,8 @@ class GUI:
     
 
     def handle_keydown(self, event):
+        wr = self.content().get_world_rect()
+
         keySym = event.key.keysym.sym
         cmdPressed = event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
 
@@ -186,8 +189,12 @@ class GUI:
             
             # Cmd+N add new LLM chat
             if keySym == sdl2.SDLK_n:
+                x = ctypes.c_int()
+                y = ctypes.c_int()                
+                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
                 self.content().sizeToChildren()
-                chat = self.create_control("LLMChatContainer", y=10, x=10+self.content().bounding_rect.w)
+                chat = self.create_control("LLMChatContainer", x=x.value-wr.x, y=y.value-wr.y)
                 self.content().add_child(chat)
                 # self.set_focus(chat)
                 return True  # event was handled
@@ -203,8 +210,12 @@ class GUI:
             
             # Cmd+T creaes a new TextArea
             if keySym == sdl2.SDLK_t:
+                x = ctypes.c_int()
+                y = ctypes.c_int()                
+                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
                 self.content().sizeToChildren()
-                textArea = self.create_control("TextArea", w=160, h=80, y=10, x=10+self.content().bounding_rect.w)
+                textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
                 self.content().add_child(textArea)
                 self.set_focus(textArea)
                 return True
