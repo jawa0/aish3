@@ -88,6 +88,15 @@ class TextArea(GUIControl):
                 self.set_needs_redraw()
                 return True
             
+            # Cmd+Backspace/Delete deletes the currently focused message
+            # If the whole LLMChatContainer is focused, then delete this chat.
+            elif keySymbol == sdl2.SDLK_BACKSPACE:
+                focused_control = self.gui.get_focus()
+                if focused_control is self:
+                    assert(self.parent is not None)
+                    self.parent.remove_child(self)
+                    return True
+
             # left arrow key
             elif keySymbol == sdl2.SDLK_LEFT:  
                 # Is Shift held? Start selection if None
