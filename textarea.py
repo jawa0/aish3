@@ -88,12 +88,13 @@ class TextArea(GUIControl):
                 self.set_needs_redraw()
                 return True
             
-            # Cmd+Backspace/Delete deletes the currently focused message
-            # If the whole LLMChatContainer is focused, then delete this chat.
-            elif keySymbol == sdl2.SDLK_BACKSPACE:
+            # Cmd+Backspace/Delete delete the TextArea, but only if
+            # it is at the top-level of the GUI, not part of some other
+            # container.
+
+            elif cmdPressed and keySymbol == sdl2.SDLK_BACKSPACE:
                 focused_control = self.gui.get_focus()
-                if focused_control is self:
-                    assert(self.parent is not None)
+                if focused_control is self and focused_control.parent == self.gui.content():
                     self.parent.remove_child(self)
                     return True
 
