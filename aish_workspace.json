@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-08-27T14:23:56.713027+00:00",
-  "saved_at_local": "2023-08-27T10:23:56.713027-04:00",
+  "saved_at_utc": "2023-09-29T17:30:53.204022+00:00",
+  "saved_at_local": "2023-09-29T13:30:53.204022-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -8,7 +8,7 @@
       "bounding_rect": [
         0,
         0,
-        735,
+        1182,
         507
       ],
       "layout": null,
@@ -204,6 +204,38 @@
             100
           ],
           "text": "This is a TextArea."
+        },
+        {
+          "class": "VoiceTranscriptContainer",
+          "bounding_rect": [
+            829,
+            144,
+            352,
+            142
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "Voice Transcript"
+            },
+            {
+              "class": "TextArea",
+              "bounding_rect": [
+                1,
+                21,
+                350,
+                120
+              ],
+              "text": ""
+            }
+          ]
         }
       ]
     }
