@@ -24,6 +24,15 @@ from textarea import TextArea
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 
+import pyaudio
+from multiprocessing import Process, Queue
+import os
+
+
+SAMPLE_RATE = 16000
+SAMPLE_FORMAT = pyaudio.paInt16
+N_RECORDING_CHANNELS = 1
+
 
 PANEL_WIDTH = 350
 PANEL_HEIGHT = 120
@@ -50,6 +59,12 @@ class VoiceTranscriptContainer(GUIContainer):
             self.text_area = TextArea(18, w=PANEL_WIDTH, h=PANEL_HEIGHT, **kwargs)
             self.add_child(self.text_area, add_to_focus_ring=False)
 
+        self.command_q = Queue()
+        self.recording_q = Queue()
+
+        self.recording_process = Process(target=VoiceTranscriptContainer.recordingProcessMain, args=(self.command_q, self.recording_q))
+        self.recording_process.start()
+
 
     @classmethod
     def from_json(cls, json, **kwargs):
@@ -72,6 +87,81 @@ class VoiceTranscriptContainer(GUIContainer):
             elif child_class_name == "TextArea":
                 instance.text_area = child
         return instance
+
+
+    def _on_quit(self):
+        self.command_q.put("q")
+        return super()._on_quit()
+    
+
+    @staticmethod
+    def recordingProcessMain(commandQueue, outputQueue):
+        STATE_UNINITIALIZED = 0
+        STATE_INITIALIZED = 1
+        STATE_RECORDING = 2
+
+        state = STATE_UNINITIALIZED
+        stream = None
+
+
+        def info(msg):
+            print(f"[INFO] pid: {os.getpid()}, msg: '{msg}'")
+
+
+        def stop_recording(stream, state):
+            if stream:
+                stream.stop_stream()
+                stream.close()
+                stream = None
+
+            info("Recording stopped")
+            state = STATE_INITIALIZED
+
+
+        info("Recording process started")
+
+        pa = pyaudio.PyAudio()
+        state = STATE_INITIALIZED
+        info("Recording process initialized")
+        info(f"* Sample rate: {SAMPLE_RATE}; Sample format: {SAMPLE_FORMAT}; Channels: {N_RECORDING_CHANNELS}")
+        info(f"Waiting for commands...")
+
+        while True:
+            cmd = commandQueue.get()    # Blocks until command is received
+            info(f"Received command: {cmd}")
+            if cmd == "q":
+                break
+
+            if cmd == "r":
+                if state < STATE_INITIALIZED:
+                    info("Command ignored: recording process not initialized")
+                    continue
+                elif state == STATE_RECORDING:
+                    info("Command ignored: already recording")
+                    continue
+
+                stream = pa.open(format=SAMPLE_FORMAT, channels=N_RECORDING_CHANNELS, rate=SAMPLE_RATE, input=True, )
+                state = STATE_RECORDING
+                info("Recording started")
+
+                audio_data = b''
+                while state == STATE_RECORDING:
+                    n_frames_available = stream.get_read_available()
+                    if n_frames_available:
+                        audio_data += stream.read(n_frames_available)
+
+                    # @todo: do I really need to use exceptions here? @perf
+                    try:
+                        cmd = commandQueue.get_nowait()
+                        if cmd == "r":
+                            stop_recording(stream, state)
+                    except:
+                        pass
+                outputQueue.put(audio_data)
+        
+        pa.terminate()
+        stop_recording(stream, state)
+        state = STATE_UNINITIALIZED
 
 
     def get_text(self):
@@ -98,48 +188,11 @@ class VoiceTranscriptContainer(GUIContainer):
         return self.parent.handle_event(event)
 
 
-    # def send(self):
-    #     messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
-    #     print(messages)
-
-    #     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    #     OPENAI_ORGANIZATION = os.getenv("OPENAI_ORGANIZATION")
-        
-    #     openai.api_key = OPENAI_API_KEY
-    #     openai.organization = OPENAI_ORGANIZATION
-
-    #     # Add Answer TextArea
-    #     answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-    #     self.add_child(answer, add_to_focus_ring=False)
-    #     self.focusRing.add(answer.text_area, set_focus=True)
-
-    #     # Shrink previous messages
-    #     for u in self.utterances:
-    #         u.text_area.set_size(PANEL_WIDTH, 60)
-    #     self.utterances.append(answer)
-    #     self.updateLayout
-
-    #     completion = openai.ChatCompletion.create(model="gpt-4", messages=messages, stream=True)
-    #     self.gui._running_completions[self] = completion
-
-
     def get_json(self):
         return {
             "type": "VoiceTranscriptContainer",
             "version": 1,
         }
-
-
-    # def load(self):
-    #     print("loading")
-    #     try:
-    #         with open("aish_workspace.json", "r") as f:
-    #             data = json.load(f)
-    #             self.system.text_area.text_buffer.set_text(data["system_text"])
-    #             self.system.text_area.text_buffer.move_point_to_start()
-    #             self.system.text_area.text_buffer.clear_mark()
-    #     except FileNotFoundError:
-    #         self.save()
 
 
 GUI.register_control_type("VoiceTranscriptContainer", VoiceTranscriptContainer)
