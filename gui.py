@@ -199,12 +199,16 @@ class GUI:
                 # self.set_focus(chat)
                 return True  # event was handled
 
-            # Cmd+R remove LLM chat
+            # Cmd+R create new VoiceTranscriptContainer
             if keySym == sdl2.SDLK_r:
-                assert(self.chats is not None)
-                control = self.get_focus()
-                print(control)
-                print(self.get_ancestor_chain(control))
+                # @todo DRY with Cmd+N
+                x = ctypes.c_int()
+                y = ctypes.c_int()                
+                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+                self.content().sizeToChildren()
+                voice = self.create_control("VoiceTranscriptContainer", x=x.value-wr.x, y=y.value-wr.y)
+                self.content().add_child(voice)
 
                 return True  # event was handled
             
