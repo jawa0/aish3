@@ -1,0 +1,79 @@
+{
+  "saved_at_utc": "2023-09-29T19:01:46.638747+00:00",
+  "saved_at_local": "2023-09-29T15:01:46.638747-04:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        0,
+        0,
+        983,
+        542
+      ],
+      "layout": null,
+      "children": [
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            252,
+            174,
+            160,
+            80
+          ],
+          "text": "Deepgram Nova-2\nhttps://deepgram.com/learn/nova-2-speech-to-text-api?utm_source=LinkedIn&utm_medium=Organic+Social&utm_campaign=0923+Nova-2"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            525,
+            180,
+            160,
+            80
+          ],
+          "text": "OpenAI Whisper"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            537,
+            271,
+            160,
+            80
+          ],
+          "text": "ggerganov whisper.cpp"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            782,
+            181,
+            160,
+            80
+          ],
+          "text": "Google Cloud Speech"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            783,
+            275,
+            160,
+            80
+          ],
+          "text": "Amazon"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            785,
+            370,
+            160,
+            80
+          ],
+          "text": "Azure"
+        }
+      ]
+    }
+  }
+}
