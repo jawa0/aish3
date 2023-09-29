@@ -97,6 +97,17 @@ class GUI:
         return self._content
     
     
+    def on_quit(self):
+        # Do depth-first traversal
+        q = [self.content()]
+        while len(q) > 0:
+            control = q.pop()
+            if hasattr(control, "children"):
+                q.extend(control.children)
+            if hasattr(control, "_on_quit"):
+                control._on_quit()
+
+
     def get_ancestor_chain(self, control):
         chain = []
         while control is not None:
@@ -446,6 +457,11 @@ class GUIControl:
         json["class"] = self.__class__.__name__
         json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
         return json
+
+
+    def _on_quit(self):
+        pass
+
 
     # In local coordinates (relative to parent)
     def get_position(self):

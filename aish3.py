@@ -38,6 +38,7 @@ import argparse
 import time
 from gui import GUI
 from llm_chat_container import LLMChatContainer
+from transcribe_audio import VoiceTranscriptContainer
 from gui_layout import RowLayout
 from draw import draw_text
 from dotenv import load_dotenv
@@ -95,6 +96,7 @@ def run(fullscreen, width, height, workspace_filename):
             for event in events:
                 if event.type == sdl2.SDL_QUIT:
                     running = False
+                    gui.on_quit()
                     break
                 elif event.type == sdl2.SDL_WINDOWEVENT and \
                     event.window.event == sdl2.SDL_WINDOWEVENT_SIZE_CHANGED:
