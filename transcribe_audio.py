@@ -146,9 +146,13 @@ class VoiceTranscriptContainer(GUIContainer):
 
                 audio_data = b''
                 while state == STATE_RECORDING:
-                    n_frames_available = stream.get_read_available()
-                    if n_frames_available:
-                        audio_data += stream.read(n_frames_available)
+                    # info("a")
+                    # n_frames_available = stream.get_read_available()
+                    # # info(f"n_frames_available: {n_frames_available}")
+                    # if n_frames_available > 0:
+                    #     info("About to append to audio_data")
+                    #     audio_data += stream.read(n_frames_available)
+                    #     info(f"Read {n_frames_available} frames from stream")
 
                     # @todo: do I really need to use exceptions here? @perf
                     try:
@@ -173,17 +177,9 @@ class VoiceTranscriptContainer(GUIContainer):
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
             keySymbol = event.key.keysym.sym
 
-            if cmdPressed:
-                # Cmd+R toggles recording audio
-                if keySymbol == sdl2.SDLK_r:
-                    # self.send()
-                    return True
-                            
-            if keySymbol == sdl2.SDLK_RETURN:
-                # Delegate to GUIContainer
-                handled = super().handle_event(event)
-                if handled:
-                    return True
+            if cmdPressed and keySymbol == sdl2.SDLK_RETURN:
+                print('Command: toggle recording')
+                self.command_q.put("r")
             
         return self.parent.handle_event(event)
 
