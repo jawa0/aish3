@@ -46,7 +46,8 @@ import candlestick
 
 
 def run(fullscreen, width, height, workspace_filename):
-    sdl2.ext.init()
+    # sdl2.ext.init()
+    sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO | sdl2.SDL_INIT_EVENTS)
     ttf.TTF_Init()
 
     window = sdl2.ext.Window("AISH", size=(width, height), 

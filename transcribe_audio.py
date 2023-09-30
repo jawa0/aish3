@@ -24,6 +24,8 @@ from textarea import TextArea
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 
+from record_audio import MicrophoneStream, RATE, CHUNK
+
 import pyaudio
 from multiprocessing import Process, Queue
 import os
@@ -39,6 +41,8 @@ PANEL_HEIGHT = 120
 
 
 class VoiceTranscriptContainer(GUIContainer):
+    STATE_IDLE = 0
+    STATE_RECORDING = 1
 
     @classmethod
     def create(cls, **kwargs):
@@ -58,12 +62,8 @@ class VoiceTranscriptContainer(GUIContainer):
 
             self.text_area = TextArea(18, w=PANEL_WIDTH, h=PANEL_HEIGHT, **kwargs)
             self.add_child(self.text_area, add_to_focus_ring=False)
-
-        self.command_q = Queue()
-        self.recording_q = Queue()
-
-        self.recording_process = Process(target=VoiceTranscriptContainer.recordingProcessMain, args=(self.command_q, self.recording_q))
-        self.recording_process.start()
+        
+        self.state = self.STATE_IDLE
 
 
     @classmethod
@@ -94,80 +94,6 @@ class VoiceTranscriptContainer(GUIContainer):
         return super()._on_quit()
     
 
-    @staticmethod
-    def recordingProcessMain(commandQueue, outputQueue):
-        STATE_UNINITIALIZED = 0
-        STATE_INITIALIZED = 1
-        STATE_RECORDING = 2
-
-        state = STATE_UNINITIALIZED
-        stream = None
-
-
-        def info(msg):
-            print(f"[INFO] pid: {os.getpid()}, msg: '{msg}'")
-
-
-        def stop_recording(stream, state):
-            if stream:
-                stream.stop_stream()
-                stream.close()
-                stream = None
-
-            info("Recording stopped")
-            state = STATE_INITIALIZED
-
-
-        info("Recording process started")
-
-        pa = pyaudio.PyAudio()
-        state = STATE_INITIALIZED
-        info("Recording process initialized")
-        info(f"* Sample rate: {SAMPLE_RATE}; Sample format: {SAMPLE_FORMAT}; Channels: {N_RECORDING_CHANNELS}")
-        info(f"Waiting for commands...")
-
-        while True:
-            cmd = commandQueue.get()    # Blocks until command is received
-            info(f"Received command: {cmd}")
-            if cmd == "q":
-                break
-
-            if cmd == "r":
-                if state < STATE_INITIALIZED:
-                    info("Command ignored: recording process not initialized")
-                    continue
-                elif state == STATE_RECORDING:
-                    info("Command ignored: already recording")
-                    continue
-
-                stream = pa.open(format=SAMPLE_FORMAT, channels=N_RECORDING_CHANNELS, rate=SAMPLE_RATE, input=True, )
-                state = STATE_RECORDING
-                info("Recording started")
-
-                audio_data = b''
-                while state == STATE_RECORDING:
-                    # info("a")
-                    # n_frames_available = stream.get_read_available()
-                    # # info(f"n_frames_available: {n_frames_available}")
-                    # if n_frames_available > 0:
-                    #     info("About to append to audio_data")
-                    #     audio_data += stream.read(n_frames_available)
-                    #     info(f"Read {n_frames_available} frames from stream")
-
-                    # @todo: do I really need to use exceptions here? @perf
-                    try:
-                        cmd = commandQueue.get_nowait()
-                        if cmd == "r":
-                            stop_recording(stream, state)
-                    except:
-                        pass
-                outputQueue.put(audio_data)
-        
-        pa.terminate()
-        stop_recording(stream, state)
-        state = STATE_UNINITIALIZED
-
-
     def get_text(self):
         return self.text_area.text_buffer.get_text()
         
@@ -179,9 +105,21 @@ class VoiceTranscriptContainer(GUIContainer):
 
             if cmdPressed and keySymbol == sdl2.SDLK_RETURN:
                 print('Command: toggle recording')
-                self.command_q.put("r")
+                if self.state == self.STATE_IDLE:
+                    self.state = self.STATE_RECORDING
+                    self.record_audio()
+                    
+                elif self.state == self.STATE_RECORDING:
+                    self.state = self.STATE_IDLE
             
         return self.parent.handle_event(event)
+
+
+    def record_audio(self):
+        with MicrophoneStream(RATE, CHUNK) as stream:
+            audio_generator = stream.generator()
+            for audio_data in audio_generator:
+                print(len(audio_data))
 
 
     def get_json(self):
