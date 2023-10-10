@@ -90,6 +90,8 @@ def run(fullscreen, width, height, workspace_filename):
     # gui.content().add_child(sticks)
 
     running = True
+    t_prev_update = time.time()
+
     fps_smoothed = 0.0
     while running:
         events = sdl2.ext.get_events()
@@ -129,6 +131,11 @@ def run(fullscreen, width, height, workspace_filename):
 
 
         else:
+            t_update = time.time()
+            dt = t_update - t_prev_update
+            gui.update(dt)
+            t_prev_update = t_update
+
             t0 = time.time()
             renderer.clear()
             gui.draw()
