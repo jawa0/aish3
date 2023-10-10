@@ -272,6 +272,12 @@ class GUI:
                         return True  # event was handled
 
 
+    def update(self, dt):
+        for c in self.content():
+            if hasattr(c, 'on_update'):
+                c.on_update(dt)
+
+
     def draw(self):
         if self._content:
             self._content.draw()
@@ -346,7 +352,7 @@ class GUI:
     def check_hit(self, x, y):
         p = sdl2.SDL_Point(x, y)
         
-        q = list(self.content().children)
+        q = list(self.content())
         while len(q) > 0:
             child = q.pop()
             if sdl2.SDL_PointInRect(p, child.get_world_rect()):
@@ -529,7 +535,7 @@ class GUIControl:
         if self.parent:
             return self.parent.handle_event(event)
         else:
-            return False
+            return False            
 
 
 #===============================================================================
@@ -563,6 +569,20 @@ class GUIContainer(GUIControl):
         self.focusRing = FocusRing(gui=self.gui)
 
 
+    def __iter__(self):
+        self._iter_index = 0
+        return self
+
+
+    def __next__(self):
+        if self._iter_index < len(self.children):
+            result = self.children[self._iter_index]
+            self._iter_index += 1
+            return result
+        else:
+            raise StopIteration
+
+
     def __json__(self):
         json = super().__json__()
         json["class"] = self.__class__.__name__
@@ -586,6 +606,12 @@ class GUIContainer(GUIControl):
                 self.updateLayout()
 
 
+    def on_update(self, dt):
+        for c in self:
+            if hasattr(c, 'on_update'):
+                c.on_update(dt)
+
+
     def draw(self):
         # Draw own bounding rect @debug @test
         if self.draw_bounds and self.bounding_rect is not None:
@@ -606,7 +632,7 @@ class GUIContainer(GUIControl):
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
 
         # Draw children @test drawinb bounnds after
-        for child in self.children:
+        for child in self:
             child.draw()
 
 
@@ -653,8 +679,8 @@ class GUIContainer(GUIControl):
         INSET_Y = 1
 
         if self.children:
-            w = max([child.bounding_rect.x + child.bounding_rect.w for child in self.children])
-            h = max([child.bounding_rect.y + child.bounding_rect.h for child in self.children])
+            w = max([child.bounding_rect.x + child.bounding_rect.w for child in self])
+            h = max([child.bounding_rect.y + child.bounding_rect.h for child in self])
             self.set_size(w + INSET_X, h + INSET_Y, updateLayout=False)
 
 
