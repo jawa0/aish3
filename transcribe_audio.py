@@ -73,6 +73,7 @@ class VoiceTranscriptContainer(GUIContainer):
         self.stream = None
         self.transcriber = None
         self.incoming_text = queue.Queue()
+        self.insertion_point = 0
 
 
     @classmethod
@@ -118,9 +119,11 @@ class VoiceTranscriptContainer(GUIContainer):
                 print('Command: toggle recording')
                 if self.state == self.STATE_IDLE:
                     self.start_recording()
+                    return True
                     
                 elif self.state == self.STATE_RECORDING:
                     self.stop_recording()
+                    return True
             
         return self.parent.handle_event(event)
 
@@ -138,8 +141,6 @@ class VoiceTranscriptContainer(GUIContainer):
             on_close=self._on_transcribe_close
         )
         self.transcriber.connect()
-        # self.stream = aai.extras.MicrophoneStream(sample_rate=16_000)
-        # self.transcriber.stream(self.stream)
         self.state = self.STATE_RECORDING
 
 
@@ -150,8 +151,6 @@ class VoiceTranscriptContainer(GUIContainer):
 
         assert(self.transcriber is not None)
         self.transcriber.close()
-        # self.stream.close()
-        # self.stream = None
         self.transcriber = None
         self.state = self.STATE_IDLE
 
@@ -163,10 +162,10 @@ class VoiceTranscriptContainer(GUIContainer):
         if not transcript.text:
             return
 
-        if isinstance(transcript, aai.RealtimeFinalTranscript):
-            # self.text_area.text_buffer.insert(transcript.text + '\n')
-        #     self.text_area.set_needs_redraw()
-            self.incoming_text.put(transcript.text)
+        if isinstance(transcript, aai.RealtimePartialTranscript):
+            self.incoming_text.put((transcript.text, False))
+        elif isinstance(transcript, aai.RealtimeFinalTranscript):
+            self.incoming_text.put((transcript.text, True))
 
 
     def _on_transcribe_error(self, error: aai.RealtimeError):
@@ -177,6 +176,7 @@ class VoiceTranscriptContainer(GUIContainer):
         print(f"Assembly AI session opened with ID: {session_opened.session_id}")
 
     def _on_transcribe_close(self):
+        # @note @bug whiy is this called twice on stop_recording?
         print("Assembly AI session closed.")
 
 
@@ -191,17 +191,36 @@ class VoiceTranscriptContainer(GUIContainer):
                 self.transcriber.stream(audio_bytes)
 
         text = ""
+        was_final = False
         try:
             while True:
-                t = self.incoming_text.get_nowait()
-                if len(t) > 0:
+                (t, is_final) = self.incoming_text.get_nowait()
+                if len(t) == 0:
+                    continue
+
+                if is_final:
+                    text = t
+                else:
                     text += t
+                was_final = is_final
+
         except queue.Empty:
             if len(text) > 0:
-                print('****', text)
+                print('**', text)
 
         if len(text) > 0:
-            self.text_area.text_buffer.insert(text + '\n')
+            ta = self.text_area
+            tb = self.text_area.text_buffer
+
+            tb.set_mark(self.insertion_point)
+            tb.move_point_to_end()
+            tb.delete_selection()
+            tb.insert(text)
+            tb.clear_mark()
+            if was_final:
+                tb.insert('\n')
+                self.insertion_point = tb.get_point()
+
             self.text_area.set_needs_redraw()
 
 
