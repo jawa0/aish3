@@ -18,6 +18,11 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
     OPENAI_ORGANIZATION = "..."
     OPENAI_API_KEY="..."
 
+To use speech-to-text transcription, you'll need an AssemblyAI API KEY
+
+    ASSEMBLYAI_API_KEY="..."
+
+
 ### Keyboard Commands
 
 |Command|Description|
@@ -27,7 +32,8 @@ If you want to make GPT API requests, you'll need to provide a couple of environ
 |Cmd+G|Send messages to GPT-4 for chat completion|
 |Cmd+U|Add another "user" message text field|
 |Cmd+Delete|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
-|Cmd+R|Toggle recording when a VoiceTranscriptContainer is focused.|
+|Cmd+R|Create a new VoiceTranscriptContainer at the current cursor location.|
+|Cmd+Enter|Toggle audio recording on/off when a VoiceTranscriptContainer is focused.|
 |Cmd+T|Create a new TextArea (use it like a post-it note)|
 |Cmd+S|Save workspace to aish_workspace.json|
 |Cmd+L|Load workspace from aish_workspace.json
