@@ -26,13 +26,19 @@ from gui_focus import FocusRing
 
 from record_audio import MicrophoneStream, RATE, CHUNK
 
-import pyaudio
+# import pyaudio
 from multiprocessing import Process, Queue
 import os
+import assemblyai as aai
+import threading
+import queue
+
+load_dotenv()
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
 
 SAMPLE_RATE = 16000
-SAMPLE_FORMAT = pyaudio.paInt16
+# SAMPLE_FORMAT = pyaudio.paInt16
 N_RECORDING_CHANNELS = 1
 
 
@@ -64,6 +70,9 @@ class VoiceTranscriptContainer(GUIContainer):
             self.add_child(self.text_area, add_to_focus_ring=False)
         
         self.state = self.STATE_IDLE
+        self.stream = None
+        self.transcriber = None
+        self.incoming_text = queue.Queue()
 
 
     @classmethod
@@ -90,7 +99,9 @@ class VoiceTranscriptContainer(GUIContainer):
 
 
     def _on_quit(self):
-        self.command_q.put("q")
+        if self.state == self.STATE_RECORDING:
+            self.stop_recording()
+
         return super()._on_quit()
     
 
@@ -106,20 +117,92 @@ class VoiceTranscriptContainer(GUIContainer):
             if cmdPressed and keySymbol == sdl2.SDLK_RETURN:
                 print('Command: toggle recording')
                 if self.state == self.STATE_IDLE:
-                    self.state = self.STATE_RECORDING
-                    self.record_audio()
+                    self.start_recording()
                     
                 elif self.state == self.STATE_RECORDING:
-                    self.state = self.STATE_IDLE
+                    self.stop_recording()
             
         return self.parent.handle_event(event)
 
 
-    def record_audio(self):
-        with MicrophoneStream(RATE, CHUNK) as stream:
-            audio_generator = stream.generator()
-            for audio_data in audio_generator:
-                print(len(audio_data))
+    def start_recording(self):
+        assert(self.state == self.STATE_IDLE)
+        self.stream = MicrophoneStream(RATE, CHUNK)
+        self.stream.start()
+
+        self.transcriber = aai.RealtimeTranscriber(
+            sample_rate=16_000,
+            on_data=self._on_transcribe_data,
+            on_error=self._on_transcribe_error,
+            on_open=self._on_transcribe_open,
+            on_close=self._on_transcribe_close
+        )
+        self.transcriber.connect()
+        # self.stream = aai.extras.MicrophoneStream(sample_rate=16_000)
+        # self.transcriber.stream(self.stream)
+        self.state = self.STATE_RECORDING
+
+
+    def stop_recording(self):
+        assert(self.state == self.STATE_RECORDING)
+        self.stream.stop()
+        self.stream = None
+
+        assert(self.transcriber is not None)
+        self.transcriber.close()
+        # self.stream.close()
+        # self.stream = None
+        self.transcriber = None
+        self.state = self.STATE_IDLE
+
+    # @note: this is executing on a different thread than my app functions
+    # like on_update()
+    def _on_transcribe_data(self, transcript: aai.RealtimeTranscript):
+        # print(f"_on_transcribe_data(): tid={threading.current_thread().ident}")
+        # print(transcript)
+        if not transcript.text:
+            return
+
+        if isinstance(transcript, aai.RealtimeFinalTranscript):
+            # self.text_area.text_buffer.insert(transcript.text + '\n')
+        #     self.text_area.set_needs_redraw()
+            self.incoming_text.put(transcript.text)
+
+
+    def _on_transcribe_error(self, error: aai.RealtimeError):
+        print(f"Assembly AI Error: {error}")
+
+
+    def _on_transcribe_open(self, session_opened: aai.RealtimeSessionOpened):
+        print(f"Assembly AI session opened with ID: {session_opened.session_id}")
+
+    def _on_transcribe_close(self):
+        print("Assembly AI session closed.")
+
+
+    def on_update(self, dt):
+        # print(f"on_update(): tid={threading.current_thread().ident}")
+        if self.state == self.STATE_RECORDING:
+            assert(self.transcriber is not None)
+            assert(self.stream is not None)
+            audio_bytes = self.stream.get_nowait()
+            # print(dt, len(audio_bytes))
+            if len(audio_bytes) > 0:
+                self.transcriber.stream(audio_bytes)
+
+        text = ""
+        try:
+            while True:
+                t = self.incoming_text.get_nowait()
+                if len(t) > 0:
+                    text += t
+        except queue.Empty:
+            if len(text) > 0:
+                print('****', text)
+
+        if len(text) > 0:
+            self.text_area.text_buffer.insert(text + '\n')
+            self.text_area.set_needs_redraw()
 
 
     def get_json(self):
