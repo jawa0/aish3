@@ -25,22 +25,7 @@ class MicrophoneStream(object):
         with MicrophoeStream(16000, 1600) as stream:
             # do stuff with stream...
         """
-        self._audio_interface = pyaudio.PyAudio()
-        self._audio_stream = self._audio_interface.open(
-            format=pyaudio.paInt16,
-            # The API currently only supports 1-channel (mono) audio
-            # https://goo.gl/z757pE
-            channels=1,
-            rate=self._rate,
-            input=True,
-            frames_per_buffer=self._chunk,
-            # Run the audio stream asynchronously to fill the buffer object.
-            # This is necessary so that the input device's buffer doesn't
-            # overflow while the calling thread makes network requests, etc.
-            stream_callback=self._fill_buffer,
-        )
-
-        self.closed = False
+        self.start()
         return self
 
 
@@ -58,30 +43,36 @@ class MicrophoneStream(object):
         return None, pyaudio.paContinue
 
 
-    def generator(self):
-        while not self.closed:
-            # Use a blocking get() to ensure there's at least one chunk of
-            # data, and stop iteration if the chunk is None, indicating the
-            # end of the audio stream.
-            chunk = self._buff.get()
-            if chunk is None:
-                return
-            data = [chunk]
-
-            # Now consume whatever other data's still buffered.
+    def get_nowait(self):
+        chunks = []
+        try:
             while True:
-                try:
-                    chunk = self._buff.get(block=False)
-                    if chunk is None:
-                        return
-                    data.append(chunk)
-                except queue.Empty:
-                    break
+                chunk = self._buff.get_nowait()
+                assert(chunk is not None)
+                chunks.append(chunk)
+        except queue.Empty:
+            if not len(chunks):
+                return b""
 
-            yield b"".join(data)
+        return b"".join(chunks)
 
-            # if self._quit_event.is_set():
-            #     self.stop()
+
+    def start(self):
+        self._audio_interface = pyaudio.PyAudio()
+        self._audio_stream = self._audio_interface.open(
+            format=pyaudio.paInt16,
+            # The API currently only supports 1-channel (mono) audio
+            # https://goo.gl/z757pE
+            channels=1,
+            rate=self._rate,
+            input=True,
+            frames_per_buffer=self._chunk,
+            # Run the audio stream asynchronously to fill the buffer object.
+            # This is necessary so that the input device's buffer doesn't
+            # overflow while the calling thread makes network requests, etc.
+            stream_callback=self._fill_buffer,
+        )
+        self.closed = False
 
 
     def stop(self):
@@ -92,5 +83,3 @@ class MicrophoneStream(object):
         # streaming_recognize method will not block the process termination.
         self._buff.put(None)
         self._audio_interface.terminate()
-
-
