@@ -223,6 +223,15 @@ class VoiceTranscriptContainer(GUIContainer):
 
             self.text_area.set_needs_redraw()
 
+            focused_control = self.gui.get_focus()
+            if was_final and \
+                focused_control is not None and focused_control is not self and isinstance(focused_control, TextArea):
+                
+                ta = focused_control
+                tb = ta.text_buffer
+                tb.insert(text + '\n')
+                ta.set_needs_redraw()
+
 
     def get_json(self):
         return {

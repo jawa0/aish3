@@ -23,7 +23,7 @@ from tzlocal import get_localzone
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 import weakref
-
+import os
 
 #===============================================================================
 class GUI:
@@ -406,6 +406,12 @@ class GUI:
         
         print("GUI loaded.")
         return True
+
+
+    def voice_input_available(self):
+        """Is speech input available?"""
+        return os.getenv("ASSEMBLYAI_API_KEY") is not None
+    
 
 #===============================================================================
 class GUIControl:
