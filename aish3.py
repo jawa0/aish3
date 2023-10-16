@@ -71,6 +71,8 @@ def run(fullscreen, width, height, workspace_filename):
 
     
     gui = GUI(renderer, font_manager, workspace_filename=workspace_filename)
+    print(f'Voice input available? {gui.voice_input_available()}')
+    
     # gui = GUI(renderer, font_manager, workspace_filename=None)
 
     # chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
