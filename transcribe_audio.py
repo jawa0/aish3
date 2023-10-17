@@ -31,8 +31,10 @@ from multiprocessing import Process, Queue
 import os
 import assemblyai as aai
 import webrtcvad
-import threading
 import queue
+import wave
+from datetime import datetime
+
 
 load_dotenv()
 aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
@@ -74,6 +76,8 @@ class VoiceTranscriptContainer(GUIContainer):
         self.state = self.STATE_IDLE
         self.vad = None
         self.stream = None
+        self.recording_start_dt = None
+        self.all_audio_bytes = b""
         self.transcriber = None
         self.incoming_text = queue.Queue()
         self.insertion_point = 0
@@ -138,6 +142,7 @@ class VoiceTranscriptContainer(GUIContainer):
 
         self.stream = MicrophoneStream(N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES)
         self.stream.start()
+        self.recording_start_dt = datetime.now()
 
         self.transcriber = aai.RealtimeTranscriber(
             sample_rate=N_SAMPLES_PER_SECOND,
@@ -160,6 +165,14 @@ class VoiceTranscriptContainer(GUIContainer):
         self.transcriber = None
         self.vad = None
         self.state = self.STATE_IDLE
+
+        # Write audio to file
+        audio_filename = self._unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
+        self._write_audio_file(audio_filename, self.all_audio_bytes)
+        print(f"Wrote audio to {audio_filename}")
+        self.recording_start_dt = None
+        self.all_audio_bytes = b""
+
 
     # @note: this is executing on a different thread than my app functions
     # like on_update()
@@ -215,6 +228,9 @@ class VoiceTranscriptContainer(GUIContainer):
                 else:
                     print('is_speech: False.')
 
+                self.all_audio_bytes += audio_bytes
+                print(f"Total audio: {len(self.all_audio_bytes)} bytes")
+
         text = ""
         was_final = False
         try:
@@ -258,6 +274,25 @@ class VoiceTranscriptContainer(GUIContainer):
                 tb.insert(text + '\n')
                 ta.set_needs_redraw()
 
+
+    def _write_audio_file(self, filename, audio_bytes):
+        with wave.open(filename, 'wb') as wf:
+            wf.setnchannels(N_RECORDING_CHANNELS)
+            wf.setsampwidth(N_SAMPLE_BYTES)
+            wf.setframerate(N_SAMPLES_PER_SECOND)
+            wf.writeframes(audio_bytes)
+
+
+    def _unique_filename(self, candidate_filename):
+        counter = 1
+        name, ext = os.path.splitext(candidate_filename)
+
+        while os.path.exists(candidate_filename):
+            candidate_filename = f"{name}_{counter}{ext}"
+            counter += 1
+
+        return candidate_filename
+    
 
     def get_json(self):
         return {
