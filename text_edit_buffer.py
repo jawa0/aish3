@@ -134,7 +134,7 @@ class TextEditBuffer(object):
         if after_row == before_row:
             self.desired_col = after_col
 
-        print(f'POINT = {self.POINT} row = {after_row}  col = {after_col}  desired_col = {self.desired_col}')            
+        # print(f'POINT = {self.POINT} row = {after_row}  col = {after_col}  desired_col = {self.desired_col}')            
 
 
     def set_mark(self, mark_position=None):

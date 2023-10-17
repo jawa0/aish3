@@ -1,10 +1,13 @@
+import ctypes
 import pyaudio
 import queue
 
 
 # Audio recording parameters
-RATE = 16000
-CHUNK = int(RATE / 10)  # 100ms
+N_SAMPLES_PER_SECOND = 16_000
+N_SAMPLE_BYTES = ctypes.sizeof(ctypes.c_int16)  # pyaudio.paInt16
+N_CHANNELS = 1
+N_CHUNK_SAMPLES = int(N_SAMPLES_PER_SECOND / 5)  # 200ms
 
 
 class MicrophoneStream(object):
