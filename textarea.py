@@ -371,7 +371,7 @@ class TextArea(GUIControl):
         
         cursor_bottom_y = y_cursor + self.row_spacing
         rect_bottom_y = wr.y + wr.h
-        print(f'cursor_bottom_y: {cursor_bottom_y}, rect_bottom_y: {rect_bottom_y}')
+        # print(f'cursor_bottom_y: {cursor_bottom_y}, rect_bottom_y: {rect_bottom_y}')
 
         if cursor_bottom_y >= rect_bottom_y:
             y_correction = cursor_bottom_y - rect_bottom_y

@@ -24,12 +24,13 @@ from textarea import TextArea
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 
-from record_audio import MicrophoneStream, RATE, CHUNK
+from record_audio import MicrophoneStream, N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES, N_SAMPLE_BYTES
 
 # import pyaudio
 from multiprocessing import Process, Queue
 import os
 import assemblyai as aai
+import webrtcvad
 import threading
 import queue
 
@@ -38,8 +39,9 @@ aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
 
 SAMPLE_RATE = 16000
-# SAMPLE_FORMAT = pyaudio.paInt16
 N_RECORDING_CHANNELS = 1
+
+N_BYTES_PER_20_MS = N_SAMPLES_PER_SECOND * N_SAMPLE_BYTES // 50  # The VAD can only handle chunks of 10, 20, or 30 ms.
 
 
 PANEL_WIDTH = 350
@@ -70,6 +72,7 @@ class VoiceTranscriptContainer(GUIContainer):
             self.add_child(self.text_area, add_to_focus_ring=False)
         
         self.state = self.STATE_IDLE
+        self.vad = None
         self.stream = None
         self.transcriber = None
         self.incoming_text = queue.Queue()
@@ -130,11 +133,14 @@ class VoiceTranscriptContainer(GUIContainer):
 
     def start_recording(self):
         assert(self.state == self.STATE_IDLE)
-        self.stream = MicrophoneStream(RATE, CHUNK)
+
+        self.vad = webrtcvad.Vad()
+
+        self.stream = MicrophoneStream(N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES)
         self.stream.start()
 
         self.transcriber = aai.RealtimeTranscriber(
-            sample_rate=16_000,
+            sample_rate=N_SAMPLES_PER_SECOND,
             on_data=self._on_transcribe_data,
             on_error=self._on_transcribe_error,
             on_open=self._on_transcribe_open,
@@ -152,6 +158,7 @@ class VoiceTranscriptContainer(GUIContainer):
         assert(self.transcriber is not None)
         self.transcriber.close()
         self.transcriber = None
+        self.vad = None
         self.state = self.STATE_IDLE
 
     # @note: this is executing on a different thread than my app functions
@@ -186,9 +193,27 @@ class VoiceTranscriptContainer(GUIContainer):
             assert(self.transcriber is not None)
             assert(self.stream is not None)
             audio_bytes = self.stream.get_nowait()
+            n_audio_bytes = len(audio_bytes)
+            n_audio_frames = n_audio_bytes // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
+            n_ms = n_audio_frames * 1000 // SAMPLE_RATE
+
             # print(dt, len(audio_bytes))
             if len(audio_bytes) > 0:
-                self.transcriber.stream(audio_bytes)
+                print(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
+                
+                # Any speech detected in this audio chunk?
+                is_speech = False
+                for i in range(0, n_audio_bytes, N_BYTES_PER_20_MS):
+                    vad_chunk = audio_bytes[i:i+N_BYTES_PER_20_MS]
+                    is_speech = self.vad.is_speech(vad_chunk, N_SAMPLES_PER_SECOND)
+                    if is_speech:
+                        break
+
+                if is_speech:
+                    print('is_speech: True. Sending for transcription.')
+                    self.transcriber.stream(audio_bytes)
+                else:
+                    print('is_speech: False.')
 
         text = ""
         was_final = False
@@ -206,7 +231,8 @@ class VoiceTranscriptContainer(GUIContainer):
 
         except queue.Empty:
             if len(text) > 0:
-                print('**', text)
+                pass
+                # print('**', text)
 
         if len(text) > 0:
             ta = self.text_area
