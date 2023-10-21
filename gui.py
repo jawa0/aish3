@@ -16,6 +16,7 @@
 import ctypes
 import datetime
 import json
+import logging
 import pytz
 from rect_utils import rect_union
 import sdl2
@@ -24,6 +25,9 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 import weakref
 import os
+
+from voice_out import VoiceOut
+
 
 #===============================================================================
 class GUI:
@@ -76,6 +80,8 @@ class GUI:
         self._content_pan = (0, 0)
         self._drag_control = None
         self._running_completions = {}
+
+        self._voice_out = VoiceOut()
 
         self.workspace_filename = workspace_filename
         self.load()
@@ -278,6 +284,10 @@ class GUI:
                 c.on_update(dt)
 
 
+    def say(self, text):
+        self._voice_out.say(text)
+
+
     def draw(self):
         if self._content:
             self._content.draw()
@@ -369,7 +379,7 @@ class GUI:
         local_timezone = get_localzone()
         local_now = utc_now.astimezone(local_timezone)
 
-        print("Saving GUI...")
+        logging.info("Saving GUI...")
         with open(self.workspace_filename, "w") as f:
             gui_json = {
                 "saved_at_utc": utc_now.isoformat(),
@@ -377,7 +387,7 @@ class GUI:
                 "gui": self.__json__()
             }
             json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
-        print("GUI saved.")
+        logging.info("GUI saved.")
 
 
     def load(self):
@@ -385,7 +395,7 @@ class GUI:
         bak_focused_control = self._focused_control
         self.focus_stack = []
 
-        print("Loading GUI...")
+        logging.info("Loading GUI...")
         try:
             with open(self.workspace_filename, "r") as f:
                 gui_json = json.load(f)
@@ -399,12 +409,12 @@ class GUI:
                 focusRing.focus_first()
 
         except Exception as e:
-            print("Error loading GUI. Exception: ", str(e))
+            logging.error("Error loading GUI. Exception: ", str(e))
             self._content = bak_content
             self._focused_control = bak_focused_control
             return False
         
-        print("GUI loaded.")
+        logging.info("GUI loaded.")
         return True
 
 
