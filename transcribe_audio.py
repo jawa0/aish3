@@ -285,8 +285,6 @@ class VoiceTranscriptContainer(GUIContainer):
             # @hack say it
             if was_final:
                 self.stop_recording()
-                audio_data = self.gui.say(text)
-                self.start_recording()
 
 
     def _write_audio_file(self, filename, audio_bytes):
