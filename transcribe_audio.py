@@ -137,6 +137,7 @@ class VoiceTranscriptContainer(GUIContainer):
 
 
     def start_recording(self):
+        logging.debug("start_recording()")
         assert(self.state == self.STATE_IDLE)
 
         self.vad = webrtcvad.Vad()
@@ -157,6 +158,7 @@ class VoiceTranscriptContainer(GUIContainer):
 
 
     def stop_recording(self):
+        logging.debug("stop_recording()")
         assert(self.state == self.STATE_RECORDING)
         self.stream.stop()
         self.stream = None
@@ -282,7 +284,9 @@ class VoiceTranscriptContainer(GUIContainer):
 
             # @hack say it
             if was_final:
+                self.stop_recording()
                 audio_data = self.gui.say(text)
+                self.start_recording()
 
 
     def _write_audio_file(self, filename, audio_bytes):

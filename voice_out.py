@@ -7,7 +7,7 @@ import pydub
 class VoiceOut:
     def __init__(self):
         self.client = texttospeech.TextToSpeechClient()
-        self.voice = texttospeech.VoiceSelectionParams(language_code='en-GB', name='en-GB-Neural2-F')
+        self.voice = texttospeech.VoiceSelectionParams(language_code='en-GB', name='en-GB-Neural2-D')
         self.audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.LINEAR16,
             speaking_rate=1.0,
@@ -26,7 +26,6 @@ class VoiceOut:
         logging.debug(f'audio_data: {len(audio_bytes)} bytes')
 
         audio = pydub.AudioSegment(data=audio_bytes, sample_width=2, frame_rate=44100, channels=1)
-        # audio.play()
 
         p = pyaudio.PyAudio()
         stream = p.open(format=p.get_format_from_width(audio.sample_width),
