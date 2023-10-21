@@ -280,6 +280,10 @@ class VoiceTranscriptContainer(GUIContainer):
                 tb.insert(text + '\n')
                 ta.set_needs_redraw()
 
+            # @hack say it
+            if was_final:
+                audio_data = self.gui.say(text)
+
 
     def _write_audio_file(self, filename, audio_bytes):
         with wave.open(filename, 'wb') as wf:
