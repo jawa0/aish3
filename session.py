@@ -71,6 +71,7 @@ class Session:
             del self._running_completions[done_completion]
 
 
-    def llm_send_streaming_chat_request(self, chat_messages, handlers=[]):
+    def llm_send_streaming_chat_request(self, chat_messages, handlers: List[ChatCompletionHandler]=[]):
         completion = openai.ChatCompletion.create(model="gpt-4", messages=chat_messages, stream=True)
+        logging.debug(chat_messages)
         self._running_completions[completion] = handlers

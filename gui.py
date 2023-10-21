@@ -25,7 +25,6 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 import weakref
 import os
-
 from voice_out import VoiceOut
 
 
@@ -83,10 +82,11 @@ class GUI:
         self._content_pan = (0, 0)
         self._drag_control = None
 
-        self._voice_out = VoiceOut()
-
         self.workspace_filename = workspace_filename
+        
         self.load()
+
+        self._voice_out = VoiceOut()
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -214,15 +214,17 @@ class GUI:
 
             # Cmd+R create new VoiceTranscriptContainer
             if keySym == sdl2.SDLK_r:
-                # @todo DRY with Cmd+N
-                x = ctypes.c_int()
-                y = ctypes.c_int()                
-                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+                # # @todo DRY with Cmd+N
+                # x = ctypes.c_int()
+                # y = ctypes.c_int()                
+                # sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
 
-                self.content().sizeToChildren()
-                voice = self.create_control("VoiceTranscriptContainer", x=x.value-wr.x, y=y.value-wr.y)
-                self.content().add_child(voice)
+                # self.content().sizeToChildren()
+                # voice = self.create_control("VoiceTranscriptContainer", x=x.value-wr.x, y=y.value-wr.y)
+                # self.content().add_child(voice)
 
+
+                self._voice_out.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea
@@ -278,10 +280,6 @@ class GUI:
         for c in self.content():
             if hasattr(c, 'on_update'):
                 c.on_update(dt)
-
-
-    def say(self, text):
-        self._voice_out.say(text)
 
 
     def draw(self):

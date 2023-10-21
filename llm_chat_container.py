@@ -204,7 +204,6 @@ class LLMChatContainer(GUIContainer):
 
     def send(self):
         messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
-        logging.debug(messages)
 
         handler = ChatCompletionHandler(chunk_handler=self.on_llm_response_chunk)
         self.gui.session.llm_send_streaming_chat_request(messages, handlers=[handler])
