@@ -15,6 +15,7 @@
 
 import sdl2
 import json
+import logging
 import os
 from dotenv import load_dotenv
 import openai
@@ -123,7 +124,7 @@ class VoiceTranscriptContainer(GUIContainer):
             keySymbol = event.key.keysym.sym
 
             if cmdPressed and keySymbol == sdl2.SDLK_RETURN:
-                print('Command: toggle recording')
+                logging.info('Command: toggle recording')
                 if self.state == self.STATE_IDLE:
                     self.start_recording()
                     return True
@@ -169,7 +170,11 @@ class VoiceTranscriptContainer(GUIContainer):
         # Write audio to file
         audio_filename = self._unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
         self._write_audio_file(audio_filename, self.all_audio_bytes)
-        print(f"Wrote audio to {audio_filename}")
+        
+        n_frames = len(self.all_audio_bytes) // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
+        c_seconds = n_frames / N_SAMPLES_PER_SECOND
+
+        logging.info(f"Wrote {c_seconds} seconds ({n_frames} frames) of audio to {audio_filename}")
         self.recording_start_dt = None
         self.all_audio_bytes = b""
 
@@ -178,7 +183,8 @@ class VoiceTranscriptContainer(GUIContainer):
     # like on_update()
     def _on_transcribe_data(self, transcript: aai.RealtimeTranscript):
         # print(f"_on_transcribe_data(): tid={threading.current_thread().ident}")
-        # print(transcript)
+        # 
+        logging.debug(transcript)
         if not transcript.text:
             return
 
@@ -189,15 +195,15 @@ class VoiceTranscriptContainer(GUIContainer):
 
 
     def _on_transcribe_error(self, error: aai.RealtimeError):
-        print(f"Assembly AI Error: {error}")
+        logging.error(f"Assembly AI Error: {error}")
 
 
     def _on_transcribe_open(self, session_opened: aai.RealtimeSessionOpened):
-        print(f"Assembly AI session opened with ID: {session_opened.session_id}")
+        logging.debug(f"Assembly AI session opened with ID: {session_opened.session_id}")
 
     def _on_transcribe_close(self):
         # @note @bug whiy is this called twice on stop_recording?
-        print("Assembly AI session closed.")
+        logging.debug("Assembly AI session closed.")
 
 
     def on_update(self, dt):
@@ -212,7 +218,7 @@ class VoiceTranscriptContainer(GUIContainer):
 
             # print(dt, len(audio_bytes))
             if len(audio_bytes) > 0:
-                print(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
+                logging.debug(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
                 
                 # Any speech detected in this audio chunk?
                 is_speech = False
@@ -223,13 +229,13 @@ class VoiceTranscriptContainer(GUIContainer):
                         break
 
                 if is_speech:
-                    print('is_speech: True. Sending for transcription.')
+                    logging.debug('is_speech: True. Sending for transcription.')
                     self.transcriber.stream(audio_bytes)
                 else:
-                    print('is_speech: False.')
+                    logging.debug('is_speech: False.')
 
                 self.all_audio_bytes += audio_bytes
-                print(f"Total audio: {len(self.all_audio_bytes)} bytes")
+                # print(f"Total audio: {len(self.all_audio_bytes)} bytes")
 
         text = ""
         was_final = False

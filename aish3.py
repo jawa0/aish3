@@ -35,17 +35,21 @@ import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
 import argparse
+import logging
 import time
+
+import config
 from gui import GUI
 from llm_chat_container import LLMChatContainer
 from transcribe_audio import VoiceTranscriptContainer
 from gui_layout import RowLayout
 from draw import draw_text
-from dotenv import load_dotenv
 import candlestick
 
 
 def run(fullscreen, width, height, workspace_filename):
+    logging.info('App start.')
+
     # sdl2.ext.init()
     sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO | sdl2.SDL_INIT_EVENTS)
     ttf.TTF_Init()
@@ -154,11 +158,12 @@ def run(fullscreen, width, height, workspace_filename):
 
     ttf.TTF_Quit()
     sdl2.ext.quit()
+    logging.info('App quit.')
 
 
 if __name__ == "__main__":
-    # Load the .env file
-    load_dotenv()
+    
+    config.load()
 
     parser = argparse.ArgumentParser(description='AISH window application.')
     parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
