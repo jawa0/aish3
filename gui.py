@@ -61,7 +61,10 @@ class GUI:
             return None
 
 
-    def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json"):        
+    def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json", client_session=None):        
+        assert(client_session is not None)
+        self.session = client_session
+
         self.renderer = renderer
         self.font_manager = font_manager
 
@@ -79,7 +82,6 @@ class GUI:
         self._strokes = {}
         self._content_pan = (0, 0)
         self._drag_control = None
-        self._running_completions = {}
 
         self._voice_out = VoiceOut()
 
@@ -103,6 +105,10 @@ class GUI:
         return self._content
     
     
+    def session(self):
+        return self.session
+    
+
     def on_quit(self):
         # Do depth-first traversal
         q = [self.content()]
@@ -113,16 +119,6 @@ class GUI:
             if hasattr(control, "_on_quit"):
                 control._on_quit()
 
-
-    def get_ancestor_chain(self, control):
-        chain = []
-        while control is not None:
-            chain.append(control)
-            control = control.parent
-        chain.reverse()
-        chain.pop()  # Don't want the control, itself
-        return chain
-    
 
     def handle_event(self, event):
         handled = False
@@ -372,6 +368,16 @@ class GUI:
                     q.extend(child.children)
             # print(len(q))
         return None
+    
+
+    def get_ancestor_chain(self, control):
+        chain = []
+        while control is not None:
+            chain.append(control)
+            control = control.parent
+        chain.reverse()
+        chain.pop()  # Don't want the control, itself
+        return chain
     
 
     def save(self):        
