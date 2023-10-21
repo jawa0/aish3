@@ -14,7 +14,6 @@
 
 # @todo log chat gpt reqeusts and responses
 # @todo animated control resizing - jarring when textareas shrink on chat completion
-# @todo make chat completion wait asynch. Show some kind of busy indicator
 # @todo when cycling focus in LLMChatContainer, enlarge focused container, shrink others.
 # @todo token streaming output from gpt
 # @todo selected text should have a more drab background colour if TextArea is not focused
@@ -45,6 +44,7 @@ from transcribe_audio import VoiceTranscriptContainer
 from gui_layout import RowLayout
 from draw import draw_text
 import candlestick
+from session import Session
 
 
 def run(fullscreen, width, height, workspace_filename):
@@ -74,28 +74,13 @@ def run(fullscreen, width, height, workspace_filename):
         font_size = 12
         font_manager = sdl2.ext.FontManager(font_path, size=font_size, color=WHITE)
 
+
+        session: Session = Session()
+        session.start()
+
+        gui = GUI(renderer, font_manager, workspace_filename=workspace_filename, client_session=session)
+        logging.info(f'Voice input available? {gui.voice_input_available()}')
         
-        gui = GUI(renderer, font_manager, workspace_filename=workspace_filename)
-        print(f'Voice input available? {gui.voice_input_available()}')
-        
-        # gui = GUI(renderer, font_manager, workspace_filename=None)
-
-        # chat1 = gui.create_control("LLMChatContainer", x=10, y=200)
-        # chat2 = gui.create_control("LLMChatContainer", x=380, y=200)
-
-        # label = gui.create_control("Label", text="This is a Label", x=10, y=10, w=120)
-
-        # text = gui.create_control("TextArea", text="This is a TextArea.", x=10, y=50, w=300, h=100)
-
-        # gui.content().add_child(chat1)
-        # gui.content().add_child(chat2)
-        # gui.content().add_child(label)
-        # gui.content().add_child(text)
-
-        # filename = "./data/test1.csv"
-        # sticks = gui.create_control("CandlestickPlot", csv_filepath=filename, x=10, y=40, w=1380, h=600)
-        # gui.content().add_child(sticks)
-
         running = True
         t_prev_update = time.time()
 
@@ -126,15 +111,7 @@ def run(fullscreen, width, height, workspace_filename):
                         gui.handle_event(event)
 
             else:
-                # Pump chat completions...
-                for chat in gui._running_completions:
-                    completion = gui._running_completions[chat]
-                    chat.update_completion(completion)
-
-                # Remove finished completion callbacks
-                for chat, completion in list(gui._running_completions.items()):
-                    if completion is None:
-                        del gui._running_completions[chat]
+                session.update()
 
                 t_update = time.time()
                 dt = t_update - t_prev_update
@@ -154,6 +131,8 @@ def run(fullscreen, width, height, workspace_filename):
                 # print(fps_str)
 
                 renderer.present()
+
+        session.stop()
 
         ttf.TTF_Quit()
         sdl2.ext.quit()

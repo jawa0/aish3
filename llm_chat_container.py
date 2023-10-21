@@ -15,14 +15,15 @@
 
 import sdl2
 import json
+import logging
 import os
-from dotenv import load_dotenv
 import openai
 from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
+from session import ChatCompletionHandler
 
 
 PANEL_WIDTH = 350
@@ -203,13 +204,10 @@ class LLMChatContainer(GUIContainer):
 
     def send(self):
         messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
-        print(messages)
+        logging.debug(messages)
 
-        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-        OPENAI_ORGANIZATION = os.getenv("OPENAI_ORGANIZATION")
-        
-        openai.api_key = OPENAI_API_KEY
-        openai.organization = OPENAI_ORGANIZATION
+        handler = ChatCompletionHandler(chunk_handler=self.on_llm_response_chunk)
+        self.gui.session.llm_send_streaming_chat_request(messages, handlers=[handler])
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
@@ -220,29 +218,17 @@ class LLMChatContainer(GUIContainer):
         for u in self.utterances:
             u.text_area.set_size(PANEL_WIDTH, 60)
         self.utterances.append(answer)
-        self.updateLayout
-
-        completion = openai.ChatCompletion.create(model="gpt-4", messages=messages, stream=True)
-        self.gui._running_completions[self] = completion
+        self.updateLayout()
 
 
-    def update_completion(self, completion):
+    def on_llm_response_chunk(self, chunk_text: str) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
         assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
 
-        try:
-            chunk = next(completion)
-        except StopIteration:
-            self.gui._running_completions[self] = None  # signal we're done without removing item
-            return
-        
-        # answer.label.set_text(chunk.choices[0].delta.role)
-        delta = chunk.choices[0].delta
-        if hasattr(delta, 'content'):
-            answer.text_area.text_buffer.move_point_to_end()
-            answer.text_area.text_buffer.insert(chunk.choices[0].delta.content)
-            answer.text_area.set_needs_redraw()
+        answer.text_area.text_buffer.move_point_to_end()
+        answer.text_area.text_buffer.insert(chunk_text)
+        answer.text_area.set_needs_redraw()
 
 
     def get_json(self):
@@ -254,7 +240,6 @@ class LLMChatContainer(GUIContainer):
 
 
     def load(self):
-        print("loading")
         try:
             with open("aish_workspace.json", "r") as f:
                 data = json.load(f)
