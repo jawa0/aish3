@@ -10,8 +10,8 @@ class VoiceOut:
         self.voice = texttospeech.VoiceSelectionParams(language_code='en-GB', name='en-GB-Neural2-D')
         self.audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.LINEAR16,
-            speaking_rate=1.0,
-            pitch=0.0,
+            speaking_rate=1.2,
+            pitch=-20.0,
             volume_gain_db=0.0,
             sample_rate_hertz=44100,
             effects_profile_id=['headphone-class-device'])
