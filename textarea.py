@@ -81,7 +81,7 @@ class TextArea(GUIControl):
                 self.set_needs_redraw()
                 return True
             
-            elif keySymbol == sdl2.SDLK_RETURN:
+            elif keySymbol == sdl2.SDLK_RETURN and not cmdPressed:
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
