@@ -35,6 +35,7 @@ import webrtcvad
 import queue
 import wave
 from datetime import datetime
+from utils import unique_filename
 
 
 load_dotenv()
@@ -150,6 +151,8 @@ class VoiceTranscriptContainer(GUIContainer):
     def stop_recording(self):
         logging.debug("stop_recording()")
         assert(self.state == self.STATE_RECORDING)
+        self.state = self.STATE_IDLE
+
         self.stream.stop()
         self.stream = None
 
@@ -157,19 +160,22 @@ class VoiceTranscriptContainer(GUIContainer):
         self.transcriber.close()
         self.transcriber = None
         self.vad = None
-        self.state = self.STATE_IDLE
 
         # Write audio to file
-        audio_filename = self._unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
-        self._write_audio_file(audio_filename, self.all_audio_bytes)
+        # audio_filename = unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
+        # self._write_audio_file(audio_filename, self.all_audio_bytes)
         
-        n_frames = len(self.all_audio_bytes) // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
-        c_seconds = n_frames / N_SAMPLES_PER_SECOND
+        # n_frames = len(self.all_audio_bytes) // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
+        # c_seconds = n_frames / N_SAMPLES_PER_SECOND
 
-        logging.info(f"Wrote {c_seconds} seconds ({n_frames} frames) of audio to {audio_filename}")
+        # logging.info(f"Wrote {c_seconds} seconds ({n_frames} frames) of audio to {audio_filename}")
         self.recording_start_dt = None
         self.all_audio_bytes = b""
 
+
+    def is_recording(self):
+        return self.state == self.STATE_RECORDING and self.stream is not None
+    
 
     # @note: this is executing on a different thread than my app functions
     # like on_update()
@@ -272,10 +278,6 @@ class VoiceTranscriptContainer(GUIContainer):
                 tb.insert(text + '\n')
                 ta.set_needs_redraw()
 
-            # @hack say it
-            if was_final:
-                self.stop_recording()
-
 
     def _write_audio_file(self, filename, audio_bytes):
         with wave.open(filename, 'wb') as wf:
@@ -284,17 +286,6 @@ class VoiceTranscriptContainer(GUIContainer):
             wf.setframerate(N_SAMPLES_PER_SECOND)
             wf.writeframes(audio_bytes)
 
-
-    def _unique_filename(self, candidate_filename):
-        counter = 1
-        name, ext = os.path.splitext(candidate_filename)
-
-        while os.path.exists(candidate_filename):
-            candidate_filename = f"{name}_{counter}{ext}"
-            counter += 1
-
-        return candidate_filename
-    
 
     def get_json(self):
         return {

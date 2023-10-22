@@ -61,6 +61,9 @@ class VoiceOut:
 
         self._current_text = text
 
+        # @todo this *is* a blocking call to get text -> audio
+        # consider processing smaller amounts of text at a time.
+        
         synthesis_input = texttospeech.SynthesisInput(text=text)
         response = self.client.synthesize_speech(input=synthesis_input, voice=self.voice, audio_config=self.audio_config)
 
@@ -92,7 +95,7 @@ class VoiceOut:
         #     stream.close()
 
 
-        logging.debug(f'EXIT VoiceOut.say')
+        logging.debug(f'EXIT VoiceOut.say')  # Demonstrate it's not blocking on audio output
 
     
     # @note that this is called from/in a different thread

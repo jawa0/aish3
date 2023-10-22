@@ -31,6 +31,11 @@ from voice_out import VoiceOut
 
 #===============================================================================
 class GUI:
+    VOICE_IN_STATE_NOT_LISTENING = 0
+    VOICE_IN_STATE_LISTENING_FOR_WAKEWORD = 1
+    VOICE_IN_STATE_LISTENING_FOR_SPEECH = 2
+
+
     _factories = {}
 
     @classmethod
@@ -93,6 +98,7 @@ class GUI:
         self._next_texts_to_say = []
 
         self._voice_in = None
+        self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -129,6 +135,10 @@ class GUI:
     def say(self, text):
         if self._saying_text is None:
             self._saying_text = text
+
+            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                self._voice_in.stop_recording()
+                
             self._voice_out.say(text)
         else:
             self._next_texts_to_say.append(text)
@@ -136,6 +146,13 @@ class GUI:
 
     def _on_speech_done(self):
         self._saying_text = None
+
+        if len(self._next_texts_to_say) == 0 and \
+            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            not self._voice_in.is_recording():
+
+            self._voice_in.start_recording()
+
 
 
     def handle_event(self, event):
@@ -259,14 +276,18 @@ class GUI:
 
             if keySym == sdl2.SDLK_RETURN:
                 logging.info('Command: toggle recording')
-                if self._voice_in.state == self._voice_in.STATE_IDLE:
+
+                if self._voice_in_state == self._voice_in.STATE_IDLE or self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+                    logging.info(f'GUI is idle or listening for wakeword. Starting active listening.')
+                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
                     self._voice_in.start_recording()
-                    return True
-                    
-                elif self._voice_in.state == self._voice_in.STATE_RECORDING:
+
+                elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                    logging.info(f'GUI is listening for speech. Stopping active listening.')
+                    self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
                     self._voice_in.stop_recording()
                     return True
-
+                
         if keySym == sdl2.SDLK_RETURN:
             # Focus down into FocusRing of currently focused control...
             focused = self._focused_control
