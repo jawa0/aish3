@@ -25,6 +25,7 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 import weakref
 import os
+# from transcribe_audio import VoiceTranscriptContainer
 from voice_out import VoiceOut
 
 
@@ -90,6 +91,8 @@ class GUI:
         self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
         self._saying_text = None
         self._next_texts_to_say = []
+
+        self._voice_in = None
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -253,6 +256,16 @@ class GUI:
                 self.content().add_child(textArea)
                 self.set_focus(textArea)
                 return True
+
+            if keySym == sdl2.SDLK_RETURN:
+                logging.info('Command: toggle recording')
+                if self._voice_in.state == self._voice_in.STATE_IDLE:
+                    self._voice_in.start_recording()
+                    return True
+                    
+                elif self._voice_in.state == self._voice_in.STATE_RECORDING:
+                    self._voice_in.stop_recording()
+                    return True
 
         if keySym == sdl2.SDLK_RETURN:
             # Focus down into FocusRing of currently focused control...
@@ -456,6 +469,7 @@ class GUIControl:
         self.font_manager = kwargs.get('font_manager')
         self.draw_bounds = kwargs.get('draw_bounds', False)
         self._draggable = kwargs.get('draggable', False)
+        self._visible = kwargs.get('visible', True)
 
         assert(self.gui)
         assert(self.renderer)
@@ -654,7 +668,10 @@ class GUIContainer(GUIControl):
 
 
     def draw(self):
-        # Draw own bounding rect @debug @test
+        if not self._visible:
+            return
+        
+        # Draw own bounding rect
         if self.draw_bounds and self.bounding_rect is not None:
             # Save the current color
             r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
@@ -672,9 +689,10 @@ class GUIContainer(GUIControl):
             # Reset to the old color
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
 
-        # Draw children @test drawinb bounnds after
+        # Draw children
         for child in self:
-            child.draw()
+            if child._visible:
+                child.draw()
 
 
     def get_children(self):

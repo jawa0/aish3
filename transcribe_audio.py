@@ -122,16 +122,6 @@ class VoiceTranscriptContainer(GUIContainer):
         if event.type == sdl2.SDL_KEYDOWN:
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
             keySymbol = event.key.keysym.sym
-
-            if cmdPressed and keySymbol == sdl2.SDLK_RETURN:
-                logging.info('Command: toggle recording')
-                if self.state == self.STATE_IDLE:
-                    self.start_recording()
-                    return True
-                    
-                elif self.state == self.STATE_RECORDING:
-                    self.stop_recording()
-                    return True
             
         return self.parent.handle_event(event)
 
