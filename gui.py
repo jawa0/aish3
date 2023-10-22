@@ -63,6 +63,7 @@ class GUI:
     def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json", client_session=None):        
         assert(client_session is not None)
         self.session = client_session
+        self.session.gui = weakref.ref(self)
 
         self.renderer = renderer
         self.font_manager = font_manager
@@ -86,7 +87,9 @@ class GUI:
         
         self.load()
 
-        self._voice_out = VoiceOut()
+        self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
+        self._saying_text = None
+        self._next_texts_to_say = []
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -118,6 +121,18 @@ class GUI:
                 q.extend(control.children)
             if hasattr(control, "_on_quit"):
                 control._on_quit()
+
+
+    def say(self, text):
+        if self._saying_text is None:
+            self._saying_text = text
+            self._voice_out.say(text)
+        else:
+            self._next_texts_to_say.append(text)
+
+
+    def _on_speech_done(self):
+        self._saying_text = None
 
 
     def handle_event(self, event):
@@ -224,7 +239,7 @@ class GUI:
                 # self.content().add_child(voice)
 
 
-                self._voice_out.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
+                self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea
@@ -277,6 +292,12 @@ class GUI:
 
 
     def update(self, dt):
+        # Do we have queued text to say?
+        if self._saying_text is None and len(self._next_texts_to_say) > 0:
+            self._saying_text = self._next_texts_to_say.pop(0)
+            self._voice_out.say(self._saying_text)
+
+        # Update components
         for c in self.content():
             if hasattr(c, 'on_update'):
                 c.on_update(dt)

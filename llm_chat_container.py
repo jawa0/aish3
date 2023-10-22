@@ -117,6 +117,7 @@ class LLMChatContainer(GUIContainer):
                 self.add_child(utterance, add_to_focus_ring=False)
                 self.focusRing.add(utterance.text_area)
 
+        self.accumulated_response_text = None
         # self.focusRing.focus(self.system.text_area)
 
 
@@ -205,7 +206,10 @@ class LLMChatContainer(GUIContainer):
     def send(self):
         messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
 
-        handler = ChatCompletionHandler(chunk_handler=self.on_llm_response_chunk)
+        handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
+                                        chunk_handler=self.on_llm_response_chunk,
+                                        done_handler=self.on_llm_response_done)
+        
         self.gui.session.llm_send_streaming_chat_request(messages, handlers=[handler])
 
         # Add Answer TextArea
@@ -220,6 +224,10 @@ class LLMChatContainer(GUIContainer):
         self.updateLayout()
 
 
+    def on_llm_response_start(self) -> None:
+        self.accumulated_response_text = ""
+
+
     def on_llm_response_chunk(self, chunk_text: str) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
@@ -228,6 +236,12 @@ class LLMChatContainer(GUIContainer):
         answer.text_area.text_buffer.move_point_to_end()
         answer.text_area.text_buffer.insert(chunk_text)
         answer.text_area.set_needs_redraw()
+
+        self.accumulated_response_text += chunk_text
+
+
+    def on_llm_response_done(self) -> None:
+        self.gui.say(self.accumulated_response_text)
 
 
     def get_json(self):

@@ -6,13 +6,20 @@ from typing import Callable, Dict, List, Optional
 
 class ChatCompletionHandler:
     def __init__(self, 
+                 start_handler: Optional[Callable[[], None]]=None,
                  chunk_handler: Optional[Callable[[str], None]]=None, 
                  done_handler: Optional[Callable[[], None]]=None):
         
+        self._start_handler = start_handler
         self._chunk_handler = chunk_handler
         self._done_handler = done_handler
 
 
+    def on_start(self) -> None:
+        if self._start_handler is not None:
+            self._start_handler()
+
+            
     def on_text_chunk(self, text: str) -> None:
         if self._chunk_handler is not None:
             self._chunk_handler(text)
@@ -75,3 +82,7 @@ class Session:
         completion = openai.ChatCompletion.create(model="gpt-4", messages=chat_messages, stream=True)
         logging.debug(chat_messages)
         self._running_completions[completion] = handlers
+
+        for handler in handlers:
+            if hasattr(handler, 'on_start'):
+                handler.on_start()
