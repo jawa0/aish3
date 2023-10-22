@@ -21,7 +21,7 @@ class VoiceOut:
             return VoiceOut._current_speaker
         
 
-    def __init__(self):
+    def __init__(self, on_speech_done=[]):
         self.client = texttospeech.TextToSpeechClient()
         self.voice = texttospeech.VoiceSelectionParams(language_code='en-GB', name='en-GB-Neural2-D')
         self.audio_config = texttospeech.AudioConfig(
@@ -37,6 +37,7 @@ class VoiceOut:
         self._current_byte_offset = None
 
         self.stream = None
+        self._on_done = on_speech_done
 
 
     def grab_conch(self):
@@ -126,6 +127,8 @@ class VoiceOut:
 
             # logging.debug('OUTPUT STREAMING AUDIO DONE')
             vo.drop_conch()
+            for callback in vo._on_done:
+                callback()
         else:
             return_code = pyaudio.paContinue
 
