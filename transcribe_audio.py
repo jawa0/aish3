@@ -83,6 +83,7 @@ class VoiceTranscriptContainer(GUIContainer):
         self.transcriber = None
         self.incoming_text = queue.Queue()
         self.insertion_point = 0
+        self._should_stop = False
 
 
     @classmethod
@@ -146,11 +147,14 @@ class VoiceTranscriptContainer(GUIContainer):
         )
         self.transcriber.connect()
         self.state = self.STATE_RECORDING
+        self._should_stop = False
 
 
     def stop_recording(self):
         logging.debug("stop_recording()")
-        assert(self.state == self.STATE_RECORDING)
+        if self.state != self.STATE_RECORDING:
+            return
+        # assert(self.state == self.STATE_RECORDING)
         self.state = self.STATE_IDLE
 
         self.stream.stop()
@@ -264,6 +268,14 @@ class VoiceTranscriptContainer(GUIContainer):
             tb.insert(text)
             tb.clear_mark()
             if was_final:
+                # @hack: stop listening
+                # @todo: ask gpt-3.5 if we should stop listening
+                normalized_text = text.strip().lower()
+                normalized_text = normalized_text.replace(".", "")
+                normalized_text = normalized_text.replace("!", "")
+                self._should_stop = normalized_text == "stop listening"
+
+
                 tb.insert('\n')
                 self.insertion_point = tb.get_point()
 
