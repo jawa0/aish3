@@ -105,6 +105,7 @@ class GUI:
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
         self._voice_wakeup.start()
         logging.info('Listening for wakeup phrase.')
+        # self._voice_wakeup = None
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -139,12 +140,14 @@ class GUI:
 
 
     def say(self, text):
+        logging.debug(f'GUI.say({text})')
+
         if self._saying_text is None:
             self._saying_text = text
 
             if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
                 self._voice_in.stop_recording()
-            elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+            elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
                 self._voice_wakeup.stop()
                 self._voice_wakeup = None
 
@@ -178,6 +181,8 @@ class GUI:
         logging.info(f'WAKEUP. Stopping voice wakeup. Starting active listening.')
         self._voice_wakeup.stop()
         self._voice_wakeup = None
+
+        self.say("Yes?")
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
@@ -286,10 +291,10 @@ class GUI:
                 # voice = self.create_control("VoiceTranscriptContainer", x=x.value-wr.x, y=y.value-wr.y)
                 # self.content().add_child(voice)
 
-
-                # self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
-                self.say("Listening")
+                self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
+                # self.say("Listening")
                 
+
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea

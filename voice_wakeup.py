@@ -7,21 +7,21 @@ from queue import Empty, Queue
 
 
 class PhraseListener:
-    # @todo @bug what about multiple instance?
-    _audio_q = None
 
     def __init__(self, detected_callback: callable = None):
         load_dotenv()
         self.PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
 
-        self._pa = pyaudio.PyAudio()
-        self._in_stream = None
-        PhraseListener._audio_q = None
-
         self._on_detected_callback = detected_callback
 
     
     def start(self):
+        self._pa = pyaudio.PyAudio()
+        self._in_stream = None
+
+        # @todo @bug what about multiple instance?
+        PhraseListener._audio_q = None
+
         self._pv_handle = pvporcupine.create(
             access_key=self.PICOVOICE_ACCESS_KEY,
             keyword_paths=["./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn"]
@@ -67,10 +67,11 @@ class PhraseListener:
         self._in_stream = None
         PhraseListener._audio_q = None
 
-
-    def __del__(self):
         self._pv_handle.delete()
+        self._pv_handle = None
+
         self._pa.terminate()
+        self._pa = None
 
 
     @staticmethod
