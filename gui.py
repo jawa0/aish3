@@ -27,6 +27,7 @@ import weakref
 import os
 # from transcribe_audio import VoiceTranscriptContainer
 from voice_out import VoiceOut
+from voice_wakeup import PhraseListener
 
 
 #===============================================================================
@@ -100,6 +101,11 @@ class GUI:
         self._voice_in = None
         self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
 
+        self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+        self._voice_wakeup.start()
+        logging.info('Listening for wakeup phrase.')
+
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -138,7 +144,10 @@ class GUI:
 
             if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
                 self._voice_in.stop_recording()
-                
+            elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+                self._voice_wakeup.stop()
+                self._voice_wakeup = None
+
             self._voice_out.say(text)
         else:
             self._next_texts_to_say.append(text)
@@ -147,12 +156,31 @@ class GUI:
     def _on_speech_done(self):
         self._saying_text = None
 
+        # If we were actively listening before saying speech, then return to active listening...
         if len(self._next_texts_to_say) == 0 and \
             self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
             not self._voice_in.is_recording():
 
             self._voice_in.start_recording()
 
+        # If we were waiting for the wakeup phrase, then go back to doing that
+        elif len(self._next_texts_to_say) == 0 and \
+            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and \
+            self._voice_wakeup is None:
+
+            self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
+            self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+            self._voice_wakeup.start()
+            logging.info('Listening for wakeup phrase.')
+
+
+    def _on_voice_wakeup(self):
+        logging.info(f'WAKEUP. Stopping voice wakeup. Starting active listening.')
+        self._voice_wakeup.stop()
+        self._voice_wakeup = None
+
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
+        self._voice_in.start_recording()
 
 
     def handle_event(self, event):
@@ -259,7 +287,9 @@ class GUI:
                 # self.content().add_child(voice)
 
 
-                self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
+                # self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
+                self.say("Listening")
+                
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea
@@ -286,6 +316,12 @@ class GUI:
                     logging.info(f'GUI is listening for speech. Stopping active listening.')
                     self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
                     self._voice_in.stop_recording()
+
+                    self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
+                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+                    self._voice_wakeup.start()
+                    logging.info('Listening for wakeup phrase.')
+
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
@@ -326,6 +362,9 @@ class GUI:
 
 
     def update(self, dt):
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+            self._voice_wakeup.update()
+
         # Do we have queued text to say?
         if self._saying_text is None and len(self._next_texts_to_say) > 0:
             self._saying_text = self._next_texts_to_say.pop(0)
