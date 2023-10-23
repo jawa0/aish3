@@ -13,6 +13,8 @@ This is a Python command-line (CLI) application. It doesn't do much right now, e
 
 `python aish3.py`
 
+#### Setting up required environment variables
+
 If you want to make GPT API requests, you'll need to provide a couple of environment variables in a .env file:
 
     OPENAI_ORGANIZATION = "..."
@@ -22,6 +24,13 @@ To use speech-to-text transcription, you'll need an AssemblyAI API KEY
 
     ASSEMBLYAI_API_KEY="..."
 
+In order to use voice output (text to speech), you'll need Google Cloud credentials:
+
+    GOOGLE_APPLICATION_CREDENTIALS="..."
+
+And finally, to use the wakeup phrase detection, you'll need a PicoVoice access key:
+
+    PICOVOICE_ACCESS_KEY="..."
 
 ### Keyboard Commands
 
