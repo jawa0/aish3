@@ -3,9 +3,14 @@ import os
 import pvporcupine
 import pyaudio
 from queue import Empty, Queue
+import struct
 
 
 _audio_q = Queue()
+
+
+def bytes_to_ints(byte_data):
+    return struct.unpack(str(len(byte_data) // 2) + 'h', byte_data)
 
 
 def main():
@@ -28,7 +33,7 @@ def main():
         in_stream = pa.open(
             rate=pv_handle.sample_rate,
             channels=1,
-            format=pyaudio.paUInt8,
+            format=pyaudio.paInt16,
             input=True,
             frames_per_buffer=pv_handle.frame_length,
             stream_callback=audio_input_stream_callback
@@ -36,13 +41,14 @@ def main():
 
         # Infinite loop while we listen. Ctrl+C to exit.
         while True:
+            pass
             try:
-                audio_bytes = _audio_q.get()
+                audio_ints = _audio_q.get()
             except Empty:
                 print("Queue is empty. Skipping.")
                 continue
 
-            i_keyword = pv_handle.process(audio_bytes)
+            i_keyword = pv_handle.process(audio_ints)
             if i_keyword >= 0:
                 print(f"Detected keyword with index {i_keyword}")
 
@@ -52,12 +58,20 @@ def main():
         in_stream.stop_stream()
         in_stream.close()
 
+    pv_handle.delete()
     pa.terminate()
 
 
 def audio_input_stream_callback(in_data, frame_count, time_info, status_flags):
-    # print(f"frame_count: {frame_count}")
-    _audio_q.put(in_data)
+    # print('audio_input_stream_callback')
+    # print(f" frame_count: {frame_count}")
+    # print(f" in_data length: {len(in_data)}")
+    
+    # print type of in_data
+    # print(type(in_data))
+
+    ints = bytes_to_ints(in_data)
+    _audio_q.put(ints)
     # print(f"qsize: {_audio_q.qsize()}")
     return (None, pyaudio.paContinue)
 

@@ -4,6 +4,11 @@ import os
 import pvporcupine
 import pyaudio
 from queue import Empty, Queue
+import struct
+
+
+def bytes_to_ints(byte_data):
+    return struct.unpack(str(len(byte_data) // 2) + 'h', byte_data)
 
 
 class PhraseListener:
@@ -35,7 +40,7 @@ class PhraseListener:
         self._in_stream = self._pa.open(
             rate=self._pv_handle.sample_rate,
             channels=1,
-            format=pyaudio.paUInt8,
+            format=pyaudio.paInt16,
             input=True,
             frames_per_buffer=self._pv_handle.frame_length,
             stream_callback=PhraseListener._audio_input_stream_callback
@@ -48,13 +53,13 @@ class PhraseListener:
             return
         
         try:
-            audio_bytes = PhraseListener._audio_q.get_nowait()
+            audio_ints = PhraseListener._audio_q.get_nowait()
         except Empty:
             return
 
-        logging.debug(f"PhraseListener.update() audio_bytes: {len(audio_bytes)}")
+        logging.debug(f"PhraseListener.update() audio_ints: {len(audio_ints)}")
 
-        i_keyword = self._pv_handle.process(audio_bytes)
+        i_keyword = self._pv_handle.process(audio_ints)
         if i_keyword >= 0:
             logging.info('Detected wakeup phrase.')
             if self._on_detected_callback is not None:
@@ -76,5 +81,6 @@ class PhraseListener:
 
     @staticmethod
     def _audio_input_stream_callback(in_data, frame_count, time_info, status_flags):
-        PhraseListener._audio_q.put(in_data)
+        audio_ints = bytes_to_ints(in_data)
+        PhraseListener._audio_q.put(audio_ints)
         return (None, pyaudio.paContinue)
