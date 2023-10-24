@@ -29,9 +29,9 @@ class Label(GUIControl):
         instance._text = json["text"]
         return instance
 
-    def __init__(self, text="", **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(can_focus=False, **kwargs)
-        self._text = text
+        self._text = kwargs.get('text', '')
         self.combined_text_texture = None
 
 

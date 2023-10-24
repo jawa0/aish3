@@ -98,12 +98,10 @@ class GUI:
         self._saying_text = None
         self._next_texts_to_say = []
 
-        self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
         self._voice_in = VoiceTranscriber()
-
         self._voice_wakeup = None
-        self._start_listening_wakeword()
 
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -126,11 +124,17 @@ class GUI:
         self._voice_wakeup.start()
         logging.info('Listening for wakeup phrase.')
 
+        if self.listening_indicator is not None:
+            self.listening_indicator.set_text("Listening for WAKEUP")
+
 
     def _stop_listening_wakeword(self):
         assert(self._voice_wakeup is not None)
         self._voice_wakeup.stop()
         self._voice_wakeup = None
+
+        if self.listening_indicator is not None:
+            self.listening_indicator.set_text("")
 
 
     def content(self):
@@ -388,7 +392,13 @@ class GUI:
 
         # Voice In
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and self._voice_in is not None:
+            
             self._voice_in.update()
+
+            if self.listening_indicator is not None:
+                voice_indicator_text = "LISTENING..."
+                if self.listening_indicator.get_text() != voice_indicator_text:
+                    self.listening_indicator.set_text(voice_indicator_text)
 
             # Stop voice in?
             if self._voice_in._should_stop and self._voice_in.is_recording():
