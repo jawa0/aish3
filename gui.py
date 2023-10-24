@@ -127,6 +127,12 @@ class GUI:
         logging.info('Listening for wakeup phrase.')
 
 
+    def _stop_listening_wakeword(self):
+        assert(self._voice_wakeup is not None)
+        self._voice_wakeup.stop()
+        self._voice_wakeup = None
+
+
     def content(self):
         return self._content
     
@@ -184,10 +190,9 @@ class GUI:
 
     def _on_voice_wakeup(self):
         logging.info(f'WAKEUP. Stopping voice wakeup. Starting active listening.')
-        self._voice_wakeup.stop()
-        self._voice_wakeup = None
+        self._stop_listening_wakeword()
 
-        self.say("Yes?")
+        # self.say("Yes?")
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
@@ -308,15 +313,23 @@ class GUI:
             if keySym == sdl2.SDLK_RETURN:
                 logging.info('Command: toggle recording')
 
-                if self._voice_in_state == self._voice_in.STATE_IDLE or self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
-                    logging.info(f'GUI is idle or listening for wakeword. Starting active listening.')
-                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
+                # Toggle active listening...
+
+                if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                    logging.debug('GUI is idle or listening for wakeword.')
+
+                    if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+                        logging.debug('GUI is listening for wakeword. Stopping voice wakeup.')
+                        self._stop_listening_wakeword()
+
+                    logging.info(f'Starting active listening.')
                     self._voice_in.start_recording()
+                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
 
                 elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
                     logging.info(f'GUI is listening for speech. Stopping active listening.')
-                    self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
                     self._voice_in.stop_recording()
+                    self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
 
                     self._start_listening_wakeword()
                     return True
@@ -359,6 +372,9 @@ class GUI:
 
 
     def update(self, dt):
+        if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+            self._stop_listening_wakeword()
+
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
             self._start_listening_wakeword()
 
@@ -377,6 +393,7 @@ class GUI:
             # Stop voice in?
             if self._voice_in._should_stop and self._voice_in.is_recording():
                 self._voice_in.stop_recording()
+                logging.debug(f'Just called self._voice_in.stop_recording() and self._voice_in is {self._voice_in}')
                 self._voice_in._should_stop = False
 
                 self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
