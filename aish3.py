@@ -40,7 +40,6 @@ import time
 import config
 from gui import GUI
 from llm_chat_container import LLMChatContainer
-from transcribe_audio import VoiceTranscriptContainer
 from gui_layout import RowLayout
 from draw import draw_text
 import candlestick
@@ -80,12 +79,6 @@ def run(fullscreen, width, height, workspace_filename):
 
         gui = GUI(renderer, font_manager, workspace_filename=workspace_filename, client_session=session)
         logging.info(f'Voice input available? {gui.voice_input_available()}')
-
-        # @hack
-        voice_in = gui.create_control("VoiceTranscriptContainer", gui=gui, renderer=renderer, font_manager=font_manager)
-        voice_in._visible = False
-        gui._voice_in = voice_in
-        gui.content().add_child(voice_in)
 
         running = True
         t_prev_update = time.time()

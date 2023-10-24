@@ -16,6 +16,7 @@ def bytes_to_ints(byte_data):
 class PhraseListener:
 
     def __init__(self, detected_callback: callable = None):
+        logging.debug('PhraseListener.__init__()')
         load_dotenv()
         self.PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
 
@@ -23,6 +24,7 @@ class PhraseListener:
 
     
     def start(self):
+        logging.debug('PhraseListener.start()')
         self._in_stream = None
 
         # @todo @bug what about multiple instance?
@@ -61,6 +63,7 @@ class PhraseListener:
 
 
     def stop(self):
+        logging.debug('PhraseListener.stop()')
         self._in_stream.stop_stream()
         self._in_stream.close()
         self._in_stream = None

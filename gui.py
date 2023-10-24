@@ -25,9 +25,9 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 import weakref
 import os
-# from transcribe_audio import VoiceTranscriptContainer
 from voice_out import VoiceOut
 from voice_wakeup import PhraseListener
+from transcribe_audio import VoiceTranscriber
 
 
 #===============================================================================
@@ -98,14 +98,12 @@ class GUI:
         self._saying_text = None
         self._next_texts_to_say = []
 
-        self._voice_in = None
         self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+        self._voice_in = VoiceTranscriber()
 
-        self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
-        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
-        self._voice_wakeup.start()
-        logging.info('Listening for wakeup phrase.')
-        # self._voice_wakeup = None
+        self._voice_wakeup = None
+        self._start_listening_wakeword()
+
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -119,6 +117,15 @@ class GUI:
         return {"class": self.__class__.__name__, 
                 "content": self._content.__json__()}
     
+
+    def _start_listening_wakeword(self):
+        assert(self._voice_wakeup is None)
+
+        self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+        self._voice_wakeup.start()
+        logging.info('Listening for wakeup phrase.')
+
 
     def content(self):
         return self._content
@@ -141,6 +148,7 @@ class GUI:
 
     def say(self, text):
         logging.debug(f'GUI.say({text})')
+        return
 
         if self._saying_text is None:
             self._saying_text = text
@@ -171,10 +179,7 @@ class GUI:
             self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and \
             self._voice_wakeup is None:
 
-            self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
-            self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
-            self._voice_wakeup.start()
-            logging.info('Listening for wakeup phrase.')
+            self._start_listening_wakeword()
 
 
     def _on_voice_wakeup(self):
@@ -280,17 +285,8 @@ class GUI:
                 # self.set_focus(chat)
                 return True  # event was handled
 
-            # Cmd+R create new VoiceTranscriptContainer
+            # Cmd+R say something
             if keySym == sdl2.SDLK_r:
-                # # @todo DRY with Cmd+N
-                # x = ctypes.c_int()
-                # y = ctypes.c_int()                
-                # sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-
-                # self.content().sizeToChildren()
-                # voice = self.create_control("VoiceTranscriptContainer", x=x.value-wr.x, y=y.value-wr.y)
-                # self.content().add_child(voice)
-
                 self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
                 # self.say("Listening")
                 
@@ -322,11 +318,7 @@ class GUI:
                     self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
                     self._voice_in.stop_recording()
 
-                    self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
-                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
-                    self._voice_wakeup.start()
-                    logging.info('Listening for wakeup phrase.')
-
+                    self._start_listening_wakeword()
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
@@ -367,6 +359,9 @@ class GUI:
 
 
     def update(self, dt):
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
+            self._start_listening_wakeword()
+
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
             self._voice_wakeup.update()
 
@@ -374,6 +369,18 @@ class GUI:
         if self._saying_text is None and len(self._next_texts_to_say) > 0:
             self._saying_text = self._next_texts_to_say.pop(0)
             self._voice_out.say(self._saying_text)
+
+        # Voice In
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and self._voice_in is not None:
+            self._voice_in.update()
+
+            # Stop voice in?
+            if self._voice_in._should_stop and self._voice_in.is_recording():
+                self._voice_in.stop_recording()
+                self._voice_in._should_stop = False
+
+                self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+                # self.say("Okay")
 
         # Update components
         for c in self.content():
