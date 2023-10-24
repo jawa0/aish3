@@ -273,7 +273,13 @@ class TextArea(GUIControl):
 
     def draw(self):
         lines = self.text_buffer.get_lines()
-        wr = self.get_world_rect()
+        
+        # @todo should each specialized control need to implement this?
+        if self._screen_relative:
+            wr = self.bounding_rect
+        else:
+            wr = self.get_world_rect()
+
         x = wr.x - self.x_scroll
         y = wr.y - self.y_scroll
 

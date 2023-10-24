@@ -192,6 +192,7 @@ class VoiceTranscriber:
                 pass
                 # print('**', text)
 
+        # @todo: generalize into some signal/socket or pipe routing thing...
         if len(text) > 0:
             if was_final:
                 # @hack: stop listening
