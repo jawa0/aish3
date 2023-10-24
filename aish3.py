@@ -42,8 +42,8 @@ from gui import GUI
 from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
 from draw import draw_text
-import candlestick
 from session import Session
+from label import Label
 
 
 def run(fullscreen, width, height, workspace_filename):
@@ -79,6 +79,11 @@ def run(fullscreen, width, height, workspace_filename):
 
         gui = GUI(renderer, font_manager, workspace_filename=workspace_filename, client_session=session)
         logging.info(f'Voice input available? {gui.voice_input_available()}')
+
+        # @hack
+        gui.listening_indicator = Label(x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
+        gui.content().add_child(gui.listening_indicator)
+
 
         running = True
         t_prev_update = time.time()
@@ -138,7 +143,7 @@ def run(fullscreen, width, height, workspace_filename):
         logging.info('App quit.')
     
     except Exception as e:
-        logging.exception('Unhandled exception: ', e)
+        logging.exception('Unhandled exception at app level: ', e)
         raise e
 
 
