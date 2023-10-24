@@ -3,6 +3,8 @@ import openai
 import os
 from typing import Callable, Dict, List, Optional
 
+from audio_service import AudioService
+
 
 class ChatCompletionHandler:
     def __init__(self, 
@@ -36,14 +38,18 @@ class Session:
         openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
         self._running_completions: Dict[openai.ChatCompletion, List[ChatCompletionHandler]] = {}
+        
+        self._audio = AudioService()
 
 
     def start(self):
         logging.debug("Client Session.start")
+        self._audio.start()
 
     
     def stop(self):
         logging.debug("Client Session.stop")
+        self._audio.stop()
 
 
     def update(self):
