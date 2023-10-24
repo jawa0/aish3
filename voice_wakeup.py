@@ -5,9 +5,11 @@ import pvporcupine
 import pyaudio
 from queue import Empty, Queue
 import struct
+from audio_service import AudioService
 
 
 def bytes_to_ints(byte_data):
+    """Convert a byte array into a list of integers. Each integer is two bytes. Endeaness is unspecified."""
     return struct.unpack(str(len(byte_data) // 2) + 'h', byte_data)
 
 
@@ -21,7 +23,6 @@ class PhraseListener:
 
     
     def start(self):
-        self._pa = pyaudio.PyAudio()
         self._in_stream = None
 
         # @todo @bug what about multiple instance?
@@ -37,14 +38,7 @@ class PhraseListener:
 
         PhraseListener._audio_q = Queue()
 
-        self._in_stream = self._pa.open(
-            rate=self._pv_handle.sample_rate,
-            channels=1,
-            format=pyaudio.paInt16,
-            input=True,
-            frames_per_buffer=self._pv_handle.frame_length,
-            stream_callback=PhraseListener._audio_input_stream_callback
-        )
+        self._in_stream = AudioService.get_wakeword_input_stream(PhraseListener._audio_input_stream_callback)
 
 
     def update(self):
@@ -57,7 +51,7 @@ class PhraseListener:
         except Empty:
             return
 
-        logging.debug(f"PhraseListener.update() audio_ints: {len(audio_ints)}")
+        # logging.debug(f"PhraseListener.update() audio_ints: {len(audio_ints)}")
 
         i_keyword = self._pv_handle.process(audio_ints)
         if i_keyword >= 0:
@@ -74,9 +68,6 @@ class PhraseListener:
 
         self._pv_handle.delete()
         self._pv_handle = None
-
-        self._pa.terminate()
-        self._pa = None
 
 
     @staticmethod
