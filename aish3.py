@@ -44,6 +44,7 @@ from gui_layout import RowLayout
 from draw import draw_text
 from session import Session
 from label import Label
+from textarea import TextArea
 
 
 def run(fullscreen, width, height, workspace_filename):
@@ -84,6 +85,9 @@ def run(fullscreen, width, height, workspace_filename):
         gui.listening_indicator = Label(screen_relative=True, x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
         gui.content().add_child(gui.listening_indicator)
 
+        voice_transcript_height = 80
+        gui.voice_transcript = TextArea(screen_relative=True, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui, renderer=renderer, font_manager=font_manager)
+        gui.content().add_child(gui.voice_transcript)
 
         running = True
         t_prev_update = time.time()
@@ -102,6 +106,16 @@ def run(fullscreen, width, height, workspace_filename):
                             # Update renderer viewport to new window size
                             new_width = event.window.data1
                             new_height = event.window.data2
+
+                            # @hack
+                            if gui.voice_transcript is not None:
+                                gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
+                                                                new_height - voice_transcript_height - 5, 
+                                                                new_width-5, 
+                                                                voice_transcript_height)
+
+                            width = new_width
+                            height = new_height
 
                             print("SDL_WINDOWEVENT_SIZE_CHANGED")
 
