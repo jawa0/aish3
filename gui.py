@@ -569,6 +569,7 @@ class GUIControl:
         self.draw_bounds = kwargs.get('draw_bounds', False)
         self._draggable = kwargs.get('draggable', False)
         self._visible = kwargs.get('visible', True)
+        self._screen_relative = kwargs.get('screen_relative', False)
 
         assert(self.gui)
         assert(self.renderer)
