@@ -19,11 +19,6 @@ import logging
 import os
 from dotenv import load_dotenv
 import openai
-from gui import GUI, GUIContainer
-from label import Label
-from textarea import TextArea
-from gui_layout import ColumnLayout
-from gui_focus import FocusRing
 
 from record_audio import MicrophoneStream, N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES, N_SAMPLE_BYTES
 
@@ -52,85 +47,21 @@ PANEL_WIDTH = 350
 PANEL_HEIGHT = 120
 
 
-class VoiceTranscriptContainer(GUIContainer):
-    STATE_IDLE = 0
-    STATE_RECORDING = 1
+class VoiceTranscriber:
 
-    @classmethod
-    def create(cls, **kwargs):
-        return cls(**kwargs)
-    
-
-    def __init__(self, default_setup=True, **kwargs):
-        super().__init__(**kwargs)
-        self.draw_bounds = True
-        
-        self.set_layout(ColumnLayout())
-        assert(self.focusRing is not None)
-
-        if default_setup:
-            self.label = Label(text="Voice Transcript", w=PANEL_WIDTH, h=20, **kwargs)
-            self.add_child(self.label, add_to_focus_ring=False)
-
-            self.text_area = TextArea(18, w=PANEL_WIDTH, h=PANEL_HEIGHT, **kwargs)
-            self.add_child(self.text_area, add_to_focus_ring=False)
-        
-        self.state = self.STATE_IDLE
+    def __init__(self, **kwargs):
+        logging.debug("VoiceTranscriber.__init__()")
         self.vad = None
         self.stream = None
         self.recording_start_dt = None
-        self.all_audio_bytes = b""
         self.transcriber = None
-        self.incoming_text = queue.Queue()
-        self.insertion_point = 0
-        self._should_stop = False
-
-
-    @classmethod
-    def from_json(cls, json, **kwargs):
-        assert(json["class"] == cls.__name__)
-        gui = kwargs.get('gui')
-        assert(gui is not None)
-
-        kwargs["default_setup"] = False
-        instance = gui.create_control(json["class"], **kwargs)
-        instance.set_bounds(*json["bounding_rect"])
-
-        for child_json in json["children"]:
-            child_class_name = child_json["class"]
-            # child = gui.create_control(child_class_name, **kwargs)
-            child_class = GUI.control_class(child_class_name)
-            child = child_class.from_json(child_json, **kwargs)
-            instance.add_child(child, add_to_focus_ring=False)
-            if child_class_name == "Label":
-                instance.label = child
-            elif child_class_name == "TextArea":
-                instance.text_area = child
-        return instance
-
-
-    def _on_quit(self):
-        if self.state == self.STATE_RECORDING:
-            self.stop_recording()
-
-        return super()._on_quit()
-    
-
-    def get_text(self):
-        return self.text_area.text_buffer.get_text()
-        
-
-    def handle_event(self, event):
-        if event.type == sdl2.SDL_KEYDOWN:
-            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
-            keySymbol = event.key.keysym.sym
-            
-        return self.parent.handle_event(event)
+        self.all_audio_bytes = b""
+        self.incoming_text = Queue()  # Entries are (text: str, is_final: bool)
 
 
     def start_recording(self):
-        logging.debug("start_recording()")
-        assert(self.state == self.STATE_IDLE)
+        logging.debug("ENTER VoiceTranscriber.start_recording()")
+        assert(not self.is_recording())
 
         self.vad = webrtcvad.Vad()
 
@@ -146,16 +77,15 @@ class VoiceTranscriptContainer(GUIContainer):
             on_close=self._on_transcribe_close
         )
         self.transcriber.connect()
-        self.state = self.STATE_RECORDING
         self._should_stop = False
+
+        logging.debug("EXIT VoiceTranscriber.start_recording()")
 
 
     def stop_recording(self):
-        logging.debug("stop_recording()")
-        if self.state != self.STATE_RECORDING:
+        logging.debug("ENTER VoiceTranscriber.stop_recording()")
+        if self.stream is None:
             return
-        # assert(self.state == self.STATE_RECORDING)
-        self.state = self.STATE_IDLE
 
         self.stream.stop()
         self.stream = None
@@ -164,6 +94,7 @@ class VoiceTranscriptContainer(GUIContainer):
         self.transcriber.close()
         self.transcriber = None
         self.vad = None
+
 
         # Write audio to file
         # audio_filename = unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
@@ -176,9 +107,11 @@ class VoiceTranscriptContainer(GUIContainer):
         self.recording_start_dt = None
         self.all_audio_bytes = b""
 
+        logging.debug("EXIT VoiceTranscriber.stop_recording()")
+
 
     def is_recording(self):
-        return self.state == self.STATE_RECORDING and self.stream is not None
+        return self.stream is not None
     
 
     # @note: this is executing on a different thread than my app functions
@@ -208,19 +141,19 @@ class VoiceTranscriptContainer(GUIContainer):
         logging.debug("Assembly AI session closed.")
 
 
-    def on_update(self, dt):
-        # print(f"on_update(): tid={threading.current_thread().ident}")
-        if self.state == self.STATE_RECORDING:
+    def update(self):
+        # logging.debug('ENTER VoiceTranscriber.update()')
+        # logging.debug(f"self.is_recording(): {self.is_recording()}")
+        if self.is_recording():
             assert(self.transcriber is not None)
-            assert(self.stream is not None)
+
             audio_bytes = self.stream.get_nowait()
             n_audio_bytes = len(audio_bytes)
             n_audio_frames = n_audio_bytes // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
             n_ms = n_audio_frames * 1000 // SAMPLE_RATE
 
-            # print(dt, len(audio_bytes))
             if len(audio_bytes) > 0:
-                logging.debug(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
+                # logging.debug(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
                 
                 # Any speech detected in this audio chunk?
                 is_speech = False
@@ -231,10 +164,11 @@ class VoiceTranscriptContainer(GUIContainer):
                         break
 
                 if is_speech:
-                    logging.debug('is_speech: True. Sending for transcription.')
+                    # logging.debug('is_speech: True. Sending for transcription.')
                     self.transcriber.stream(audio_bytes)
                 else:
-                    logging.debug('is_speech: False.')
+                    # logging.debug('is_speech: False.')
+                    pass
 
                 self.all_audio_bytes += audio_bytes
                 # print(f"Total audio: {len(self.all_audio_bytes)} bytes")
@@ -259,14 +193,6 @@ class VoiceTranscriptContainer(GUIContainer):
                 # print('**', text)
 
         if len(text) > 0:
-            ta = self.text_area
-            tb = self.text_area.text_buffer
-
-            tb.set_mark(self.insertion_point)
-            tb.move_point_to_end()
-            tb.delete_selection()
-            tb.insert(text)
-            tb.clear_mark()
             if was_final:
                 # @hack: stop listening
                 # @todo: ask gpt-3.5 if we should stop listening
@@ -275,20 +201,9 @@ class VoiceTranscriptContainer(GUIContainer):
                 normalized_text = normalized_text.replace("!", "")
                 self._should_stop = normalized_text == "stop listening"
 
+                logging.info(f"** Speech Final Transcript: '{text}'")
 
-                tb.insert('\n')
-                self.insertion_point = tb.get_point()
-
-            self.text_area.set_needs_redraw()
-
-            focused_control = self.gui.get_focus()
-            if was_final and \
-                focused_control is not None and focused_control is not self and isinstance(focused_control, TextArea):
-                
-                ta = focused_control
-                tb = ta.text_buffer
-                tb.insert(text + '\n')
-                ta.set_needs_redraw()
+        # logging.debug('EXIT VoiceTranscriber.update()')
 
 
     def _write_audio_file(self, filename, audio_bytes):
@@ -297,13 +212,3 @@ class VoiceTranscriptContainer(GUIContainer):
             wf.setsampwidth(N_SAMPLE_BYTES)
             wf.setframerate(N_SAMPLES_PER_SECOND)
             wf.writeframes(audio_bytes)
-
-
-    def get_json(self):
-        return {
-            "type": "VoiceTranscriptContainer",
-            "version": 1,
-        }
-
-
-GUI.register_control_type("VoiceTranscriptContainer", VoiceTranscriptContainer)

@@ -3,6 +3,7 @@ import logging
 import pyaudio
 import pydub
 import threading
+from audio_service import AudioService
 
 
 class VoiceOut:
@@ -12,7 +13,6 @@ class VoiceOut:
 
     _lock = threading.Lock()
     _current_speaker = None
-    _pa = pyaudio.PyAudio()
 
 
     @classmethod
@@ -41,18 +41,24 @@ class VoiceOut:
 
 
     def grab_conch(self):
+        logging.debug(f'ENTER VoiceOut.grab_conch')
         with VoiceOut._lock:
+            logging.debug(f'VoiceOut.grab_conch: GOT LOCK')
             assert(VoiceOut._current_speaker is None)
             VoiceOut._current_speaker = self
+        logging.debug(f'VoiceOut.grab_conch: RELEASED LOCK')
 
 
     def drop_conch(self):
+        logging.debug(f'ENTER VoiceOut.drop_conch')
         with VoiceOut._lock:
+            logging.debug(f'VoiceOut.drop_conch: GOT LOCK')
             VoiceOut._current_speaker = None
+        logging.debug(f'VoiceOut.drop_conch: RELEASED LOCK')
 
-        # self.stream.stop_stream()
-        # self.stream.close()
-        # self.stream = None
+        self.stream.stop_stream()
+        self.stream.close()
+        self.stream = None
 
 
     def say(self, text):
@@ -80,20 +86,7 @@ class VoiceOut:
         # We want to output what might be some long audio, but to do it without blocking our
         # thread. So, we use a callback.
 
-        self.stream = VoiceOut._pa.open(format=VoiceOut._pa.get_format_from_width(audio.sample_width),
-                        channels=audio.channels,
-                        rate=audio.frame_rate,
-                        output=True,
-                        stream_callback=VoiceOut._stream_callback)
-
-        # # Just in case there were any exceptions/interrupts, we release the resource
-        # # So as not to raise OSError: Device Unavailable should play() be used again
-        # try:
-        #     stream.write(audio_bytes)
-        # finally:
-        #     stream.stop_stream()
-        #     stream.close()
-
+        self.stream = AudioService.get_voice_output_stream(VoiceOut._stream_callback)
 
         logging.debug(f'EXIT VoiceOut.say')  # Demonstrate it's not blocking on audio output
 

@@ -1,7 +1,8 @@
 import ctypes
-import pyaudio
 import queue
 
+from audio_service import AudioService
+import pyaudio
 
 # Audio recording parameters
 N_SAMPLES_PER_SECOND = 16_000
@@ -20,6 +21,7 @@ class MicrophoneStream(object):
 
         # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
+        self._audio_stream = None
         self.closed = True
 
 
@@ -61,20 +63,7 @@ class MicrophoneStream(object):
 
 
     def start(self):
-        self._audio_interface = pyaudio.PyAudio()
-        self._audio_stream = self._audio_interface.open(
-            format=pyaudio.paInt16,
-            # The API currently only supports 1-channel (mono) audio
-            # https://goo.gl/z757pE
-            channels=1,
-            rate=self._rate,
-            input=True,
-            frames_per_buffer=self._chunk,
-            # Run the audio stream asynchronously to fill the buffer object.
-            # This is necessary so that the input device's buffer doesn't
-            # overflow while the calling thread makes network requests, etc.
-            stream_callback=self._fill_buffer,
-        )
+        self._audio_stream = AudioService.get_voice_input_stream(self._fill_buffer)
         self.closed = False
 
 
@@ -85,4 +74,3 @@ class MicrophoneStream(object):
         # Signal the generator to terminate so that the client's
         # streaming_recognize method will not block the process termination.
         self._buff.put(None)
-        self._audio_interface.terminate()

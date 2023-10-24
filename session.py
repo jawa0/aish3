@@ -34,6 +34,8 @@ class ChatCompletionHandler:
 
 class Session:
     def __init__(self):
+        logging.debug("Client Session.__init__")
+
         openai.api_key = os.getenv("OPENAI_API_KEY")
         openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
@@ -53,6 +55,7 @@ class Session:
 
 
     def update(self):
+        # logging.debug("ENTER Client Session.update")
         done_completions = []
 
         # Pump chat completions...
@@ -82,6 +85,8 @@ class Session:
         # Remove finished completion callbacks
         for done_completion in done_completions:
             del self._running_completions[done_completion]
+        
+        # logging.debug("EXIT Client Session.update")
 
 
     def llm_send_streaming_chat_request(self, chat_messages, handlers: List[ChatCompletionHandler]=[]):
