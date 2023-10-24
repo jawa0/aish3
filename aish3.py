@@ -81,7 +81,7 @@ def run(fullscreen, width, height, workspace_filename):
         logging.info(f'Voice input available? {gui.voice_input_available()}')
 
         # @hack
-        gui.listening_indicator = Label(x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
+        gui.listening_indicator = Label(screen_relative=True, x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
         gui.content().add_child(gui.listening_indicator)
 
 
