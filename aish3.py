@@ -85,7 +85,7 @@ def run(fullscreen, width, height, workspace_filename):
         gui.listening_indicator = Label(screen_relative=True, x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
         gui.content().add_child(gui.listening_indicator)
 
-        voice_transcript_height = 80
+        voice_transcript_height = 60
         gui.voice_transcript = TextArea(screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui, renderer=renderer, font_manager=font_manager)
         gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
         gui.content().add_child(gui.voice_transcript)
