@@ -58,6 +58,9 @@ class VoiceTranscriber:
         self.all_audio_bytes = b""
         self.incoming_text = Queue()  # Entries are (text: str, is_final: bool)
 
+        self.session = kwargs.get("session")
+        assert(self.session is not None)
+
 
     def start_recording(self):
         logging.debug("ENTER VoiceTranscriber.start_recording()")
@@ -177,14 +180,16 @@ class VoiceTranscriber:
         was_final = False
         try:
             while True:
-                (t, is_final) = self.incoming_text.get_nowait()
-                if len(t) == 0:
+                (text, is_final) = self.incoming_text.get_nowait()
+                if len(text) == 0:
                     continue
 
                 if is_final:
-                    text = t
+                    logging.debug(f"** FINAL text: '{text}'")
                 else:
-                    text += t
+                    logging.debug(f"** PARTIAL text: '{text}'")
+                
+                self.session.publish("transcribed_text", (text, is_final))
                 was_final = is_final
 
         except queue.Empty:
@@ -192,11 +197,11 @@ class VoiceTranscriber:
                 pass
                 # print('**', text)
 
-        # @todo: generalize into some signal/socket or pipe routing thing...
         if len(text) > 0:
+                                     
+            # @todo: ask gpt-3.5 if we should stop listening
             if was_final:
                 # @hack: stop listening
-                # @todo: ask gpt-3.5 if we should stop listening
                 normalized_text = text.strip().lower()
                 normalized_text = normalized_text.replace(".", "")
                 normalized_text = normalized_text.replace("!", "")

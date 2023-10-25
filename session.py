@@ -1,6 +1,7 @@
 import logging
 import openai
 import os
+from queue import Queue
 from typing import Callable, Dict, List, Optional
 
 from audio_service import AudioService
@@ -42,6 +43,7 @@ class Session:
         self._running_completions: Dict[openai.ChatCompletion, List[ChatCompletionHandler]] = {}
         
         self._audio = AudioService()
+        self._channels = {}
 
 
     def start(self):
@@ -87,6 +89,20 @@ class Session:
             del self._running_completions[done_completion]
         
         # logging.debug("EXIT Client Session.update")
+
+
+    def publish(self, channel_name, obj):
+        if channel_name in self._channels:
+            for q in self._channels[channel_name]:
+                q.put(obj)
+
+                
+    def subscribe(self, channel_name: str) -> Queue:
+        q = Queue()
+        if channel_name not in self._channels:
+            self._channels[channel_name] = []
+        self._channels[channel_name].append(q)
+        return q
 
 
     def llm_send_streaming_chat_request(self, chat_messages, handlers: List[ChatCompletionHandler]=[]):
