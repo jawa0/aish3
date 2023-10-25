@@ -211,10 +211,17 @@ class GUI:
     def _on_voice_command(self, command: str) -> None:
         logging.info(f'GUI._on_voice_command({command})')
 
+        # @todo make sanitization routines
+        command = command.replace('"', "")
+        command = command.replace("'", "")
+
         if command == "stop_listening":
             logging.info('Command: stop listening')
             self._should_stop_voice_in = True
-            return
+
+        elif command == "create_new_chat":
+            logging.info('Command: create new chat')
+            self.cmd_new_llm_chat()
 
 
 
@@ -282,6 +289,22 @@ class GUI:
         return handled
     
 
+    def cmd_new_llm_chat(self):
+        wr = self.content().get_world_rect()
+        x = ctypes.c_int()
+        y = ctypes.c_int()                
+        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+        self.content().sizeToChildren()
+
+        argx = x.value-wr.x
+        argy = y.value-wr.y
+
+        logging.debug(f"Creating new LLMChatContainer at {argx}, {argy}")
+        chat = self.create_control("LLMChatContainer", x=argx, y=argy)
+        self.content().add_child(chat)
+
+
     def handle_keydown(self, event):
         wr = self.content().get_world_rect()
 
@@ -300,14 +323,7 @@ class GUI:
             
             # Cmd+N add new LLM chat
             if keySym == sdl2.SDLK_n:
-                x = ctypes.c_int()
-                y = ctypes.c_int()                
-                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-
-                self.content().sizeToChildren()
-                chat = self.create_control("LLMChatContainer", x=x.value-wr.x, y=y.value-wr.y)
-                self.content().add_child(chat)
-                # self.set_focus(chat)
+                self.cmd_new_llm_chat()
                 return True  # event was handled
 
             # Cmd+R say something

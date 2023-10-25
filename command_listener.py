@@ -37,6 +37,7 @@ you to perform a command.
 --------
 COMMANDS:
 "stop_listening"
+"create_new_chat"
 """
                     # Get last K transcribed texts, for context. Includes partials.
                     K = 3
