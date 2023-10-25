@@ -106,7 +106,7 @@ class LLMChatContainer(GUIContainer):
         self.utterances = []
 
         if default_setup:
-            self.add_child(Label(text="GPT-4 Chat", w=PANEL_WIDTH, h=20, **kwargs),
+            self.add_child(Label(text="LLM Chat [gpt-4]", w=PANEL_WIDTH, h=20, **kwargs),
                            add_to_focus_ring=False)
 
             self.system = self.ChatMessageUI(role="System", **kwargs)
@@ -210,7 +210,7 @@ class LLMChatContainer(GUIContainer):
                                         chunk_handler=self.on_llm_response_chunk,
                                         done_handler=self.on_llm_response_done)
         
-        self.gui.session.llm_send_streaming_chat_request(messages, handlers=[handler])
+        self.gui.session.llm_send_streaming_chat_request("gpt-4", messages, handlers=[handler])
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
