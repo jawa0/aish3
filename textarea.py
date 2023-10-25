@@ -18,6 +18,7 @@ import sdl2
 from draw import draw_cursor, draw_text
 from gui import GUI, GUIControl
 from text_edit_buffer import TextEditBuffer
+import queue
 
 
 class TextArea(GUIControl):
@@ -43,6 +44,7 @@ class TextArea(GUIControl):
         self.x_scroll = 0
         self.combined_text_texture = None
         self.is_user_scrolling = False
+        self.input_q = None
 
 
     def __json__(self):
@@ -51,6 +53,23 @@ class TextArea(GUIControl):
         json["text"] = self.text_buffer.get_text()
         return json
     
+    
+    def on_update(self, dt):
+        if self.input_q is not None:
+            try:
+                while True:
+                    (text, is_final) = self.input_q.get_nowait()
+                    if len(text) == 0:
+                        continue
+
+                    self.text_buffer.set_text(text)
+
+            except queue.Empty:
+                pass
+            finally:
+                self.set_needs_redraw()
+        
+
 
     def handle_event(self, event):
 

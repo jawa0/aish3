@@ -98,7 +98,7 @@ class GUI:
         self._saying_text = None
         self._next_texts_to_say = []
 
-        self._voice_in = VoiceTranscriber()
+        self._voice_in = VoiceTranscriber(session=self.session)
         self._voice_wakeup = None
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
@@ -376,14 +376,30 @@ class GUI:
 
 
     def update(self, dt):
+        # Should we enable or disable wake word listening?
         if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
             self._stop_listening_wakeword()
 
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
             self._start_listening_wakeword()
 
+        # Update voice wakeup, if it's active
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
             self._voice_wakeup.update()
+
+        # Update visibility of voice transcript window...
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            self.voice_transcript is not None and \
+            not self.voice_transcript._visible:
+
+            self.voice_transcript._visible = True
+        
+        elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            self.voice_transcript is not None and \
+            self.voice_transcript._visible:
+
+            self.voice_transcript._visible = False
+
 
         # Do we have queued text to say?
         if self._saying_text is None and len(self._next_texts_to_say) > 0:
