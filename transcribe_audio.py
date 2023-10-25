@@ -80,7 +80,6 @@ class VoiceTranscriber:
             on_close=self._on_transcribe_close
         )
         self.transcriber.connect()
-        self._should_stop = False
 
         logging.debug("EXIT VoiceTranscriber.start_recording()")
 
@@ -193,21 +192,7 @@ class VoiceTranscriber:
                 was_final = is_final
 
         except queue.Empty:
-            if len(text) > 0:
-                pass
-                # print('**', text)
-
-        if len(text) > 0:
-                                     
-            # @todo: ask gpt-3.5 if we should stop listening
-            if was_final:
-                # @hack: stop listening
-                normalized_text = text.strip().lower()
-                normalized_text = normalized_text.replace(".", "")
-                normalized_text = normalized_text.replace("!", "")
-                self._should_stop = normalized_text == "stop listening"
-
-                logging.info(f"** Speech Final Transcript: '{text}'")
+            pass
 
         # logging.debug('EXIT VoiceTranscriber.update()')
 

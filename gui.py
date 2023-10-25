@@ -28,6 +28,7 @@ import os
 from voice_out import VoiceOut
 from voice_wakeup import PhraseListener
 from transcribe_audio import VoiceTranscriber
+from command_listener import VoiceCommandListener
 
 
 #===============================================================================
@@ -98,10 +99,13 @@ class GUI:
         self._saying_text = None
         self._next_texts_to_say = []
 
-        self._voice_in = VoiceTranscriber(session=self.session)
-        self._voice_wakeup = None
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
+        self._voice_wakeup = None
+        self._voice_in = VoiceTranscriber(session=self.session)
+        self._should_stop_voice_in = False
+
+        self.command_listener = None
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -183,6 +187,7 @@ class GUI:
             not self._voice_in.is_recording():
 
             self._voice_in.start_recording()
+            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
 
         # If we were waiting for the wakeup phrase, then go back to doing that
         elif len(self._next_texts_to_say) == 0 and \
@@ -200,6 +205,17 @@ class GUI:
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
+        self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+
+
+    def _on_voice_command(self, command: str) -> None:
+        logging.info(f'GUI._on_voice_command({command})')
+
+        if command == "stop_listening":
+            logging.info('Command: stop listening')
+            self._should_stop_voice_in = True
+            return
+
 
 
     def handle_event(self, event):
@@ -328,11 +344,13 @@ class GUI:
 
                     logging.info(f'Starting active listening.')
                     self._voice_in.start_recording()
+                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
                     self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
 
                 elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
                     logging.info(f'GUI is listening for speech. Stopping active listening.')
                     self._voice_in.stop_recording()
+                    self.command_listener = None
                     self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
 
                     self._start_listening_wakeword()
@@ -424,11 +442,15 @@ class GUI:
                 if self.listening_indicator.get_text() != voice_indicator_text:
                     self.listening_indicator.set_text(voice_indicator_text)
 
+            if self.command_listener is not None:
+                self.command_listener.update()
+
             # Stop voice in?
-            if self._voice_in._should_stop and self._voice_in.is_recording():
+            if self._should_stop_voice_in and self._voice_in.is_recording():
                 self._voice_in.stop_recording()
                 logging.debug(f'Just called self._voice_in.stop_recording() and self._voice_in is {self._voice_in}')
-                self._voice_in._should_stop = False
+                self._should_stop_voice_in = False
+                self.command_listener = None
 
                 self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
                 # self.say("Okay")

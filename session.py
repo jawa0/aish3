@@ -17,10 +17,14 @@ class ChatCompletionHandler:
         self._chunk_handler = chunk_handler
         self._done_handler = done_handler
 
+        self._started = False
+        self._done = False
+    
 
     def on_start(self) -> None:
         if self._start_handler is not None:
             self._start_handler()
+        self._started = True
 
             
     def on_text_chunk(self, text: str) -> None:
@@ -28,9 +32,11 @@ class ChatCompletionHandler:
             self._chunk_handler(text)
 
 
+    # @todo: accumulate text and send to done?
     def on_done(self) -> None:
         if self._done_handler is not None:
             self._done_handler()
+        self._done = True
 
 
 class Session:
@@ -96,7 +102,7 @@ class Session:
             for q in self._channels[channel_name]:
                 q.put(obj)
 
-                
+
     def subscribe(self, channel_name: str) -> Queue:
         q = Queue()
         if channel_name not in self._channels:
@@ -105,8 +111,9 @@ class Session:
         return q
 
 
-    def llm_send_streaming_chat_request(self, chat_messages, handlers: List[ChatCompletionHandler]=[]):
-        completion = openai.ChatCompletion.create(model="gpt-4", messages=chat_messages, stream=True)
+    def llm_send_streaming_chat_request(self, model, chat_messages, handlers: List[ChatCompletionHandler]=[]):
+        assert(model == 'gpt-4' or model == 'gpt-3.5-turbo')
+        completion = openai.ChatCompletion.create(model=model, messages=chat_messages, stream=True)
         logging.debug(chat_messages)
         self._running_completions[completion] = handlers
 
