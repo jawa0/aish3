@@ -177,7 +177,7 @@ class GUI:
     def _on_speech_done(self):
         self._saying_text = None
 
-        # If we were actively listening before saying speech, then return to active listening...
+        # If we were actively listening before text_buffer_set_textsaying speech, then return to active listening...
         if len(self._next_texts_to_say) == 0 and \
             self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
             not self._voice_in.is_recording():
@@ -392,6 +392,7 @@ class GUI:
             self.voice_transcript is not None and \
             not self.voice_transcript._visible:
 
+            self.voice_transcript.text_buffer.set_text("")  # @hack
             self.voice_transcript._visible = True
         
         elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
