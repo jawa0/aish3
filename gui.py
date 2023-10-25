@@ -376,7 +376,10 @@ class GUI:
 
 
     def update(self, dt):
+        #
         # Should we enable or disable wake word listening?
+        #
+        
         if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
             self._stop_listening_wakeword()
 
@@ -387,13 +390,17 @@ class GUI:
         if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
             self._voice_wakeup.update()
 
+        # 
+        # Voice transcription
+        #
+        
         # Update visibility of voice transcript window...
-        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
-            self.voice_transcript is not None and \
-            not self.voice_transcript._visible:
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+            if self.voice_transcript is not None and \
+                not self.voice_transcript._visible:
 
-            self.voice_transcript.text_buffer.set_text("")  # @hack
-            self.voice_transcript._visible = True
+                self.voice_transcript.text_buffer.set_text("")  # @hack
+                self.voice_transcript._visible = True
         
         elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
             self.voice_transcript is not None and \
@@ -473,7 +480,7 @@ class GUI:
 
         if focus_it:
             # Can't focus on a control that can't be focused.
-            # @shouldn't this happen automatically?
+            # @note @todo shouldn't this happen automatically?
 
             if not control.can_focus:
                 return False
