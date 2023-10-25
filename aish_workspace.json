@@ -204,38 +204,6 @@
             100
           ],
           "text": "This is a TextArea."
-        },
-        {
-          "class": "VoiceTranscriptContainer",
-          "bounding_rect": [
-            829,
-            144,
-            352,
-            142
-          ],
-          "layout": "ColumnLayout",
-          "children": [
-            {
-              "class": "Label",
-              "bounding_rect": [
-                1,
-                1,
-                350,
-                20
-              ],
-              "text": "Voice Transcript"
-            },
-            {
-              "class": "TextArea",
-              "bounding_rect": [
-                1,
-                21,
-                350,
-                120
-              ],
-              "text": ""
-            }
-          ]
         }
       ]
     }

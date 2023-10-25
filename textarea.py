@@ -54,6 +54,16 @@ class TextArea(GUIControl):
         return json
     
     
+    def _set_focus(self, has_focus):
+        # @hack @todo make this optional
+        if has_focus:
+            self.input_q = self.gui.session.subscribe("transcribed_text")
+        else:
+            self.input_q = None
+
+        return super()._set_focus(has_focus)
+    
+
     def on_update(self, dt):
         if self.input_q is not None:
             try:
@@ -62,8 +72,25 @@ class TextArea(GUIControl):
                     if len(text) == 0:
                         continue
 
-                    self.text_buffer.set_text(text)
+                    # self.text_buffer.set_text(text)
 
+                    # Don't just overwrite text, but insert it at the current cursor position
+                    # However, delete any current selection. We'll use this as a way to 
+                    # update partial text results.
+                    if self.text_buffer.get_selection() is not None:
+                        self.text_buffer.delete_selection()
+                    
+                    # Cause the new text we insert to be selected, so if we get new partial 
+                    # text, then it will overwrite the old partial text by overwriting the
+                    # selection.
+
+                    if not is_final:
+                        self.text_buffer.set_mark()
+                    else:
+                        text += '\n'
+                        self.text_buffer.clear_mark()
+                    self.text_buffer.insert(text)
+                    
             except queue.Empty:
                 pass
             finally:
