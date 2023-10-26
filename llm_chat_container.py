@@ -241,7 +241,8 @@ class LLMChatContainer(GUIContainer):
 
 
     def on_llm_response_done(self) -> None:
-        self.gui.say(self.accumulated_response_text)
+        pass
+        # self.gui.say(self.accumulated_response_text)
 
 
     def get_json(self):
