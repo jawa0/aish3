@@ -219,9 +219,11 @@ class GUI:
             logging.info('Command: stop listening')
             self._should_stop_voice_in = True
 
-        elif command == "create_new_chat":
-            logging.info('Command: create new chat')
+        elif command == "create_new_chat_with_llm":
             self.cmd_new_llm_chat()
+
+        elif command == "create_new_text_area":
+            self.cmd_new_text_area()
 
 
 
@@ -289,7 +291,21 @@ class GUI:
         return handled
     
 
+    def cmd_new_text_area(self):
+        logging.info('Command: create new text area')
+        wr = self.content().get_world_rect()
+        x = ctypes.c_int()
+        y = ctypes.c_int()                
+        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+        self.content().sizeToChildren()
+        textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
+        self.content().add_child(textArea)
+        self.set_focus(textArea)
+
+
     def cmd_new_llm_chat(self):
+        logging.info('Command: create new LLM chat')
         wr = self.content().get_world_rect()
         x = ctypes.c_int()
         y = ctypes.c_int()                
@@ -336,14 +352,7 @@ class GUI:
             
             # Cmd+T creaes a new TextArea
             if keySym == sdl2.SDLK_t:
-                x = ctypes.c_int()
-                y = ctypes.c_int()                
-                sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-
-                self.content().sizeToChildren()
-                textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
-                self.content().add_child(textArea)
-                self.set_focus(textArea)
+                self.cmd_new_text_area()
                 return True
 
             if keySym == sdl2.SDLK_RETURN:

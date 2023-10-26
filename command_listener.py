@@ -36,8 +36,15 @@ the empty string. You must also respond with the empty string if you are not sur
 you to perform a command.
 --------
 COMMANDS:
-"stop_listening"
-"create_new_chat"
+stop_listening
+create_new_chat_with_llm
+create_new_text_area
+
+EXAMPLES:
+"stop_listening" -> stop_listening
+"don't stop listening" -> ""
+"create a new LLM chat" -> create_new_chat_with_llm
+"create a new chat" -> create_new_chat_with_llm
 """
                     # Get last K transcribed texts, for context. Includes partials.
                     K = 3
@@ -46,8 +53,8 @@ COMMANDS:
 
                     messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
-                    model = "gpt-4"
-                    # model = "gpt-3.5-turbo"  # @todo: fails on "don't stop listening" etc.
+                    # model = "gpt-4"
+                    model = "gpt-3.5-turbo"  # @todo: fails on "don't stop listening" etc.
                     logging.debug(f"**** COMMAND DETECTION: Sending chat request to {model}: {messages}")
                     self.session.llm_send_streaming_chat_request(model, messages, handlers=[self.completion_handler])
 
