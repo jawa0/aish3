@@ -7,7 +7,13 @@ _Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire" in English._
 _In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common informal exclamation often used to express frustration, annoyance, or mild surprise, somewhat equivalent to "Oh no!", "Darn!", or "Ugh!" in English._
 
 
-This is a Python command-line (CLI) application. It doesn't do much right now, except submit chat completions to GPT-4, and provide a GUI framework using text and rectangles. The eventual goal is to rapidly prototype GUI + LLM ideas. The first goal is to have a replacement for the ChatGPT web-interface and Playgrounds.
+This is a Python command-line (CLI) application. The goal is to have a portable hands-free AI assistant and playground.
+Features:
+* Have multiple LLM chats (with ChatGPT)
+* Voice-in speech-to-text transcription
+* Voice-out reading of chat results and other text
+* Make notes in TextAreas
+* Save and Load workspaces
 
 ### Running it
 
