@@ -20,6 +20,7 @@ import logging
 import pytz
 from rect_utils import rect_union
 import sdl2
+from typing import Union
 from tzlocal import get_localzone
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
@@ -249,6 +250,7 @@ class GUI:
                         hit_control = self.check_hit(event.button.x, event.button.y)
                         if hit_control:
                             self._drag_control = hit_control
+                            self.set_focus(hit_control)
                     return True
 
             elif event.type == sdl2.SDL_MOUSEBUTTONUP:
@@ -258,7 +260,7 @@ class GUI:
                     del self._strokes[event.button.button]
                     # print(f"STROKE (button {event.button.button}) end")
 
-                    # If it's the let mouse button, then check if we're dragging and release drag.
+                    # If it's the left mouse button, then check if we're dragging and release drag.
                     if self._drag_control and event.button.button == sdl2.SDL_BUTTON_LEFT:
                         self._drag_control = None
                     return True
@@ -522,9 +524,7 @@ class GUI:
         return self._focused_control
     
     
-    def set_focus(self, control, focus_it=True):
-        assert(control is not None and isinstance(control, GUIControl))
-
+    def set_focus(self, control: "GUIControl", focus_it=True):
         if focus_it:
             # Can't focus on a control that can't be focused.
             # @note @todo shouldn't this happen automatically?
@@ -557,7 +557,7 @@ class GUI:
             return control._set_focus(False)
         
 
-    def check_hit(self, x, y):
+    def check_hit(self, x: int, y: int) -> "Union[GUIControl, None]":
         p = sdl2.SDL_Point(x, y)
         
         q = list(self.content())
