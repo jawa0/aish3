@@ -89,7 +89,8 @@ class GUI:
         self._focused_control = None
 
         self._strokes = {}
-        self._content_pan = (0, 0)
+        # self._content_pan = (0, 0)
+        self._viewport_pos = (0, 0)
         self._drag_control = None
 
         self.workspace_filename = workspace_filename
@@ -286,7 +287,8 @@ class GUI:
                                                self._drag_control.bounding_rect.h)
                         self._drag_control.bounding_rect = new_r
                     else:
-                        self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
+                        # self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
+                        self._viewport_pos = (self._viewport_pos[0] - dx, self._viewport_pos[1] - dy)
 
                     return True
                 
@@ -622,6 +624,9 @@ class GUI:
             self._focused_control = bak_focused_control
             return False
         
+        self._content.sizeToChildren()
+        self._viewport_pos = self.content().bounding_rect.x, self.content().bounding_rect.y
+
         logging.info("GUI loaded.")
         return True
 
@@ -736,8 +741,8 @@ class GUIControl:
                                  self.bounding_rect.h)
         else:
             wr = self.bounding_rect
-            wr = sdl2.SDL_Rect(wr.x + self.gui._content_pan[0],
-                           wr.y + self.gui._content_pan[1],
+            wr = sdl2.SDL_Rect(wr.x - self.gui._viewport_pos[0],
+                           wr.y - self.gui._viewport_pos[1],
                            wr.w,
                            wr.h)
         return wr
