@@ -1,0 +1,4100 @@
+Project directory and file layout:
+.
+├── LICENSE
+├── Makefile
+├── README.md
+├── Yar-Robot-Oh_en_mac_v2_2_0.zip
+├── Yar-assistant_en_mac_v2_2_0.zip
+├── __init__.py
+├── a.txt
+├── aish3.py
+├── aish_workspace.json
+├── ast.dot
+├── ast.png
+├── audio_service.py
+├── b.txt
+├── bio
+├── candlestick.py
+├── command_listener.py
+├── config.py
+├── data
+│   └── test1.csv
+├── draw.py
+├── generate-context.sh
+├── get-project-structure.sh
+├── gui.py
+├── gui_focus.py
+├── gui_layout.py
+├── jaba.json
+├── jobs.json
+├── label.py
+├── llm_chat_container.py
+├── memory.json
+├── output.mp4
+├── output2.mp4
+├── project-context.txt
+├── record_audio.py
+├── rect_utils.py
+├── res
+│   ├── fonts
+│   │   ├── FiraCode-Bold.ttf
+│   │   ├── FiraCode-Light.ttf
+│   │   ├── FiraCode-Medium.ttf
+│   │   ├── FiraCode-Regular.ttf
+│   │   ├── FiraCode-Retina.ttf
+│   │   └── FiraCode-SemiBold.ttf
+│   └── wake-phrases
+│       ├── Yar-Robot-Oh_en_mac_v2_2_0
+│       │   ├── LICENSE.txt
+│       │   └── Yar-Robot-Oh_en_mac_v2_2_0.ppn
+│       └── Yar-assistant_en_mac_v2_2_0
+│           ├── LICENSE.txt
+│           └── Yar-assistant_en_mac_v2_2_0.ppn
+├── resume.json
+├── session.py
+├── speech.json
+├── test
+│   ├── __init__.py
+│   └── test_aish3.py
+├── text_edit_buffer.py
+├── textarea.py
+├── transcribe_audio.py
+├── trywake.py
+├── utils.py
+├── voice.json
+├── voice_commands.mp4
+├── voice_in.mp4
+├── voice_out.py
+├── voice_wakeup.py
+└── yarr_assistant.mp4
+
+9 directories, 59 files
+========================
+./aish3.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# @todo log chat gpt reqeusts and responses
+# @todo animated control resizing - jarring when textareas shrink on chat completion
+# @todo when cycling focus in LLMChatContainer, enlarge focused container, shrink others.
+# @todo token streaming output from gpt
+# @todo selected text should have a more drab background colour if TextArea is not focused
+# @todo move to beginning/end of line
+# @todo move to prev/next word
+# @todo TextArea/TextEditBuffer word wrap
+# @todo focus controls using mouse click
+# @todo @bug weird behaviour when deleting past start of buffer
+# @todo tabs don't just insert spaces, but move to a multiple of tab_spaces
+# @todo hitting line down on last line goes to end of line doesn't affect desired_col
+# @todo hitting line up on first line goes to start of line doesn't affect desired_col
+# @todo flashing cursor
+# @todo key repeat
+# @todo copy text to clipboard
+# @todo @bug ONLY FOR VARIABLE-WIDTH FONT: k and w misalignment between letters and cursor after drawing red boxes
+
+import sdl2
+import sdl2.ext
+import sdl2.sdlttf as ttf
+import argparse
+import logging
+import time
+
+import config
+from gui import GUI
+from llm_chat_container import LLMChatContainer
+from gui_layout import RowLayout
+from draw import draw_text
+from session import Session
+from label import Label
+from textarea import TextArea
+
+
+def run(fullscreen, width, height, workspace_filename):
+    try:
+        logging.info('App start.')
+
+        # sdl2.ext.init()
+        sdl2.SDL_Init(sdl2.SDL_INIT_VIDEO | sdl2.SDL_INIT_EVENTS)
+        ttf.TTF_Init()
+
+        window = sdl2.ext.Window("AISH", size=(width, height), 
+                                flags=sdl2.SDL_WINDOW_ALLOW_HIGHDPI | 
+                                sdl2.SDL_WINDOW_RESIZABLE)
+
+        if fullscreen:
+            sdl2.SDL_SetWindowFullscreen(window.window, sdl2.SDL_WINDOW_FULLSCREEN)
+
+        window.show()
+
+        renderer = sdl2.ext.Renderer(window, 
+                                        flags=sdl2.SDL_RENDERER_ACCELERATED | 
+                                        sdl2.SDL_RENDERER_PRESENTVSYNC)
+
+        WHITE = sdl2.ext.Color(255, 255, 255)
+        font_path = "./res/fonts/FiraCode-Regular.ttf"
+        # font_path = "./res/fonts/Menlo-Regular.ttf"
+        font_size = 12
+        font_manager = sdl2.ext.FontManager(font_path, size=font_size, color=WHITE)
+
+
+        session: Session = Session()
+        session.start()
+
+        gui = GUI(renderer, font_manager, workspace_filename=workspace_filename, client_session=session)
+        logging.info(f'Voice input available? {gui.voice_input_available()}')
+
+        # @hack
+        gui.listening_indicator = Label(screen_relative=True, x=5, y=5, w=200, gui=gui, renderer=renderer, font_manager=font_manager)
+        gui.content().add_child(gui.listening_indicator)
+
+        voice_transcript_height = 60
+        gui.voice_transcript = TextArea(screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui, renderer=renderer, font_manager=font_manager)
+        gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
+        gui.content().add_child(gui.voice_transcript)
+
+        running = True
+        t_prev_update = time.time()
+
+        fps_smoothed = 0.0
+        while running:
+            events = sdl2.ext.get_events()
+            if events:
+                for event in events:
+                    if event.type == sdl2.SDL_QUIT:
+                        running = False
+                        gui.on_quit()
+                        break
+                    elif event.type == sdl2.SDL_WINDOWEVENT and \
+                        event.window.event == sdl2.SDL_WINDOWEVENT_SIZE_CHANGED:
+                            # Update renderer viewport to new window size
+                            new_width = event.window.data1
+                            new_height = event.window.data2
+
+                            # @hack
+                            if gui.voice_transcript is not None:
+                                gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
+                                                                new_height - voice_transcript_height - 5, 
+                                                                new_width-5, 
+                                                                voice_transcript_height)
+
+                            width = new_width
+                            height = new_height
+
+                            print("SDL_WINDOWEVENT_SIZE_CHANGED")
+
+                            sdl2.SDL_RenderSetLogicalSize(renderer.renderer, new_width, new_height)
+
+                            renderer.clear()
+                            gui.draw()
+                            renderer.present()
+
+                    else:
+                        gui.handle_event(event)
+
+            else:
+                session.update()
+
+                t_update = time.time()
+                dt = t_update - t_prev_update
+                gui.update(dt)
+                t_prev_update = t_update
+
+                t0 = time.time()
+                renderer.clear()
+                gui.draw()
+
+                t1 = time.time()
+                elapsed = t1 - t0
+                fps = 1.0 / elapsed
+                fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
+                fps_str = f"FPS: {fps_smoothed:.2f}"
+                draw_text(renderer, font_manager, fps_str, width - 100, 10)
+                # print(fps_str)
+
+                renderer.present()
+
+        session.stop()
+
+        ttf.TTF_Quit()
+        sdl2.ext.quit()
+        logging.info('App quit.')
+    
+    except Exception as e:
+        logging.exception('Unhandled exception at app level: ', e)
+        raise e
+
+
+if __name__ == "__main__":
+    
+    config.load()
+
+    parser = argparse.ArgumentParser(description='AISH window application.')
+    parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
+    parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
+    parser.add_argument('--height', type=int, default=800, help='window height (default: 800)')
+
+    parser.add_argument('--workspace', default='aish_workspace.json', help='workspace file (default: aish_workspace.json)')
+    args = parser.parse_args()
+
+    run(args.fullscreen, args.width, args.height, args.workspace)
+
+
+========================
+./textarea.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import ctypes
+import sdl2
+from draw import draw_cursor, draw_text
+from gui import GUI, GUIControl
+from text_edit_buffer import TextEditBuffer
+import queue
+
+
+class TextArea(GUIControl):
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        gui = kwargs.get('gui')
+
+        instance = gui.create_control(json["class"], **kwargs)
+        instance.set_bounds(*json["bounding_rect"])
+        instance.text_buffer.set_text(json["text"])
+        return instance
+
+
+    def __init__(self, row_spacing=18, text_buffer=None, **kwargs):
+        # print(f'TextArea.__init__() called')
+        super().__init__(**kwargs)
+        text = kwargs.get('text', '')
+        self.text_buffer = text_buffer or TextEditBuffer(text=text)
+        self.is_editable = True
+        self.row_spacing = row_spacing
+        self.y_scroll = 0
+        self.x_scroll = 0
+        self.combined_text_texture = None
+        self.is_user_scrolling = False
+        self.input_q = None
+
+
+    def __json__(self):
+        json = super().__json__()
+        json["class"] = self.__class__.__name__
+        json["text"] = self.text_buffer.get_text()
+        return json
+    
+    
+    def _set_focus(self, has_focus):
+        # @hack @todo make this optional
+        if has_focus:
+            self.input_q = self.gui.session.subscribe("transcribed_text")
+        else:
+            self.input_q = None
+
+        return super()._set_focus(has_focus)
+    
+
+    def on_update(self, dt):
+        if self.input_q is not None:
+            try:
+                while True:
+                    (text, is_final) = self.input_q.get_nowait()
+                    if len(text) == 0:
+                        continue
+
+                    # self.text_buffer.set_text(text)
+
+                    # Don't just overwrite text, but insert it at the current cursor position
+                    # However, delete any current selection. We'll use this as a way to 
+                    # update partial text results.
+                    if self.text_buffer.get_selection() is not None:
+                        self.text_buffer.delete_selection()
+                    
+                    # Cause the new text we insert to be selected, so if we get new partial 
+                    # text, then it will overwrite the old partial text by overwriting the
+                    # selection.
+
+                    if not is_final:
+                        self.text_buffer.set_mark()
+                    else:
+                        text += '\n'
+                        self.text_buffer.clear_mark()
+                    self.text_buffer.insert(text)
+                    
+            except queue.Empty:
+                pass
+            finally:
+                self.set_needs_redraw()
+        
+
+
+    def handle_event(self, event):
+
+        if event.type == sdl2.SDL_MOUSEWHEEL:
+            # Here, we handle the vertical scrolling (event.wheel.y) 
+            
+            self.is_user_scrolling = True
+            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
+            self.is_user_scrolling = False
+
+            return True
+        
+        elif event.type == sdl2.SDL_KEYDOWN:
+            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            keySymbol = event.key.keysym.sym
+
+            # Esc: If if there is a text selection, then clear selection.
+            if keySymbol == sdl2.SDLK_ESCAPE:
+                if self.text_buffer.get_selection() is not None:
+                    self.text_buffer.clear_mark()
+                    self.set_needs_redraw()
+                    return True
+                
+            # Cmd+A selects all text
+            elif keySymbol == sdl2.SDLK_a and (cmdPressed):
+                self.text_buffer.set_mark(mark_position=0)
+                self.text_buffer.move_point_to_end()
+                self.set_needs_redraw()
+                return True
+            
+            elif keySymbol == sdl2.SDLK_RETURN and not cmdPressed:
+                if self.text_buffer.get_selection() is not None:
+                    self.text_buffer.delete_selection()
+                self.text_buffer.insert()
+                self.set_needs_redraw()
+                return True
+            
+            # Cmd+Backspace/Delete delete the TextArea, but only if
+            # it is at the top-level of the GUI, not part of some other
+            # container.
+
+            elif cmdPressed and keySymbol == sdl2.SDLK_BACKSPACE:
+                focused_control = self.gui.get_focus()
+                if focused_control is self and focused_control.parent == self.gui.content():
+                    self.parent.remove_child(self)
+                    return True
+
+            # left arrow key
+            elif keySymbol == sdl2.SDLK_LEFT:  
+                # Is Shift held? Start selection if None
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  
+                    if self.text_buffer.get_selection() is None:
+                        self.text_buffer.set_mark()
+                else:
+                    self.text_buffer.clear_mark()
+
+                # Option/Alt - start of current or previous word
+                if event.key.keysym.mod & sdl2.KMOD_ALT:
+                    # move to start of word
+                    self.text_buffer.move_point_word_left()
+                # Cmd - beginning of line
+                elif cmdPressed:
+                    self.text_buffer.move_point_start_of_line()
+                else:
+                    self.text_buffer.move_point_left()
+
+                self.set_needs_redraw()    
+                return True
+            
+            # right arrow key
+            elif keySymbol == sdl2.SDLK_RIGHT:
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:
+                    if self.text_buffer.get_selection() is None:
+                        self.text_buffer.set_mark()
+                else:
+                    self.text_buffer.clear_mark()
+
+                # Option/Alt - start of next word
+                if event.key.keysym.mod & sdl2.KMOD_ALT:
+                    self.text_buffer.move_point_word_right()
+                # Cmd - end of line
+                elif cmdPressed:
+                    self.text_buffer.move_point_end_of_line()
+                else:
+                    self.text_buffer.move_point_right()
+
+                self.set_needs_redraw()    
+                return True
+            
+            elif keySymbol == sdl2.SDLK_UP:  # up arrow key
+                if cmdPressed:
+                    # move to start of buffer
+                    self.text_buffer.move_point_to_start()
+                else:
+                    if event.key.keysym.mod & sdl2.KMOD_SHIFT:
+                        if self.text_buffer.get_selection() is None:
+                            self.text_buffer.set_mark()
+                    else:
+                        self.text_buffer.clear_mark()
+                    self.text_buffer.move_point_up()
+
+                self.set_needs_redraw()    
+                return True
+            
+            elif keySymbol == sdl2.SDLK_DOWN:  # down arrow key
+                if cmdPressed:
+                    # move to end of buffer
+                    self.text_buffer.move_point_to_end()
+                else:
+                    if event.key.keysym.mod & sdl2.KMOD_SHIFT:
+                        if self.text_buffer.get_selection() is None:
+                            self.text_buffer.set_mark()
+                    else:
+                        self.text_buffer.clear_mark()
+                    if self.text_buffer.move_point_down():  
+                        # @todo encapsulate in a controller
+                        # self.scroll_cursor_into_view()
+                        pass
+
+                self.set_needs_redraw()        
+                return True
+                
+            # delete key -- delete char, but send Cmd+Delete to parent
+            elif keySymbol == sdl2.SDLK_BACKSPACE and not cmdPressed:
+                if self.text_buffer.get_selection() is not None:
+                    self.text_buffer.delete_selection()
+                else:
+                    self.text_buffer.delete_char()
+
+                self.set_needs_redraw()    
+                return True
+            
+            elif keySymbol == sdl2.SDLK_TAB:  # tab key
+                # TAB focuses next control
+                # Shift+TAB focuses previous control
+                # Ctrl+TAB inserts a tab character
+                if event.key.keysym.mod & sdl2.KMOD_LCTRL:  # if left Ctrl was held
+                    if self.text_buffer.get_selection() is not None:
+                        self.text_buffer.delete_selection()
+                    self.text_buffer.insert('\t')  # @todo how to access self.text_buffer through current control?
+
+                    self.set_needs_redraw()
+                    return True
+                
+            elif (keySymbol == sdl2.SDLK_SPACE and
+                (event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL))):
+                self.text_buffer.set_mark()
+
+                self.set_needs_redraw()
+                return True
+
+            # Check for Cmd+V (paste) on macOS
+            elif cmdPressed and keySymbol == sdl2.SDLK_v:
+                # Get the clipboard text
+                clipboard_text = sdl2.SDL_GetClipboardText()
+                if clipboard_text:
+                    # Convert the clipboard text from bytes to a string
+                    text = ctypes.cast(clipboard_text, ctypes.c_char_p).value.decode('utf-8')
+                    # Insert the text into the text buffer
+                    if self.text_buffer.get_selection() is not None:
+                        self.text_buffer.delete_selection()
+                    self.text_buffer.insert(text)
+                    # Free the clipboard text
+                    # sdl2.SDL_free(clipboard_text)
+
+                    self.set_needs_redraw()
+                    return True
+
+            # Copy & Cut
+            elif cmdPressed and keySymbol == (sdl2.SDLK_c or keySymbol == sdl2.SDLK_x):
+                # Is there a selection?
+                if self.text_buffer.get_selection() is not None:
+                    # Get the selected text
+                    start, end = self.text_buffer.get_selection()
+                    text = self.text_buffer.get_text()[start:end]
+                    
+                    # If we're cutting, then delete selection
+                    if keySymbol == sdl2.SDLK_x:
+                        self.text_buffer.delete_selection()
+                else:
+                    # Get all the text
+                    text = self.text_buffer.get_text()
+
+                    # If we're cutting, then delete all the text
+                    if keySymbol == sdl2.SDLK_x:
+                        self.text_buffer.set_text('')
+
+                # Set the clipboard text
+                sdl2.SDL_SetClipboardText(text.encode('utf-8'))
+                self.set_needs_redraw()
+                return True
+                    
+        elif event.type == sdl2.SDL_TEXTINPUT:
+            # event.text.text is a bytes object representing a string in UTF-8 encoding
+            text = event.text.text.decode('utf-8')
+            if self.text_buffer.get_selection() is not None:
+                self.text_buffer.delete_selection()
+            self.text_buffer.insert(text)
+            self.set_needs_redraw()
+            return True
+    
+        return self.parent_handle_event(event)
+    
+
+    def set_needs_redraw(self):
+        if self.combined_text_texture is not None:
+            sdl2.SDL_DestroyTexture(self.combined_text_texture)
+            self.combined_text_texture = None
+            if not self.is_user_scrolling:
+                self.scroll_cursor_into_view()
+
+
+    def set_size(self, w, h):
+        super().set_size(w, h)
+
+        # Mark dirty or else the cached text texture will be stretched
+        # to the new size.
+        self.set_needs_redraw()
+
+
+    def draw(self):
+        lines = self.text_buffer.get_lines()
+        
+        # @todo should each specialized control need to implement this?
+        if self._screen_relative:
+            wr = self.bounding_rect
+        else:
+            wr = self.get_world_rect()
+
+        x = wr.x - self.x_scroll
+        y = wr.y - self.y_scroll
+
+        # Determine start and end of selection
+        selected = self.text_buffer.get_selection()
+        if selected is not None:
+            i_start, i_end = selected
+            sel_rc0 = self.text_buffer.get_row_col(i_start)
+            sel_rc1 = self.text_buffer.get_row_col(i_end)
+
+        if self.combined_text_texture is None:
+            surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
+
+            # Draw the text
+            for i, line in enumerate(lines):
+                if len(line.strip()) != 0:
+                    if selected is not None:
+                        # Figure out where the selection starts and ends, line by line since
+                        # we can have multiline selections, and we are drawing the text a line
+                        # at a time.
+
+                        c_start = None
+                        if i < sel_rc0[0]:          # current line is before (not in) selection
+                            pass
+                        elif i == sel_rc0[0]:       # current line is first line of selection
+                            c_start = sel_rc0[1]
+                        elif i <= sel_rc1[0]:       # current line is internal to selection or last
+                            c_start = 0
+
+
+                        c_end = None
+                        if i > sel_rc1[0]:
+                            pass
+                        elif i < sel_rc1[0]:
+                            c_end = len(line)
+                        elif i == sel_rc1[0]:
+                            c_end = sel_rc1[1]
+
+                        draw_text(self.renderer, self.font_manager, 
+                                line, 
+                                x, y, bounding_rect=wr,
+                                dst_surface=surf, 
+                                selection_start=c_start, selection_end=c_end)
+                    else:
+                        draw_text(self.renderer, self.font_manager, line, x, y, bounding_rect=wr, dst_surface=surf)
+
+                y += self.row_spacing
+
+            self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
+            sdl2.SDL_FreeSurface(surf)
+
+        assert(self.combined_text_texture is not None)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, wr)
+
+        # Draw the bounding rectangle after all text has been drawn
+        # Save the current color
+        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+        old_color = (r.value, g.value, b.value, a.value)
+
+        # Set the new color
+        r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+        # Draw the bounding rectangle
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
+
+        # Reset to the old color
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+        # Draw cursor
+        if self.has_focus():
+            row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
+            line = lines[row]
+            if line is not None and col is not None:
+                draw_cursor(self.renderer, self.font_manager, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
+
+
+    def scroll_by(self, dx=0, dy=0):
+        self.y_scroll = max(0, self.y_scroll + dy)  # adjust y_scroll by dy
+        self.x_scroll = max(0, self.x_scroll + dx)  # adjust x_scroll by dx
+        self.set_needs_redraw()
+
+
+    def scroll_cursor_into_view(self):
+        # Where is the cursor?
+        wr = self.get_world_rect()
+        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_manager, 
+                                         self.text_buffer, 
+                                         self.row_spacing, 
+                                         wr.x, wr.y, wr, 
+                                         self.x_scroll, self.y_scroll,
+                                         dont_draw_just_calculate=True)  # !!!
+        
+        
+        cursor_bottom_y = y_cursor + self.row_spacing
+        rect_bottom_y = wr.y + wr.h
+        # print(f'cursor_bottom_y: {cursor_bottom_y}, rect_bottom_y: {rect_bottom_y}')
+
+        if cursor_bottom_y >= rect_bottom_y:
+            y_correction = cursor_bottom_y - rect_bottom_y
+            # print(f'y_correction: {y_correction}')
+            self.scroll_by(dy=y_correction)
+        elif y_cursor < wr.y:
+            y_correction = y_cursor - wr.y
+            # print(f'y_correction: {y_correction}')
+            self.scroll_by(dy=y_correction)
+
+        x_pad = 20  # Arbitrary
+        if x_cursor > wr.x + wr.w - x_pad:
+            x_correction = x_cursor - (wr.x + wr.w - x_pad)
+            self.scroll_by(dx=x_correction)
+        elif x_cursor < wr.x + x_pad:
+            x_correction = x_cursor - (wr.x + x_pad)
+            self.scroll_by(dx=x_correction)
+
+
+GUI.register_control_type("TextArea", TextArea)
+
+
+========================
+./config.py:
+========================
+import datetime
+from dotenv import load_dotenv
+import logging
+import openai
+import os.path
+from pathlib import Path
+
+
+# Ensure app user config dir exists
+app_name = "aish3"
+
+# Create the app config dir if it doesn't exist
+app_config_path = Path().home() / f".{app_name}"
+app_config_path.mkdir(exist_ok=True, mode=0o700)  # rwx------ permissions
+
+
+def setup_logging():
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
+
+    #
+    # Setup logging to STDOUT
+    #
+    
+    handle_logs_to_stdout = logging.StreamHandler()
+    handle_logs_to_stdout.setFormatter(formatter)
+    handle_logs_to_stdout.setLevel(logging.DEBUG)
+
+    #
+    # Setup logging to file
+    #
+
+    # Create log dir if it doesn't exist
+    logs_dir = "logs"
+    logs_path = app_config_path / logs_dir
+    logs_path.mkdir(exist_ok=True)
+
+    # Name our log file using the current time
+    start_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file_path = logs_path / f'{app_name}-{start_timestamp}.log'
+    handle_logs_to_file = logging.FileHandler(log_file_path)
+    handle_logs_to_file.setFormatter(formatter)
+    handle_logs_to_file.setLevel(logging.DEBUG)
+
+    handlers = [handle_logs_to_stdout, handle_logs_to_file]
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    for handler in handlers:
+        root_logger.addHandler(handler)
+
+
+    # Increase OpenAI log level
+    logging.getLogger("openai").setLevel(logging.DEBUG)
+
+
+def load():
+    load_dotenv()   # Load the .env file
+    setup_logging()
+
+
+
+
+========================
+./test/__init__.py:
+========================
+
+
+========================
+./test/test_aish3.py:
+========================
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import unittest
+from text_edit_buffer import TextEditBuffer
+
+class TestTextEditBuffer(unittest.TestCase):
+    def test_initial_point(self):
+        obj = TextEditBuffer()
+        self.assertEqual(obj.get_point(), 0)
+
+    def test_construct_with_text(self):
+        obj = TextEditBuffer("hello")
+        self.assertEqual(obj.get_point(), 0)
+
+    def test_insert_text(self):
+        text = "some text"
+        obj = TextEditBuffer()
+        obj.insert(text)
+        self.assertEqual(obj.get_point(), len(text))
+
+    def test_set_point_valid_range(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        valid_point = len(text) // 2
+        obj.set_point(valid_point)
+        self.assertEqual(obj.get_point(), valid_point)
+
+    def test_set_point_too_small(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        too_small_point = -1
+        obj.set_point(too_small_point)
+        self.assertEqual(obj.get_point(), 0)
+
+    def test_set_point_too_large(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        too_large_point = len(text) + 1
+        obj.set_point(too_large_point)
+        self.assertEqual(obj.get_point(), len(text))
+
+    def test_move_point_left_middle(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        middle_point = len(text) // 2
+        obj.set_point(middle_point)
+        obj.move_point_left()
+        self.assertEqual(obj.get_point(), middle_point - 1)
+
+    def test_move_point_left_start(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        obj.set_point(0)
+        obj.move_point_left()
+        self.assertEqual(obj.get_point(), 0)
+
+    def test_move_point_right_middle(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        middle_point = len(text) // 2
+        obj.set_point(middle_point)
+        obj.move_point_right()
+        self.assertEqual(obj.get_point(), middle_point + 1)
+
+    def test_move_point_right_end(self):
+        text = "some text"
+        obj = TextEditBuffer(text)
+        obj.set_point(len(text))
+        obj.move_point_right()
+        self.assertEqual(obj.get_point(), len(text))
+        
+    def test_get_row_col_valid_point(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+        point = 6
+        expected_row, expected_col = 1, 1
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (expected_row, expected_col))
+
+    def test_get_row_col_point_beginning(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = 0
+        expected_row, expected_col = 0, 0
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (expected_row, expected_col))
+
+    def test_get_row_col_eol(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = 4
+        expected_row, expected_col = 0, 4
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (expected_row, expected_col))
+
+    def test_get_row_col_bol(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = 5
+        expected_row, expected_col = 1, 0
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (expected_row, expected_col))
+
+    def test_get_row_col_point_end(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = len(text)
+        expected_row, expected_col = 1, 4
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (expected_row, expected_col))
+
+    def test_get_row_col_point_after_end(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = len(text) + 1
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (None, None))
+
+    def test_get_row_col_point_before_beginning(self):
+        text = "some\ntext"
+        obj = TextEditBuffer(text)
+
+        point = -1
+        row, col = obj.get_row_col(point)
+        self.assertEqual((row, col), (None, None))
+
+    def test_delete_char(self):
+        obj = TextEditBuffer()
+        obj.insert('hello world')
+        obj.set_point(6)
+        obj.delete_char()
+        self.assertEqual(obj.get_text(), "helloworld")
+        self.assertEqual(obj.get_point(), 5)
+        
+if __name__ == '__main__':
+    unittest.main()
+
+========================
+./Makefile:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+APPNAME = aish3
+
+macos:
+	@echo "Generating executable for $(APPNAME)..."
+	pyinstaller --onefile $(APPNAME).py
+	@echo "Modifying spec file..."
+	sed -i '' 's|pathex=\[\]|pathex=\["'$(shell pwd)'"\]|g' $(APPNAME).spec
+	@echo "Rebuilding with modified spec file..."
+	pyinstaller $(APPNAME).spec
+
+tests:
+	@echo "Running tests..."
+	python test/test_$(APPNAME).py
+
+clean:
+	@echo "Cleaning up..."
+	rm -rf dist/ build/ $(APPNAME).spec
+
+
+========================
+./voice_out.py:
+========================
+from google.cloud import texttospeech
+import logging
+import pyaudio
+import pydub
+import threading
+from audio_service import AudioService
+
+
+class VoiceOut:
+    N_SAMPLES_PER_SECOND = 44_100
+    N_BYTES_PER_SAMPLE = 2
+    N_CHANNELS = 1
+
+    _lock = threading.Lock()
+    _current_speaker = None
+
+
+    @classmethod
+    def get_current_speaker(cls):
+        with VoiceOut._lock:
+            return VoiceOut._current_speaker
+        
+
+    def __init__(self, on_speech_done=[]):
+        self.client = texttospeech.TextToSpeechClient()
+        self.voice = texttospeech.VoiceSelectionParams(language_code='en-GB', name='en-GB-Neural2-D')
+        self.audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.LINEAR16,
+            speaking_rate=1.2,
+            pitch=-20.0,
+            volume_gain_db=0.0,
+            sample_rate_hertz=VoiceOut.N_SAMPLES_PER_SECOND,
+            effects_profile_id=['headphone-class-device'])
+        
+        self._current_text = None
+        self._current_audio = None
+        self._current_byte_offset = None
+
+        self.stream = None
+        self._on_done = on_speech_done
+
+
+    def grab_conch(self):
+        logging.debug(f'ENTER VoiceOut.grab_conch')
+        with VoiceOut._lock:
+            logging.debug(f'VoiceOut.grab_conch: GOT LOCK')
+            assert(VoiceOut._current_speaker is None)
+            VoiceOut._current_speaker = self
+        logging.debug(f'VoiceOut.grab_conch: RELEASED LOCK')
+
+
+    def drop_conch(self):
+        logging.debug(f'ENTER VoiceOut.drop_conch')
+        with VoiceOut._lock:
+            logging.debug(f'VoiceOut.drop_conch: GOT LOCK')
+            VoiceOut._current_speaker = None
+        logging.debug(f'VoiceOut.drop_conch: RELEASED LOCK')
+
+        self.stream.stop_stream()
+        self.stream.close()
+        self.stream = None
+
+
+    def say(self, text):
+        logging.debug(f'ENTER VoiceOut.say: """{text}"""')
+        self.grab_conch()
+
+        self._current_text = text
+
+        # @todo this *is* a blocking call to get text -> audio
+        # consider processing smaller amounts of text at a time.
+        
+        synthesis_input = texttospeech.SynthesisInput(text=text)
+        response = self.client.synthesize_speech(input=synthesis_input, voice=self.voice, audio_config=self.audio_config)
+
+        audio_bytes = response.audio_content
+        logging.debug(f'audio_data: {len(audio_bytes)} bytes')
+
+        audio = pydub.AudioSegment(data=audio_bytes, 
+                                   sample_width=VoiceOut.N_BYTES_PER_SAMPLE, 
+                                   frame_rate=VoiceOut.N_SAMPLES_PER_SECOND, 
+                                   channels=VoiceOut.N_CHANNELS)
+        self._current_audio = audio
+        self._current_byte_offset = 0
+
+        # We want to output what might be some long audio, but to do it without blocking our
+        # thread. So, we use a callback.
+
+        self.stream = AudioService.get_voice_output_stream(VoiceOut._stream_callback)
+
+        logging.debug(f'EXIT VoiceOut.say')  # Demonstrate it's not blocking on audio output
+
+    
+    # @note that this is called from/in a different thread
+    # Do not call logging or print from this function! It's time-critical!
+
+    @staticmethod
+    def _stream_callback(in_data, frame_count, time_info, status_flags):
+        # Log entry to _stream_callback, and thread id
+        # logging.debug(f'ENTER VoiceOut._stream_callback tid={threading.current_thread().ident}')
+
+        vo = VoiceOut.get_current_speaker()
+        audio = vo._current_audio
+        i = vo._current_byte_offset
+
+        n_bytes_requested = frame_count * VoiceOut.N_BYTES_PER_SAMPLE * VoiceOut.N_CHANNELS
+        assert(n_bytes_requested >= 0)
+
+        n_bytes_remaining = max(0, len(audio.raw_data) - i)
+        is_last = n_bytes_remaining <= n_bytes_requested
+
+        n_bytes_to_send = min(n_bytes_requested, n_bytes_remaining)
+
+        audio_bytes = audio.raw_data[i:i + n_bytes_to_send]
+        i += n_bytes_to_send
+        vo._current_byte_offset = i
+
+        # logging.debug(f'n_bytes_requested: {n_bytes_requested}, n_bytes_remaining: {n_bytes_remaining}, n_bytes_to_send: {n_bytes_to_send}, is_last: {is_last} audio_bytes: {len(audio_bytes)} bytes')
+        if is_last:
+            return_code = pyaudio.paComplete
+            if n_bytes_remaining == 0:
+                audio_bytes = None
+
+            # logging.debug('OUTPUT STREAMING AUDIO DONE')
+            vo.drop_conch()
+            for callback in vo._on_done:
+                callback()
+        else:
+            return_code = pyaudio.paContinue
+
+        # logging.debug(f'EXIT VoiceOut._stream_callback')
+        return (audio_bytes, return_code)
+
+
+========================
+./command_listener.py:
+========================
+import logging
+import queue
+from session import ChatCompletionHandler, Session
+from typing import Callable
+
+
+class VoiceCommandListener:
+    def __init__(self, session: Session, on_command: Callable[[str], None]):
+        self.session = session
+        self.completion_handler = ChatCompletionHandler(start_handler=self._chat_completion_start,
+                                                        chunk_handler=self._chat_completion_chunk,
+                                                        done_handler=self._chat_completion_done)
+        self.text_in_q = self.session.subscribe("transcribed_text")
+        self.on_command = on_command
+        self.transcribed_texts = []
+        self.detected_command = None
+        self._completion_text = None
+
+
+    def update(self):
+        try:
+            while True:
+                (text, is_final) = self.text_in_q.get_nowait()
+                if len(text) == 0:
+                    continue
+
+                self.transcribed_texts.append(text)
+
+                if is_final:
+                    system = \
+"""You are monitoring user input TEXT that has been transcribed from voice audio by a speech to text system.
+You also know a set of COMMANDS that you can execute. Carefully examine the TEXT below, and determine
+whether the user is asking you to perform a command from your set of COMMANDS. If so, then respond with
+the command only. No other characters. If the user is not asking you to perform a command, then respond with
+the empty string. You must also respond with the empty string if you are not sure whether the user is asking
+you to perform a command.
+--------
+COMMANDS:
+stop_listening
+create_new_chat_with_llm
+create_new_text_area
+
+EXAMPLES:
+"stop_listening" -> stop_listening
+"don't stop listening" -> ""
+"create a new LLM chat" -> create_new_chat_with_llm
+"create a new chat" -> create_new_chat_with_llm
+"""
+                    # Get last K transcribed texts, for context. Includes partials.
+                    K = 3
+                    context = "\n".join(self.transcribed_texts[-K:])
+                    user = f"TEXT:\n{context}"
+
+                    messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+                    # model = "gpt-4"
+                    model = "gpt-3.5-turbo"  # @todo: fails on "don't stop listening" etc.
+                    logging.debug(f"**** COMMAND DETECTION: Sending chat request to {model}: {messages}")
+                    self.session.llm_send_streaming_chat_request(model, messages, handlers=[self.completion_handler])
+
+
+
+        except queue.Empty:
+            pass
+
+
+    def _chat_completion_start(self):
+        self._completion_text = ""
+
+
+    def _chat_completion_chunk(self, chunk_text):
+        self._completion_text += chunk_text
+
+
+    def _chat_completion_done(self):
+        logging.debug(f"**** COMMAND DETECTION: Chat completion done. Result: '{self._completion_text}'")
+        self.detected_command = self._completion_text.strip()
+        self._completion_text = None
+        if len(self.detected_command) > 0:
+            self.on_command(self.detected_command)
+
+
+========================
+./llm_chat_container.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+import json
+import logging
+import os
+import openai
+from gui import GUI, GUIContainer
+from label import Label
+from textarea import TextArea
+from gui_layout import ColumnLayout
+from gui_focus import FocusRing
+from session import ChatCompletionHandler
+
+
+PANEL_WIDTH = 350
+PANEL_HEIGHT = 120
+
+
+class LLMChatContainer(GUIContainer):
+
+    class ChatMessageUI(GUIContainer):
+        @classmethod
+        def from_json(cls, json, **kwargs):
+            assert(json["class"] == cls.__name__)
+            gui = kwargs.get('gui')
+            assert(gui is not None)
+
+            kwargs["default_setup"] = False
+            instance = gui.create_control(json["class"], **kwargs)
+            instance.set_bounds(*json["bounding_rect"])
+
+            assert(len(json["children"]) == 2)
+            assert(json["children"][0]["class"] == "Label")
+            assert(json["children"][1]["class"] == "TextArea")
+
+            for child_json in json["children"]:
+                child_class_name = child_json["class"]
+                child_class = GUI.control_class(child_class_name)
+                child = child_class.from_json(child_json, **kwargs)
+                instance.add_child(child)
+                if child_class_name == "Label":
+                    instance.label = child
+                elif child_class_name == "TextArea":
+                    instance.text_area = child
+            return instance
+
+
+        def __init__(self, children=None, role="User", text="", **kwargs):
+            super().__init__(children=children, layout=ColumnLayout(), **kwargs)
+            
+            default_setup = kwargs.get('default_setup', True)
+            if default_setup:
+                self.label = Label(text=role, w=PANEL_WIDTH, h=20, **kwargs)
+                self.add_child(self.label, add_to_focus_ring=False)
+
+                self.text_area = TextArea(18, w=PANEL_WIDTH, h=PANEL_HEIGHT, **kwargs)
+                self.text_area.text_buffer.set_text(text)
+                self.add_child(self.text_area, add_to_focus_ring=False)
+
+
+        def get_role(self):
+            return self.label.get_text()
+        
+        def set_role(self, role):
+            self.label.set_text(role)
+
+        def get_text(self):
+            return self.text_area.text_buffer.get_text()
+        
+        def set_text(self, text):
+            self.text_area.text_buffer.set_text(text)
+
+        def _set_focus(self, has_focus):
+            if has_focus:
+                return self.gui.set_focus(self.text_area)
+            else:
+                super()._set_focus(has_focus)
+
+
+    @classmethod
+    def create(cls, **kwargs):
+        return cls(**kwargs)
+    
+
+    def __init__(self, default_setup=True, **kwargs):
+        super().__init__(**kwargs)
+        self.draw_bounds = True
+        
+        self.set_layout(ColumnLayout())
+        assert(self.focusRing is not None)
+        self.system = None
+        self.utterances = []
+
+        if default_setup:
+            self.add_child(Label(text="LLM Chat [gpt-4]", w=PANEL_WIDTH, h=20, **kwargs),
+                           add_to_focus_ring=False)
+
+            self.system = self.ChatMessageUI(role="System", **kwargs)
+            # self.gui.set_focus(self.system)
+
+            self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
+            for utterance in self.utterances:
+                self.add_child(utterance, add_to_focus_ring=False)
+                self.focusRing.add(utterance.text_area)
+
+        self.accumulated_response_text = None
+        # self.focusRing.focus(self.system.text_area)
+
+
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        gui = kwargs.get('gui')
+        assert(gui is not None)
+
+        kwargs["default_setup"] = False
+        instance = gui.create_control(json["class"], **kwargs)
+        instance.set_bounds(*json["bounding_rect"])
+
+        for child_json in json["children"]:
+            child_class_name = child_json["class"]
+            # child = gui.create_control(child_class_name, **kwargs)
+            child_class = GUI.control_class(child_class_name)
+            child = child_class.from_json(child_json, **kwargs)
+            instance.add_child(child, add_to_focus_ring=False)
+            if child_class_name == "ChatMessageUI":
+                instance.utterances.append(child)
+                instance.focusRing.add(child.text_area)
+        return instance
+
+
+    def handle_event(self, event):
+        if event.type == sdl2.SDL_KEYDOWN:
+            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            keySymbol = event.key.keysym.sym
+
+            if cmdPressed:
+                # Cmd+G sends messages to GPT
+                if keySymbol == sdl2.SDLK_g:
+                    self.send()
+                    return True
+                
+                # Cmd+U creates a new user message
+                elif keySymbol == sdl2.SDLK_u: 
+                    user = self.ChatMessageUI(role="User", renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
+                    self.add_child(user, add_to_focus_ring=False)
+                    self.utterances.append(user)
+                    self.focusRing.add(user.text_area)
+                    self.focusRing.focus(user.text_area)
+                    return True  # event was handled
+                
+                # Cmd+Backspace/Delete deletes the currently focused message
+                # If the whole LLMChatContainer is focused, then delete this chat.
+                elif keySymbol == sdl2.SDLK_BACKSPACE:
+                    focused_control = self.gui.get_focus()
+                    if focused_control is self:
+                        if self.parent:
+                            if self.parent.focusRing:
+                                self.parent.focusRing.focus_next()
+                                self.parent.focusRing.remove(self)
+                            self.parent.remove_child(self)
+                        return True
+
+                    chat_message = focused_control.parent
+                    if chat_message is not None and isinstance(chat_message, self.ChatMessageUI):
+                        ancestors = self.gui.get_ancestor_chain(chat_message)
+                        assert(self in ancestors)
+
+                        # Can't delete first, System message
+                        if len(self.utterances) > 1 and chat_message != self.utterances[0]:
+                            # @todo wrap in a remove message method
+                            self.focusRing.focus_previous()
+                            self.focusRing.remove(chat_message.text_area)
+                            self.utterances.remove(chat_message)
+                            self.remove_child(chat_message)
+                            return True
+
+            
+            if keySymbol == sdl2.SDLK_RETURN:
+                # Delegate to GUIContainer
+                handled = super().handle_event(event)
+                if handled:
+                    return True
+            
+        return self.parent.handle_event(event)
+
+
+    def _set_focus(self, focus):
+        return True
+
+
+    def send(self):
+        messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
+
+        handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
+                                        chunk_handler=self.on_llm_response_chunk,
+                                        done_handler=self.on_llm_response_done)
+        
+        self.gui.session.llm_send_streaming_chat_request("gpt-4", messages, handlers=[handler])
+
+        # Add Answer TextArea
+        answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
+        self.add_child(answer, add_to_focus_ring=False)
+        self.focusRing.add(answer.text_area, set_focus=True)
+
+        # Shrink previous messages
+        for u in self.utterances:
+            u.text_area.set_size(PANEL_WIDTH, 60)
+        self.utterances.append(answer)
+        self.updateLayout()
+
+
+    def on_llm_response_start(self) -> None:
+        self.accumulated_response_text = ""
+
+
+    def on_llm_response_chunk(self, chunk_text: str) -> None:
+        assert(len(self.utterances) > 0)
+        answer = self.utterances[-1]
+        assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
+
+        answer.text_area.text_buffer.move_point_to_end()
+        answer.text_area.text_buffer.insert(chunk_text)
+        answer.text_area.set_needs_redraw()
+
+        self.accumulated_response_text += chunk_text
+
+
+    def on_llm_response_done(self) -> None:
+        pass
+        # self.gui.say(self.accumulated_response_text)
+
+
+    def get_json(self):
+        return {
+            "type": "LLMChatContainer",
+            "version": 1,
+            "system_text": self.system.text_area.text_buffer.get_text(),
+        }
+
+
+    def load(self):
+        try:
+            with open("aish_workspace.json", "r") as f:
+                data = json.load(f)
+                self.system.text_area.text_buffer.set_text(data["system_text"])
+                self.system.text_area.text_buffer.move_point_to_start()
+                self.system.text_area.text_buffer.clear_mark()
+        except FileNotFoundError:
+            self.save()
+
+
+GUI.register_control_type("LLMChatContainer", LLMChatContainer)
+GUI.register_control_type("ChatMessageUI", LLMChatContainer.ChatMessageUI)
+
+========================
+./session.py:
+========================
+import logging
+import openai
+import os
+from queue import Queue
+from typing import Callable, Dict, List, Optional
+
+from audio_service import AudioService
+
+
+class ChatCompletionHandler:
+    def __init__(self, 
+                 start_handler: Optional[Callable[[], None]]=None,
+                 chunk_handler: Optional[Callable[[str], None]]=None, 
+                 done_handler: Optional[Callable[[], None]]=None):
+        
+        self._start_handler = start_handler
+        self._chunk_handler = chunk_handler
+        self._done_handler = done_handler
+
+        self._started = False
+        self._done = False
+    
+
+    def on_start(self) -> None:
+        if self._start_handler is not None:
+            self._start_handler()
+        self._started = True
+
+            
+    def on_text_chunk(self, text: str) -> None:
+        if self._chunk_handler is not None:
+            self._chunk_handler(text)
+
+
+    # @todo: accumulate text and send to done?
+    def on_done(self) -> None:
+        if self._done_handler is not None:
+            self._done_handler()
+        self._done = True
+
+
+class Session:
+    def __init__(self):
+        logging.debug("Client Session.__init__")
+
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.organization = os.getenv("OPENAI_ORGANIZATION")
+
+        self._running_completions: Dict[openai.ChatCompletion, List[ChatCompletionHandler]] = {}
+        
+        self._audio = AudioService()
+        self._channels = {}
+
+
+    def start(self):
+        logging.debug("Client Session.start")
+        self._audio.start()
+
+    
+    def stop(self):
+        logging.debug("Client Session.stop")
+        self._audio.stop()
+
+
+    def update(self):
+        # logging.debug("ENTER Client Session.update")
+        done_completions = []
+
+        # Pump chat completions...
+        for completion in self._running_completions:
+            try:
+                chunk = next(completion)    # Could raise StopIteration
+                delta = chunk.choices[0].delta
+                if hasattr(delta, 'content'):
+                    chunk_text = chunk.choices[0].delta.content
+                    for handler in self._running_completions[completion]:
+                        if hasattr(handler, 'on_text_chunk'):
+                            handler.on_text_chunk(chunk_text)
+
+            except StopIteration:
+                # This means the completion we tried to call next() on is done.
+                # 1. Call all done handlers for that completion
+                for handler in self._running_completions[completion]:
+                    if hasattr(handler, 'on_done'):
+                        handler.on_done()
+
+                # 2. Mark that completion for removal, but since we're looping
+                #    over the dict, we can't remove it yet.
+
+                done_completions.append(completion)
+                continue
+
+        # Remove finished completion callbacks
+        for done_completion in done_completions:
+            del self._running_completions[done_completion]
+        
+        # logging.debug("EXIT Client Session.update")
+
+
+    def publish(self, channel_name, obj):
+        if channel_name in self._channels:
+            for q in self._channels[channel_name]:
+                q.put(obj)
+
+
+    def subscribe(self, channel_name: str) -> Queue:
+        q = Queue()
+        if channel_name not in self._channels:
+            self._channels[channel_name] = []
+        self._channels[channel_name].append(q)
+        return q
+
+
+    def llm_send_streaming_chat_request(self, model, chat_messages, handlers: List[ChatCompletionHandler]=[]):
+        assert(model == 'gpt-4' or model == 'gpt-3.5-turbo')
+        completion = openai.ChatCompletion.create(model=model, messages=chat_messages, stream=True)
+        logging.debug(chat_messages)
+        self._running_completions[completion] = handlers
+
+        for handler in handlers:
+            if hasattr(handler, 'on_start'):
+                handler.on_start()
+
+
+========================
+./text_edit_buffer.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+class TextEditBuffer(object):
+
+    # When constructing TextEditBuffer with non-empty text,
+    # POINT is not moved to the end. It will be 0.
+    def __init__(self, text="", tab_spaces=4, **kwargs):
+        self.TEXT_BUFFER = text
+        self.TAB_SPACES = tab_spaces
+        self.POINT = len(text)
+
+        # @note: POINT has no knowledge of expanded tabs. It's an index into the
+        # un-expanded TEXT_BUFFER. It's between 0 and len(TEXT_BUFFER). @note that
+        # this means it can point one char past the end of the buffer.
+        self.MARK = None
+        self.desired_col = 0
+
+
+    def insert(self, text='\n'):
+        self.TEXT_BUFFER = self.TEXT_BUFFER[:self.POINT] + text + self.TEXT_BUFFER[self.POINT:]
+        self.set_point(self.POINT + len(text))
+        
+        _, col = self.get_row_col(self.POINT)
+        self.desired_col = col
+
+
+    def delete_char(self):
+        self.TEXT_BUFFER = self.TEXT_BUFFER[:self.POINT - 1] + self.TEXT_BUFFER[self.POINT:]
+        self.set_point(self.POINT - 1)
+        
+        _, col = self.get_row_col(self.POINT)
+        self.desired_col = col
+
+
+    def get_text(self, expand_tabs=False):
+        if expand_tabs:
+            return self.expand_tabs(self.TEXT_BUFFER)
+        else:
+            return self.TEXT_BUFFER
+
+    
+    def set_text(self, text):
+        self.TEXT_BUFFER = text
+        self.set_point(len(text))
+        self.clear_mark()
+
+        
+    def expand_tabs(self, text):
+        return text.replace('\t', ' ' * self.TAB_SPACES)
+    
+
+    def get_line(self, row, expand_tabs=True):
+        lines = self.get_lines(expand_tabs=expand_tabs)
+        if 0 <= row < len(lines):
+            if expand_tabs:
+                return self.expand_tabs(lines[row])
+            else:
+                return lines[row]
+        raise IndexError("Row index out of range")
+    
+
+    # @return a list of strings, one for each line. The line strings do not contain
+    # terminating newline characters.
+
+    def get_lines(self, expand_tabs=True):
+        if expand_tabs:
+            return self.get_text(expand_tabs=True).split('\n')
+        else:
+            return self.TEXT_BUFFER.split('\n')
+
+
+    def get_tab_spaces(self):
+        return self.TAB_SPACES
+
+
+    def set_tab_spaces(self, num_spaces):
+        self.TAB_SPACES = num_spaces
+
+
+    def count_tab_expanded_spaces(self, string):
+        count = 0
+        for char in string:
+            if char == '\t':
+                count += self.TAB_SPACES
+            else:
+                count += 1
+        return count
+    
+    
+    def get_row_col(self, point):
+        row = None
+        col = None
+
+        lines = self.get_lines(expand_tabs=False)  # Do not expand tabs!
+        cumulative_length = 0
+        for row, line in enumerate(lines):
+            line_length = len(line) + 1   # +1 for the '\n' character
+            if cumulative_length <= point < cumulative_length + line_length:
+                col = point - cumulative_length
+                return row, col
+            cumulative_length += line_length
+        return len(lines) - 1, line_length
+    
+        print('*********')
+    
+
+    def get_point(self):
+        return self.POINT
+
+
+    def set_point(self, point):
+        # Need to check if we changed rows. If not then update desired_col.
+        # If so, don't update it. This is because we use desired_col to
+        # keep track of which column we should be on when moving up and down,
+        # across lines with different lengths.
+
+        before_row, _ = self.get_row_col(self.POINT)
+        self.POINT = min(max(0, point), len(self.TEXT_BUFFER))
+        after_row, after_col = self.get_row_col(self.POINT)
+
+        if after_row == before_row:
+            self.desired_col = after_col
+
+        # print(f'POINT = {self.POINT} row = {after_row}  col = {after_col}  desired_col = {self.desired_col}')            
+
+
+    def set_mark(self, mark_position=None):
+        self.MARK = self.POINT if mark_position is None else mark_position
+
+
+    def clear_mark(self):
+        self.MARK = None
+
+
+    def get_mark(self):
+        return self.MARK
+
+
+    def get_selection(self):
+        if self.MARK is None:
+            return None
+        else:
+            return min(self.POINT, self.MARK), max(self.POINT, self.MARK)
+        
+
+    def delete_selection(self):
+        if self.MARK is not None:
+            start, end = self.get_selection()
+            self.TEXT_BUFFER = self.TEXT_BUFFER[:start] + self.TEXT_BUFFER[end:]
+            self.set_point(start)
+            self.clear_mark()
+            
+    def move_point_left(self):
+        if self.POINT > 0:
+            self.set_point(self.POINT - 1)
+            row, col = self.get_row_col(self.POINT)
+            self.desired_col = col
+
+
+    def move_point_word_left(self):
+        i = self._prev_word_point(self.POINT)
+        self.set_point(i)
+
+
+    def move_point_word_right(self):    # @todo handle all whitespace and runs of it
+        i = self._next_word_point(self.POINT)
+        self.set_point(i)
+
+
+    def move_point_start_of_line(self):
+        row, col = self.get_row_col(self.POINT)
+        self.set_point(self.POINT - col)
+
+
+    def move_point_end_of_line(self):
+        row, col = self.get_row_col(self.POINT)
+        line = self.get_line(row)
+        self.set_point(self.POINT + len(line) - col)
+
+
+    def move_point_right(self):
+        if self.POINT < len(self.TEXT_BUFFER):
+            self.set_point(self.POINT + 1)
+            row, col = self.get_row_col(self.POINT)
+            self.desired_col = col
+
+
+    def move_point_up(self):
+        row, col = self.get_row_col(self.POINT)
+        if row > 0:
+            from_line_length = len(self.get_line(row))
+
+            to_line = self.get_line(row - 1, expand_tabs=False)
+            to_line_length = len(to_line)
+            to_col = min(self.desired_col, to_line_length)
+
+            new_point = self.POINT - col - 1 - len(to_line) + to_col  # The -1 is for the newline char
+            self.set_point(new_point)
+
+    
+    def move_point_to_start(self):
+        self.set_point(0)
+
+
+    def move_point_to_end(self):
+        self.set_point(len(self.TEXT_BUFFER))
+
+
+    def move_point_down(self):
+        row, col = self.get_row_col(self.POINT)
+        num_rows = len(self.get_lines())
+        if row < num_rows - 1:
+            from_line_length = len(self.get_line(row, expand_tabs=False))
+
+            to_line = self.get_line(row + 1)
+            to_line_length = len(to_line)
+            to_col = min(self.desired_col, to_line_length)
+
+            new_point = self.POINT - col + from_line_length + 1 + to_col  # +1 is for the newline char
+            self.set_point(new_point)
+            return True   
+
+        return False
+
+
+    # Find POINT for the start of the next word (to the right) of the given point.
+    def _next_word_point(self, point):
+        # Check characters from point forward
+        while point < len(self.TEXT_BUFFER):
+            # If we encounter a non-whitespace character immediately, continue scanning
+            if not self.TEXT_BUFFER[point].isspace():
+                point += 1
+            else:
+                # When we encounter our first whitespace, start scanning for the next non-whitespace character
+                while point < len(self.TEXT_BUFFER) and self.TEXT_BUFFER[point].isspace():
+                    point += 1
+                
+                # If a non-whitespace character is found after a whitespace character,
+                # return its position
+                if point < len(self.TEXT_BUFFER):
+                    return point
+
+        # Return the end of the buffer if no non-whitespace character is found
+        return len(self.TEXT_BUFFER)
+
+
+    # Find POINT for the start of the previous word (to the left) of the given point. If the
+    # given point is inside of a word, return the start of that word.
+    def _prev_word_point(self, point):
+        if point == len(self.TEXT_BUFFER):
+            point -= 1
+        elif point == 0:
+            return 0
+        
+        started_on_space = self.TEXT_BUFFER[point].isspace()
+        past_end_of_word = not started_on_space and not self.TEXT_BUFFER[point - 1].isspace()
+
+        # Check characters from point backward
+        point -= 1
+        while point > 0:
+            # If we aren't in a word, or haven't hit the rightmost boundary of a word,
+            # then continue scanning until we hit a non-blank character
+            if not past_end_of_word:
+                if not self.TEXT_BUFFER[point].isspace():
+                    past_end_of_word = True
+                else:
+                    point -= 1
+            else:
+                # Now we are in a word, so stop at the first (left-most) blank character
+                # we find.
+                if self.TEXT_BUFFER[point].isspace():
+                    if point < len(self.TEXT_BUFFER) - 1:
+                        return point + 1
+                    else:
+                        return point
+                else:
+                    point -= 1
+                
+        # Return the start of the buffer if no non-whitespace character is found
+        return 0
+
+
+========================
+./__init__.py:
+========================
+
+
+========================
+./voice_wakeup.py:
+========================
+from dotenv import load_dotenv
+import logging
+import os
+import pvporcupine
+import pyaudio
+from queue import Empty, Queue
+import struct
+from audio_service import AudioService
+
+
+def bytes_to_ints(byte_data):
+    """Convert a byte array into a list of integers. Each integer is two bytes. Endeaness is unspecified."""
+    return struct.unpack(str(len(byte_data) // 2) + 'h', byte_data)
+
+
+class PhraseListener:
+
+    def __init__(self, detected_callback: callable = None):
+        logging.debug('PhraseListener.__init__()')
+        load_dotenv()
+        self.PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
+
+        self._on_detected_callback = detected_callback
+
+    
+    def start(self):
+        logging.debug('PhraseListener.start()')
+        self._in_stream = None
+
+        # @todo @bug what about multiple instance?
+        PhraseListener._audio_q = None
+
+        self._pv_handle = pvporcupine.create(
+            access_key=self.PICOVOICE_ACCESS_KEY,
+            keyword_paths=["./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn"]
+        )
+
+        logging.debug(f"PicoVoice expected sample rate (Hz): {self._pv_handle.sample_rate}")
+        logging.debug(f"PicoVoice expected frame length: {self._pv_handle.frame_length}")
+
+        PhraseListener._audio_q = Queue()
+
+        self._in_stream = AudioService.get_wakeword_input_stream(PhraseListener._audio_input_stream_callback)
+
+
+    def update(self):
+        # logging.debug('PhraseListener.update()')
+        if self._in_stream is None:
+            return
+        
+        try:
+            audio_ints = PhraseListener._audio_q.get_nowait()
+        except Empty:
+            return
+
+        # logging.debug(f"PhraseListener.update() audio_ints: {len(audio_ints)}")
+
+        i_keyword = self._pv_handle.process(audio_ints)
+        if i_keyword >= 0:
+            logging.info('Detected wakeup phrase.')
+            if self._on_detected_callback is not None:
+                self._on_detected_callback()
+
+
+    def stop(self):
+        logging.debug('PhraseListener.stop()')
+        self._in_stream.stop_stream()
+        self._in_stream.close()
+        self._in_stream = None
+        PhraseListener._audio_q = None
+
+        self._pv_handle.delete()
+        self._pv_handle = None
+
+
+    @staticmethod
+    def _audio_input_stream_callback(in_data, frame_count, time_info, status_flags):
+        audio_ints = bytes_to_ints(in_data)
+        PhraseListener._audio_q.put(audio_ints)
+        return (None, pyaudio.paContinue)
+
+
+========================
+./candlestick.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import csv
+import sdl2
+from draw import draw_cursor, draw_text, set_color
+from gui import GUI, GUIControl
+from math import ceil, floor, isclose
+
+
+class CandlestickPlot(GUIControl):
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        gui = kwargs.get('gui')
+
+        instance = gui.create_control(json["class"], **kwargs)
+        instance.set_bounds(*json["bounding_rect"])
+        instance.csv_filepath = json["csv_filepath"]
+        instance.load_data(instance.csv_filepath)
+        return instance
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        csv_filepath = kwargs.get('csv_filepath', None)
+        if csv_filepath is not None:
+            self.csv_filepath = csv_filepath
+            self.load_data(csv_filepath)
+        else:
+            self.rows = None
+        
+        self.draw_bounds = True
+        self.scroll = [0, 0]
+        self.top_pad = 15
+        self.bottom_pad = 15
+        self.left_pad = 55
+        self.right_pad = 10
+
+
+    def __json__(self, for_saving=True):
+        json = super().__json__(for_saving=for_saving)
+        json['class'] = self.__class__.__name__
+        json['csv_filepath'] = self.csv_filepath
+        return json
+
+
+    def load_data(self, csv_filepath):
+        with open(csv_filepath, 'r') as file:
+            target_line = '# Date, Time, Open, High, Low, Close, Volume'
+            line = next(file).strip()
+            while line != target_line:
+                line = next(file).strip()
+
+            reader = csv.reader(file)
+            self.rows = tuple(reader)
+            # print(rows)
+            self.opens = [float(row[2]) for row in self.rows]
+            self.closes = [float(row[5]) for row in self.rows]
+            self.highs = [float(row[3]) for row in self.rows]
+            self.lows = [float(row[4]) for row in self.rows]
+
+
+
+    def draw(self):
+
+        wr = self.get_world_rect()
+        y0 = wr.y + self.top_pad
+
+        if self.rows is not None:
+            assert(len(self.opens) == len(self.closes) == len(self.highs) == len(self.lows))
+
+            top_price = ceil(max(self.highs))
+            bottom_price = floor(min(self.lows))
+            y_scale = (wr.h - self.top_pad - self.bottom_pad) / (top_price - bottom_price)
+
+            def y_from_price(price: float):
+                return int(0.5 + y0 + (top_price - price) * y_scale)
+                
+            old_color = set_color(self.renderer, (255, 255, 255, 255))
+
+            # Draw the y-axis
+            sdl2.SDL_RenderDrawLine(self.renderer.sdlrenderer, wr.x + self.left_pad, wr.y + self.top_pad, wr.x + self.left_pad, wr.y + wr.h - self.bottom_pad)
+
+
+            p = bottom_price
+            while p <= top_price + 0.05:
+                y = y_from_price(p)
+                
+                draw_number = False
+                tick_width = 4
+
+                if isclose(p % 1.0, 0.0, abs_tol=0.01):
+                    draw_number = True
+                    tick_width = 12
+                elif isclose(p % 0.5, 0.0, abs_tol=0.01):
+                    draw_number = True
+                    tick_width = 8
+
+                if draw_number:
+                    draw_text(self.renderer, self.font_manager, f'{p:0.1f}', wr.x + self.left_pad - 45, y - 8)
+
+                sdl2.SDL_RenderDrawLine(self.renderer.sdlrenderer, wr.x + self.left_pad, y, wr.x + self.left_pad - tick_width, y)
+
+                p += 0.1
+
+            # Draw the candlesticks
+            candle_w = 4
+            for i, row in enumerate(self.opens):
+                # print(i)
+                x0 = wr.x + self.left_pad + i * candle_w - self.scroll[0]
+                if x0 < wr.x + self.left_pad:
+                    continue
+
+                y_open = y_from_price(self.opens[i])
+                y_close = y_from_price(self.closes[i])
+                y_high = y_from_price(self.highs[i])
+                y_low = y_from_price(self.lows[i])
+
+                # Draw the candlestick "wicks"
+                set_color(self.renderer, (255, 255, 255, 255))
+                sdl2.SDL_RenderDrawLine(self.renderer.sdlrenderer, x0+1, y_high, x0+1, y_low)
+
+                # Draw the candlestick "body"
+                if self.opens[i] < self.closes[i]:
+                    set_color(self.renderer, (0, 255, 0, 255))
+                elif self.opens[i] > self.closes[i]:
+                    set_color(self.renderer, (255, 0, 0, 255))
+                else:
+                    set_color(self.renderer, (255, 255, 255, 255))
+
+                sdl2.SDL_RenderFillRect(self.renderer.sdlrenderer, sdl2.SDL_Rect(x0, y_open, 3, y_close - y_open))
+                
+                if x0 >= wr.x + wr.w - candle_w:
+                    break
+                
+            set_color(self.renderer, old_color)
+
+        # Draw own bounding rect @debug @test
+        if self.draw_bounds and self.bounding_rect is not None:
+            # Save the current color
+            r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+            sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+            old_color = (r.value, g.value, b.value, a.value)
+
+            # Set the new color
+            r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+            # Draw the bounding rectangle
+            wr = self.get_world_rect()
+            sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
+
+            # Reset to the old color
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+
+    def handle_event(self, event):
+        if event.type == sdl2.SDL_MOUSEWHEEL:
+            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
+            return True
+
+
+    def scroll_by(self, dx=0, dy=0):
+        self.scroll[0] = max(0, self.scroll[0] + dx)  # adjust x_scroll by dx
+        self.scroll[1] = max(0, self.scroll[1] + dy)  # adjust y_scroll by dy
+        # self.set_needs_redraw()
+
+GUI.register_control_type("CandlestickPlot", CandlestickPlot)
+
+
+========================
+./audio_service.py:
+========================
+import logging
+import pyaudio
+import threading
+from typing import Callable
+
+
+class AudioService:
+    _lock = threading.Lock()
+    _pa = pyaudio.PyAudio()
+
+    def __init__(self):
+        pass
+
+
+    def start(self):
+        logging.debug('AudioService.start()')
+        with AudioService._lock:
+            logging.debug('AudioService.start(): GOT LOCK')
+            if AudioService._pa is None:
+                AudioService._pa = pyaudio.PyAudio()
+        logging.debug('AudioService.start(): RELEASED LOCK')
+
+
+    def stop(self):
+        logging.debug('AudioService.stop()')
+        with AudioService._lock:
+            logging.debug('AudioService.stop(): GOT LOCK')
+            if AudioService._pa is not None:
+                logging.debug('AudioService.stop(): terminating PyAudio')
+                AudioService._pa.terminate()
+                logging.debug('AudioService.stop(): terminated PyAudio')
+                AudioService._pa = None
+        logging.debug('AudioService.stop(): RELEASED LOCK')
+
+
+    @classmethod
+    def get_wakeword_input_stream(cls, handler: Callable):
+        logging.debug('AudioService.get_input_wakeword_stream()')
+        with cls._lock:
+            logging.debug('AudioService.get_input_wakeword_stream(): GOT LOCK')
+            assert(cls._pa is not None)
+            stream = cls._pa.open(
+                rate=16_000,
+                channels=1,
+                format=pyaudio.paInt16,
+                input=True,
+                frames_per_buffer=512,
+                stream_callback=handler
+            )
+        logging.debug('AudioService.get_input_wakeword_stream(): RELEASED LOCK')
+        return stream
+
+
+    @classmethod
+    def get_voice_input_stream(cls, handler: Callable):
+        logging.debug('AudioService.get_voice_input_stream()')
+        with cls._lock:
+            logging.debug('AudioService.get_voice_input_stream(): GOT LOCK')
+            assert(cls._pa is not None)
+            stream = cls._pa.open(
+                rate=16_000,
+                channels=1,
+                format=pyaudio.paInt16,
+                input=True,
+                frames_per_buffer=3200,
+                stream_callback=handler
+            )
+        logging.debug('AudioService.get_voice_input_stream(): RELEASED LOCK')
+        return stream
+
+
+    @classmethod
+    def get_voice_output_stream(cls, handler: Callable):
+        logging.debug('AudioService.get_voice_output_stream()')
+        with cls._lock:
+            logging.debug('AudioService.get_voice_output_stream(): GOT LOCK')
+            assert(cls._pa is not None)
+            stream = cls._pa.open(
+                rate=44_100,
+                channels=1,
+                format=pyaudio.paInt16,
+                output=True,
+                stream_callback=handler
+            )
+        logging.debug('AudioService.get_voice_output_stream(): RELEASED LOCK')
+        return stream
+
+    # def __del__(self):
+    #     self.stop()
+
+========================
+./.gitignore:
+========================
+.DS_Store
+
+# API keys
+.env
+
+# Python
+__pycache__
+*.pyc
+
+# pyinstaller
+build
+dist
+*.spec
+
+results.txt
+
+# Some resources, but only in the project dir itself.
+*.zip
+*.mp4
+
+
+
+========================
+./utils.py:
+========================
+import os.path
+
+
+def unique_filename(candidate_filename):
+        counter = 1
+        name, ext = os.path.splitext(candidate_filename)
+
+        while os.path.exists(candidate_filename):
+            candidate_filename = f"{name}_{counter}{ext}"
+            counter += 1
+
+        return candidate_filename
+    
+
+
+========================
+./record_audio.py:
+========================
+import ctypes
+import queue
+
+from audio_service import AudioService
+import pyaudio
+
+# Audio recording parameters
+N_SAMPLES_PER_SECOND = 16_000
+N_SAMPLE_BYTES = ctypes.sizeof(ctypes.c_int16)  # pyaudio.paInt16
+N_CHANNELS = 1
+N_CHUNK_SAMPLES = int(N_SAMPLES_PER_SECOND / 5)  # 200ms
+
+
+class MicrophoneStream(object):
+    """Opens a recording stream as a generator yielding the audio chunks."""
+
+    def __init__(self, rate, chunk):
+        self._rate = rate
+        self._chunk = chunk
+        # self._quit_event = quit_event
+
+        # Create a thread-safe buffer of audio data
+        self._buff = queue.Queue()
+        self._audio_stream = None
+        self.closed = True
+
+
+    def __enter__(self):
+        """Called on entry to a 'with' block. E.g. 
+        with MicrophoeStream(16000, 1600) as stream:
+            # do stuff with stream...
+        """
+        self.start()
+        return self
+
+
+    def __exit__(self, type, value, traceback):
+        """Called on exit from a 'with' block. E.g. 
+        with MicrophoeStream(16000, 1600) as stream:
+            # do stuff with stream...
+        """
+        self.stop()
+
+
+    def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
+        """Continuously collect data from the audio stream, into the buffer."""
+        self._buff.put(in_data)
+        return None, pyaudio.paContinue
+
+
+    def get_nowait(self):
+        chunks = []
+        try:
+            while True:
+                chunk = self._buff.get_nowait()
+                assert(chunk is not None)
+                chunks.append(chunk)
+        except queue.Empty:
+            if not len(chunks):
+                return b""
+
+        return b"".join(chunks)
+
+
+    def start(self):
+        self._audio_stream = AudioService.get_voice_input_stream(self._fill_buffer)
+        self.closed = False
+
+
+    def stop(self):
+        self._audio_stream.stop_stream()
+        self._audio_stream.close()
+        self.closed = True
+        # Signal the generator to terminate so that the client's
+        # streaming_recognize method will not block the process termination.
+        self._buff.put(None)
+
+
+========================
+./label.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+from gui import GUI, GUIControl
+from draw import draw_text
+
+
+class Label(GUIControl):
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        gui = kwargs.get('gui')
+
+        instance = gui.create_control(json["class"], **kwargs)
+        instance.set_bounds(*json["bounding_rect"])
+        instance._text = json["text"]
+        return instance
+
+    def __init__(self, **kwargs):
+        super().__init__(can_focus=False, **kwargs)
+        self._text = kwargs.get('text', '')
+        self.combined_text_texture = None
+
+
+    def __json__(self):
+        json = super().__json__()
+        json["class"] = self.__class__.__name__
+        json["text"] = self._text
+        return json
+
+
+    def get_text(self):
+        return self._text
+    
+
+    def set_text(self, text):
+        self._text = text
+        self.set_needs_redraw()
+
+
+    def set_needs_redraw(self):
+        if self.combined_text_texture is not None:
+            sdl2.SDL_DestroyTexture(self.combined_text_texture)
+            self.combined_text_texture = None
+
+
+    def draw(self):
+        # @todo should each specialized control need to implement this?
+        if self._screen_relative:
+            r = self.bounding_rect
+        else:
+            r = self.get_world_rect()
+
+        if self.combined_text_texture is None:
+            surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
+
+            draw_text(self.renderer, self.font_manager, self._text, r.x, r.y, bounding_rect=r, dst_surface=surf)
+
+            self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
+            sdl2.SDL_FreeSurface(surf)
+
+        assert(self.combined_text_texture is not None)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, r)
+
+
+GUI.register_control_type("Label", Label)
+
+========================
+./rect_utils.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+
+# @todo I think there is a native SDL function to do this
+def rect_union(rect1, rect2):
+    x = min(rect1.x, rect2.x)
+    y = min(rect1.y, rect2.y)
+    w = max(rect1.x + rect1.w, rect2.x + rect2.w) - x
+    h = max(rect1.y + rect1.h, rect2.y + rect2.h) - y
+    return sdl2.SDL_Rect(x, y, w, h)
+
+
+
+========================
+./gui_layout.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+import weakref
+
+
+class GUILayout:
+    def __init__(self, container=None):
+        self.set_container(container)
+
+
+    def get_container(self):
+        return self.container() if self.container is not None else None
+
+
+    def set_container(self, container):
+        self.container = weakref.ref(container) if container else None 
+
+
+class ColumnLayout(GUILayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update(self):
+        # @todo DRY
+        INSET_X = 1
+        INSET_Y = 1
+
+        container = self.get_container()
+        if not container:
+            return
+        
+        children = container.get_children()
+        is_first = True
+        y = INSET_Y
+        for child in children:
+            child.set_position(INSET_X, y)
+            y += child.bounding_rect.h
+
+
+class RowLayout(GUILayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update(self):
+        # @todo DRY
+        INSET_X = 1
+        INSET_Y = 1
+
+        container = self.get_container()
+        if not container:
+            return
+        
+        children = container.get_children()
+        is_first = True
+        x = INSET_X
+        for child in children:
+            child.set_position(x, INSET_Y)
+            x += child.bounding_rect.w
+
+
+def rect_union(rect1, rect2):
+    x = min(rect1.x, rect2.x)
+    y = min(rect1.y, rect2.y)
+    w = max(rect1.x + rect1.w, rect2.x + rect2.w) - x
+    h = max(rect1.y + rect1.h, rect2.y + rect2.h) - y
+    return sdl2.SDL_Rect(x, y, w, h)
+
+
+
+========================
+./gui_focus.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import weakref
+
+
+class FocusRing():
+    def __init__(self, controls=[], **kwargs):
+        self.gui = kwargs.get("gui")
+        assert(self.gui is not None)
+
+        self._controls = list(controls)  # @note Copy it so our mods won't be propagaged outside this object
+        self._focused_control = None
+        if len(self._controls) > 0:
+            self.focus(self._controls[0])
+
+
+    def get_focus(self):
+        return self._focused_control
+
+
+    # Add a control to the FocusRing
+    def add(self, control, set_focus=False):
+        if control in self._controls:
+            raise Exception("Control already in focus ring")
+        
+        self._controls.append(control)
+        control.containing_focus_ring = weakref.ref(self)
+        if self._focused_control is None or set_focus:
+            self.focus(control)
+
+
+    # Remove a control from the FocusRing
+    def remove(self, control):
+        if control not in self._controls:
+            raise Exception("Control not in focus ring")
+        
+        self._controls.remove(control)
+        control.containing_focus_ring = None
+        if self._focused_control == control:
+            self._focused_control = None
+
+
+    def focus(self, control):
+        if control not in self._controls:
+            raise Exception("Control not in focus ring")
+        
+        success = self.gui.set_focus(control, True)
+        if success:
+            self._focused_control = control
+        return success
+
+
+    def focus_first(self):
+        if len(self._controls) > 0:
+            return self.focus(self._controls[0])
+        
+
+    def focus_next(self, direction=1):
+        # If there are no controls, return.
+        if len(self._controls) == 0:
+            return False
+
+        control = None
+
+        # If there is no focused control, focus the first control.
+        if self._focused_control is None:
+            control = self._controls[0]
+        else:
+            # Otherwise, focus the next control.
+            control = self._next_control(self._focused_control, offset=direction)
+
+        assert(control is not None)
+            
+        first_control_tried = None
+        while control != first_control_tried:   # Only go once around loop
+            if first_control_tried is None:
+                first_control_tried = control
+
+            result = self.focus(control)
+            if result:
+                return True
+            else:  # Try focusing the next one
+                control = self._next_control(control, offset=direction)
+
+        # Rand out of controls to try        
+        return False
+
+
+    def focus_previous(self):
+        return self.focus_next(direction=-1)
+
+
+    def _next_control(self, control, offset=1):
+        i = self._controls.index(control)
+        return self._controls[(i + offset) % len(self._controls)]
+
+
+========================
+./trywake.py:
+========================
+from dotenv import load_dotenv
+import os
+import pvporcupine
+import pyaudio
+from queue import Empty, Queue
+import struct
+
+
+_audio_q = Queue()
+
+
+def bytes_to_ints(byte_data):
+    return struct.unpack(str(len(byte_data) // 2) + 'h', byte_data)
+
+
+def main():
+    load_dotenv()    
+    PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
+
+    pv_handle = pvporcupine.create(
+        access_key=PICOVOICE_ACCESS_KEY,
+        # keyword_paths=["./res/wake-phrases/Yar-Robot-Oh_en_mac_v2_2_0/Yar-Robot-Oh_en_mac_v2_2_0.ppn"],
+        keyword_paths=["./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn"],
+        # keywords=['porcupine']
+    )
+
+    print(f"PicoVoice expected sample rate (Hz): {pv_handle.sample_rate}")
+    print(f"PicoVoice expected frame length: {pv_handle.frame_length}")
+
+    pa = pyaudio.PyAudio()
+
+    try:
+        in_stream = pa.open(
+            rate=pv_handle.sample_rate,
+            channels=1,
+            format=pyaudio.paInt16,
+            input=True,
+            frames_per_buffer=pv_handle.frame_length,
+            stream_callback=audio_input_stream_callback
+        )
+
+        # Infinite loop while we listen. Ctrl+C to exit.
+        while True:
+            pass
+            try:
+                audio_ints = _audio_q.get()
+            except Empty:
+                print("Queue is empty. Skipping.")
+                continue
+
+            i_keyword = pv_handle.process(audio_ints)
+            if i_keyword >= 0:
+                print(f"Detected keyword with index {i_keyword}")
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        in_stream.stop_stream()
+        in_stream.close()
+
+    pv_handle.delete()
+    pa.terminate()
+
+
+def audio_input_stream_callback(in_data, frame_count, time_info, status_flags):
+    # print('audio_input_stream_callback')
+    # print(f" frame_count: {frame_count}")
+    # print(f" in_data length: {len(in_data)}")
+    
+    # print type of in_data
+    # print(type(in_data))
+
+    ints = bytes_to_ints(in_data)
+    _audio_q.put(ints)
+    # print(f"qsize: {_audio_q.qsize()}")
+    return (None, pyaudio.paContinue)
+
+
+if __name__ == "__main__":
+    main()
+
+========================
+./transcribe_audio.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+import json
+import logging
+import os
+from dotenv import load_dotenv
+import openai
+
+from record_audio import MicrophoneStream, N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES, N_SAMPLE_BYTES
+
+# import pyaudio
+from multiprocessing import Process, Queue
+import os
+import assemblyai as aai
+import webrtcvad
+import queue
+import wave
+from datetime import datetime
+from utils import unique_filename
+
+
+load_dotenv()
+aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
+
+
+SAMPLE_RATE = 16000
+N_RECORDING_CHANNELS = 1
+
+N_BYTES_PER_20_MS = N_SAMPLES_PER_SECOND * N_SAMPLE_BYTES // 50  # The VAD can only handle chunks of 10, 20, or 30 ms.
+
+
+PANEL_WIDTH = 350
+PANEL_HEIGHT = 120
+
+
+class VoiceTranscriber:
+
+    def __init__(self, **kwargs):
+        logging.debug("VoiceTranscriber.__init__()")
+        self.vad = None
+        self.stream = None
+        self.recording_start_dt = None
+        self.transcriber = None
+        self.all_audio_bytes = b""
+        self.incoming_text = Queue()  # Entries are (text: str, is_final: bool)
+
+        self.session = kwargs.get("session")
+        assert(self.session is not None)
+
+
+    def start_recording(self):
+        logging.debug("ENTER VoiceTranscriber.start_recording()")
+        assert(not self.is_recording())
+
+        self.vad = webrtcvad.Vad()
+
+        self.stream = MicrophoneStream(N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES)
+        self.stream.start()
+        self.recording_start_dt = datetime.now()
+
+        self.transcriber = aai.RealtimeTranscriber(
+            sample_rate=N_SAMPLES_PER_SECOND,
+            on_data=self._on_transcribe_data,
+            on_error=self._on_transcribe_error,
+            on_open=self._on_transcribe_open,
+            on_close=self._on_transcribe_close
+        )
+        self.transcriber.connect()
+
+        logging.debug("EXIT VoiceTranscriber.start_recording()")
+
+
+    def stop_recording(self):
+        logging.debug("ENTER VoiceTranscriber.stop_recording()")
+        if self.stream is None:
+            return
+
+        self.stream.stop()
+        self.stream = None
+
+        assert(self.transcriber is not None)
+        self.transcriber.close()
+        self.transcriber = None
+        self.vad = None
+
+
+        # Write audio to file
+        # audio_filename = unique_filename(f"audio_in_{self.recording_start_dt.strftime('%Y-%m-%d_%H%Mh_%Ss')}.wav")
+        # self._write_audio_file(audio_filename, self.all_audio_bytes)
+        
+        # n_frames = len(self.all_audio_bytes) // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
+        # c_seconds = n_frames / N_SAMPLES_PER_SECOND
+
+        # logging.info(f"Wrote {c_seconds} seconds ({n_frames} frames) of audio to {audio_filename}")
+        self.recording_start_dt = None
+        self.all_audio_bytes = b""
+
+        logging.debug("EXIT VoiceTranscriber.stop_recording()")
+
+
+    def is_recording(self):
+        return self.stream is not None
+    
+
+    # @note: this is executing on a different thread than my app functions
+    # like on_update()
+    def _on_transcribe_data(self, transcript: aai.RealtimeTranscript):
+        # print(f"_on_transcribe_data(): tid={threading.current_thread().ident}")
+        # 
+        logging.debug(transcript)
+        if not transcript.text:
+            return
+
+        if isinstance(transcript, aai.RealtimePartialTranscript):
+            self.incoming_text.put((transcript.text, False))
+        elif isinstance(transcript, aai.RealtimeFinalTranscript):
+            self.incoming_text.put((transcript.text, True))
+
+
+    def _on_transcribe_error(self, error: aai.RealtimeError):
+        logging.error(f"Assembly AI Error: {error}")
+
+
+    def _on_transcribe_open(self, session_opened: aai.RealtimeSessionOpened):
+        logging.debug(f"Assembly AI session opened with ID: {session_opened.session_id}")
+
+    def _on_transcribe_close(self):
+        # @note @bug whiy is this called twice on stop_recording?
+        logging.debug("Assembly AI session closed.")
+
+
+    def update(self):
+        # logging.debug('ENTER VoiceTranscriber.update()')
+        # logging.debug(f"self.is_recording(): {self.is_recording()}")
+        if self.is_recording():
+            assert(self.transcriber is not None)
+
+            audio_bytes = self.stream.get_nowait()
+            n_audio_bytes = len(audio_bytes)
+            n_audio_frames = n_audio_bytes // N_SAMPLE_BYTES // N_RECORDING_CHANNELS
+            n_ms = n_audio_frames * 1000 // SAMPLE_RATE
+
+            if len(audio_bytes) > 0:
+                # logging.debug(f"Audio: {len(audio_bytes)} bytes ({n_audio_frames} frames; {n_ms} ms)")
+                
+                # Any speech detected in this audio chunk?
+                is_speech = False
+                for i in range(0, n_audio_bytes, N_BYTES_PER_20_MS):
+                    vad_chunk = audio_bytes[i:i+N_BYTES_PER_20_MS]
+                    is_speech = self.vad.is_speech(vad_chunk, N_SAMPLES_PER_SECOND)
+                    if is_speech:
+                        break
+
+                if is_speech:
+                    # logging.debug('is_speech: True. Sending for transcription.')
+                    self.transcriber.stream(audio_bytes)
+                else:
+                    # logging.debug('is_speech: False.')
+                    pass
+
+                self.all_audio_bytes += audio_bytes
+                # print(f"Total audio: {len(self.all_audio_bytes)} bytes")
+
+        text = ""
+        was_final = False
+        try:
+            while True:
+                (text, is_final) = self.incoming_text.get_nowait()
+                if len(text) == 0:
+                    continue
+
+                if is_final:
+                    logging.debug(f"** FINAL text: '{text}'")
+                else:
+                    logging.debug(f"** PARTIAL text: '{text}'")
+                
+                self.session.publish("transcribed_text", (text, is_final))
+                was_final = is_final
+
+        except queue.Empty:
+            pass
+
+        # logging.debug('EXIT VoiceTranscriber.update()')
+
+
+    def _write_audio_file(self, filename, audio_bytes):
+        with wave.open(filename, 'wb') as wf:
+            wf.setnchannels(N_RECORDING_CHANNELS)
+            wf.setsampwidth(N_SAMPLE_BYTES)
+            wf.setframerate(N_SAMPLES_PER_SECOND)
+            wf.writeframes(audio_bytes)
+
+
+========================
+./draw.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import sdl2
+import sdl2.ext
+import sdl2.sdlttf as ttf
+
+
+_char_width_cache = {}
+
+def get_char_width(font_manager, char):
+    global _char_width_cache
+
+    font_name = font_manager.default_font
+    font_size = font_manager.size
+    key = (font_name, font_size, char)
+
+    if key in _char_width_cache:
+        return _char_width_cache[key]
+
+    text_surface = font_manager.render(char)
+    char_width = text_surface.w
+    sdl2.SDL_FreeSurface(text_surface)
+
+    _char_width_cache[key] = char_width
+    return char_width
+
+
+def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
+    if len(text.strip()) == 0:
+        return
+    
+    # Keep track of initial x, and y since we will be updating x, y for each character.
+    # We need to know where each character is relative to the starting point in order
+    # to blit our various surfaces correctly.
+
+    if bounding_rect is not None:
+        x0 = bounding_rect.x
+        y0 = bounding_rect.y
+    else:
+        x0 = x
+        y0 = y
+
+    # Draw the text character by character, for now. While this is inefficient, it does
+    # allow for the selection background colour to be drawn with simpler logic.
+
+    for i, char in enumerate(text):
+
+        # In SDL, when you render text, you get a new surface containing only that text.
+        # To copy it to the renderer, you need to create a texture from the surface, and
+        # then copy the texture to the renderer. The surface and texture can then be freed.
+
+        text_surface = font_manager.render(char)
+        if dst_surface is None:
+            text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
+
+        text_rect = sdl2.SDL_Rect(x, y, text_surface.w, text_surface.h)
+
+        # If a bounding rectangle is specified, then only draw the text if it intersects with the bounding rectangle.
+        # I.e. the text will not be drawn outside the bounding rectangle.
+        
+        src_rect = None
+        dst_rect = None
+        do_draw_text = True
+
+        if bounding_rect is not None:
+            overlap_rect = sdl2.SDL_Rect()
+            theyDoIntersect = sdl2.SDL_IntersectRect(text_rect, bounding_rect, overlap_rect)
+
+            if theyDoIntersect:
+
+                # The text and bounding rectangle intersect, so draw the text. But, if they only partially overlap,
+                # then we need to adjust the text rectangle so that it only draws the part of the text that intersects.
+                # Maybe we could use a scissor test instead, and copy the whole rect?
+
+                src_rect = sdl2.SDL_Rect(overlap_rect.x - text_rect.x, overlap_rect.y - text_rect.y, overlap_rect.w, overlap_rect.h)
+                dst_rect = overlap_rect
+            else:
+                # The text and bounding rectangle do not intersect, so don't draw the text.
+                do_draw_text = False
+        else:
+            # No bounding rectangle specified, so draw the text as normal.
+            src_rect = None
+            dst_rect = text_rect
+            
+        if do_draw_text:
+            dst_rect2 = sdl2.SDL_Rect(dst_rect.x - x0, dst_rect.y - y0, dst_rect.w, dst_rect.h)
+
+            # If this character is part of a selection, then we want to draw it with a different background colour.
+            # We'll draw a coloured rectangle behind the character, and then draw the character on top of it.
+
+            if selection_start is not None and selection_end is not None and \
+                selection_start <= i < selection_end:
+                
+                old_color = set_color(renderer, (0, 100, 200, 200))     # @todo @perf every char!
+                # sdl2.SDL_RenderFillRect(renderer.sdlrenderer, dst_rect2)
+                # sdl2.SDL_RenderFillRect(dst_surface, dst_rect2)
+                sdl2.SDL_FillRect(dst_surface, dst_rect2, sdl2.SDL_MapRGBA(dst_surface.contents.format, 0, 100, 200, 200))
+                set_color(renderer, old_color)
+
+            # Finally, draw the text char by copying the texture with the char to our
+            # destination surface.
+
+            if dst_surface is None:
+                sdl2.SDL_RenderCopy(renderer.sdlrenderer, text_texture, src_rect, dst_rect)
+            else:
+                sdl2.SDL_BlitSurface(text_surface, src_rect, dst_surface, dst_rect2)
+
+        if char == '\n':
+            x = 0
+            y += text_rect.h
+        else:
+            x += text_rect.w
+
+        if dst_surface is None:
+            sdl2.SDL_DestroyTexture(text_texture)
+        sdl2.SDL_FreeSurface(text_surface)
+
+
+def draw_cursor(renderer, font_manager, 
+                text_buffer, 
+                row_spacing, 
+                x, y, 
+                bounding_rect=None, 
+                x_scroll=0, y_scroll=0,
+                dont_draw_just_calculate=False): 
+    
+    row, col_unexpanded = text_buffer.get_row_col(text_buffer.get_point())
+    line_unexpanded = text_buffer.get_line(row, expand_tabs=False)
+
+    cursor_height = row_spacing
+    
+    x_offset = 0
+    for char in line_unexpanded[:col_unexpanded]:
+        if char == '\t':
+            width = text_buffer.get_tab_spaces() * get_char_width(font_manager, ' ')
+        else:
+            width = get_char_width(font_manager, char)
+
+        x_offset += width
+
+    old_color = set_color(renderer, (255, 255, 255, 255))
+
+    x_cursor = x + x_offset - x_scroll
+    y_cursor = y + row * row_spacing - y_scroll 
+
+    if bounding_rect is None:
+        if not dont_draw_just_calculate:
+            sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
+
+    elif bounding_rect.x <= x_cursor < bounding_rect.x + bounding_rect.w and (
+        y_cursor + cursor_height >= bounding_rect.y  and
+        y_cursor <= bounding_rect.y + bounding_rect.h
+    ):        
+        # Set the scissor rectangle to the bounding rectangle
+        # This is so that the cursor doesn't draw outside the bounding rectangle.
+        
+        if not dont_draw_just_calculate:
+            sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, bounding_rect)
+            sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
+            sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, None)
+
+    set_color(renderer, old_color)
+    # print('draw_cursor', x_cursor, y_cursor)
+    return x_cursor, y_cursor
+
+
+def set_color(renderer, new_color):
+    # Get the current color
+    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)
+    old_color = (r.value, g.value, b.value, a.value)
+
+    # Set the new color
+    sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])
+
+    # Return the old color
+    return old_color
+
+
+
+========================
+./gui.py:
+========================
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import ctypes
+import datetime
+import json
+import logging
+import pytz
+from rect_utils import rect_union
+import sdl2
+from typing import Union
+from tzlocal import get_localzone
+from gui_layout import ColumnLayout
+from gui_focus import FocusRing
+import weakref
+import os
+from voice_out import VoiceOut
+from voice_wakeup import PhraseListener
+from transcribe_audio import VoiceTranscriber
+from command_listener import VoiceCommandListener
+
+
+#===============================================================================
+class GUI:
+    VOICE_IN_STATE_NOT_LISTENING = 0
+    VOICE_IN_STATE_LISTENING_FOR_WAKEWORD = 1
+    VOICE_IN_STATE_LISTENING_FOR_SPEECH = 2
+
+
+    _factories = {}
+
+    @classmethod
+    def register_control_type(cls, class_name, control_class):
+        cls._factories[class_name] = control_class
+
+
+    @classmethod
+    def control_class(cls, class_name):
+        return cls._factories.get(class_name, None)
+    
+
+    def create_control(self, class_name, **kwargs):
+        cls = self.__class__
+        control_class = cls.control_class(class_name)
+        if control_class:
+            if not "gui" in kwargs:
+                kwargs["gui"] = self
+            gui = kwargs["gui"]
+
+            if not "renderer" in kwargs:
+                kwargs["renderer"] = gui.renderer
+            if not "font_manager" in kwargs:
+                kwargs["font_manager"] = gui.font_manager
+
+            return control_class(**kwargs)
+        else:
+            return None
+
+
+    def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json", client_session=None):        
+        assert(client_session is not None)
+        self.session = client_session
+        self.session.gui = weakref.ref(self)
+
+        self.renderer = renderer
+        self.font_manager = font_manager
+
+        assert(self.renderer)
+        assert(self.font_manager)
+
+        self._content = GUIContainer(gui=self, renderer=self.renderer, font_manager=self.font_manager)
+        assert(self._content.focusRing is not None)
+        self.focus_stack = []
+        self.push_focus_ring(self._content.focusRing)
+        
+        # May be self.content or any depth of descendant of self.content
+        self._focused_control = None
+
+        self._strokes = {}
+        self._content_pan = (0, 0)
+        self._drag_control = None
+
+        self.workspace_filename = workspace_filename
+        
+        self.load()
+
+        self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
+        self._saying_text = None
+        self._next_texts_to_say = []
+
+
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
+        self._voice_wakeup = None
+        self._voice_in = VoiceTranscriber(session=self.session)
+        self._should_stop_voice_in = False
+
+        self.command_listener = None
+
+
+    class JSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if hasattr(obj, '__json__'):
+                return obj.__json__()
+            return json.JSONEncoder.default(self, obj)
+
+
+    def __json__(self):
+        return {"class": self.__class__.__name__, 
+                "content": self._content.__json__()}
+    
+
+    def _start_listening_wakeword(self):
+        assert(self._voice_wakeup is None)
+
+        self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+        self._voice_wakeup.start()
+        logging.info('Listening for wakeup phrase.')
+
+        if self.listening_indicator is not None:
+            self.listening_indicator.set_text("Listening for WAKEUP")
+
+
+    def _stop_listening_wakeword(self):
+        assert(self._voice_wakeup is not None)
+        self._voice_wakeup.stop()
+        self._voice_wakeup = None
+
+        if self.listening_indicator is not None:
+            self.listening_indicator.set_text("")
+
+
+    def content(self):
+        return self._content
+    
+    
+    def session(self):
+        return self.session
+    
+
+    def on_quit(self):
+        # Do depth-first traversal
+        q = [self.content()]
+        while len(q) > 0:
+            control = q.pop()
+            if hasattr(control, "children"):
+                q.extend(control.children)
+            if hasattr(control, "_on_quit"):
+                control._on_quit()
+
+
+    def say(self, text):
+        logging.debug(f'GUI.say({text})')
+        return
+
+        if self._saying_text is None:
+            self._saying_text = text
+
+            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                self._voice_in.stop_recording()
+            elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+                self._voice_wakeup.stop()
+                self._voice_wakeup = None
+
+            self._voice_out.say(text)
+        else:
+            self._next_texts_to_say.append(text)
+
+
+    def _on_speech_done(self):
+        self._saying_text = None
+
+        # If we were actively listening before text_buffer_set_textsaying speech, then return to active listening...
+        if len(self._next_texts_to_say) == 0 and \
+            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            not self._voice_in.is_recording():
+
+            self._voice_in.start_recording()
+            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+
+        # If we were waiting for the wakeup phrase, then go back to doing that
+        elif len(self._next_texts_to_say) == 0 and \
+            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and \
+            self._voice_wakeup is None:
+
+            self._start_listening_wakeword()
+
+
+    def _on_voice_wakeup(self):
+        logging.info(f'WAKEUP. Stopping voice wakeup. Starting active listening.')
+        self._stop_listening_wakeword()
+
+        # self.say("Yes?")
+
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
+        self._voice_in.start_recording()
+        self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+
+
+    def _on_voice_command(self, command: str) -> None:
+        logging.info(f'GUI._on_voice_command({command})')
+
+        # @todo make sanitization routines
+        command = command.replace('"', "")
+        command = command.replace("'", "")
+
+        if command == "stop_listening":
+            logging.info('Command: stop listening')
+            self._should_stop_voice_in = True
+
+        elif command == "create_new_chat_with_llm":
+            self.cmd_new_llm_chat()
+
+        elif command == "create_new_text_area":
+            self.cmd_new_text_area()
+
+
+
+    def handle_event(self, event):
+        handled = False
+        if self._focused_control:
+            handled = self._focused_control.handle_event(event)
+
+        if not handled:    
+            if event.type == sdl2.SDL_KEYDOWN:
+                return self.handle_keydown(event)
+            
+            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+                # Do we have a stroke for this button?
+                if event.button.button not in self._strokes:
+                    # We do not.  Add this event to the stroke.
+                    stroke = [(event.button.x, event.button.y)]                    
+                    self._strokes[event.button.button] = stroke
+                    # print(f"STROKE (button {event.button.button}) start at {stroke[0]}")
+
+                    # If it's the left mouse button, then check for a hit on a control.
+                    if event.button.button == sdl2.SDL_BUTTON_LEFT:
+                        hit_control = self.check_hit(event.button.x, event.button.y)
+                        if hit_control:
+                            self._drag_control = hit_control
+                            self.set_focus(hit_control)
+                    return True
+
+            elif event.type == sdl2.SDL_MOUSEBUTTONUP:
+                # Do we have a stroke for this button?
+                if event.button.button in self._strokes:
+                    # We do.  Remove this stroke.
+                    del self._strokes[event.button.button]
+                    # print(f"STROKE (button {event.button.button}) end")
+
+                    # If it's the left mouse button, then check if we're dragging and release drag.
+                    if self._drag_control and event.button.button == sdl2.SDL_BUTTON_LEFT:
+                        self._drag_control = None
+                    return True
+
+            elif event.type == sdl2.SDL_MOUSEMOTION:
+                # Do we have a stroke for this button?
+                # @bug @todo only seems to work for L button
+                # Maybe macOS two finger swipe is showing up as a trackpad gesture that gets handled first?
+                if event.button.button in self._strokes:
+                    # print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
+
+                    xy0 = self._strokes[event.button.button][-1]
+                    self._strokes[event.button.button].append((event.motion.x, event.motion.y))
+                    xy1 = self._strokes[event.button.button][-1]
+
+                    dx = xy1[0] - xy0[0]
+                    dy = xy1[1] - xy0[1]
+
+                    if self._drag_control:
+                        new_r = sdl2.SDL_Rect(self._drag_control.bounding_rect.x + dx,
+                                               self._drag_control.bounding_rect.y + dy,
+                                               self._drag_control.bounding_rect.w,
+                                               self._drag_control.bounding_rect.h)
+                        self._drag_control.bounding_rect = new_r
+                    else:
+                        self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
+
+                    return True
+                
+        return handled
+    
+
+    def cmd_new_text_area(self):
+        logging.info('Command: create new text area')
+        wr = self.content().get_world_rect()
+        x = ctypes.c_int()
+        y = ctypes.c_int()                
+        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+        self.content().sizeToChildren()
+        textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
+        self.content().add_child(textArea)
+        self.set_focus(textArea)
+
+
+    def cmd_new_llm_chat(self):
+        logging.info('Command: create new LLM chat')
+        wr = self.content().get_world_rect()
+        x = ctypes.c_int()
+        y = ctypes.c_int()                
+        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+        self.content().sizeToChildren()
+
+        argx = x.value-wr.x
+        argy = y.value-wr.y
+
+        logging.debug(f"Creating new LLMChatContainer at {argx}, {argy}")
+        chat = self.create_control("LLMChatContainer", x=argx, y=argy)
+        self.content().add_child(chat)
+
+
+    def handle_keydown(self, event):
+        wr = self.content().get_world_rect()
+
+        keySym = event.key.keysym.sym
+        cmdPressed = event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
+
+        if cmdPressed:
+            # Cmd+S saves GUI
+            if keySym == sdl2.SDLK_s:
+                self.save()
+                return True  # event was handled
+            # Cmd+L loads GUI
+            if keySym == sdl2.SDLK_l:
+                self.load()
+                return True  # event was handled
+            
+            # Cmd+N add new LLM chat
+            if keySym == sdl2.SDLK_n:
+                self.cmd_new_llm_chat()
+                return True  # event was handled
+
+            # Cmd+R say something
+            if keySym == sdl2.SDLK_r:
+                self.say("One, one-thousand. Two one-thousand. Three one-thousand. Do not call logging or print from this function! It's time-critical! You've touched upon a fascinating aspect of language models and artificial intelligence in general. While language models like mine lack true understanding and consciousness, they can indeed produce remarkably coherent and contextually relevant text, often to the point of surprising users.")
+                # self.say("Listening")
+                
+
+                return True  # event was handled
+            
+            # Cmd+T creaes a new TextArea
+            if keySym == sdl2.SDLK_t:
+                self.cmd_new_text_area()
+                return True
+
+            if keySym == sdl2.SDLK_RETURN:
+                logging.info('Command: toggle recording')
+
+                # Toggle active listening...
+
+                if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                    logging.debug('GUI is idle or listening for wakeword.')
+
+                    if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+                        logging.debug('GUI is listening for wakeword. Stopping voice wakeup.')
+                        self._stop_listening_wakeword()
+
+                    logging.info(f'Starting active listening.')
+                    self._voice_in.start_recording()
+                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
+
+                elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                    logging.info(f'GUI is listening for speech. Stopping active listening.')
+                    self._voice_in.stop_recording()
+                    self.command_listener = None
+                    self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+
+                    self._start_listening_wakeword()
+                    return True
+                
+        if keySym == sdl2.SDLK_RETURN:
+            # Focus down into FocusRing of currently focused control...
+            focused = self._focused_control
+            if focused:
+                if hasattr(focused, "focusRing"):
+                    self.push_focus_ring(focused.focusRing)
+                    focused.focusRing.focus_first()
+                    return True
+
+        elif keySym == sdl2.SDLK_ESCAPE:
+            # Focus up into previous FocusRing on stack
+            self.pop_focus_ring()
+
+            oldFocusRing = self.get_focus_ring()
+            assert(oldFocusRing is not None)
+            oldFocusRing.focus(oldFocusRing.get_focus())
+            return True
+
+        elif keySym == sdl2.SDLK_TAB:
+            # TAB focuses next control in focus ring
+            # Shift+TAB focuses previous control
+
+            focusRing = self.get_focus_ring()
+            assert(focusRing is not None)
+
+            if event.key.keysym.mod & sdl2.KMOD_LCTRL:
+                # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
+                pass
+            else:
+                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # if shift was also held
+                    if focusRing.focus_previous():
+                        return True  # event was handled
+                else:
+                    if focusRing.focus_next():
+                        return True  # event was handled
+
+
+    def update(self, dt):
+        #
+        # Should we enable or disable wake word listening?
+        #
+        
+        if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+            self._stop_listening_wakeword()
+
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
+            self._start_listening_wakeword()
+
+        # Update voice wakeup, if it's active
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+            self._voice_wakeup.update()
+
+        # 
+        # Voice transcription
+        #
+        
+        # Update visibility of voice transcript window...
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+            if self.voice_transcript is not None and \
+                not self.voice_transcript._visible:
+
+                self.voice_transcript.text_buffer.set_text("")  # @hack
+                self.voice_transcript._visible = True
+        
+        elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            self.voice_transcript is not None and \
+            self.voice_transcript._visible:
+
+            self.voice_transcript._visible = False
+
+
+        # Do we have queued text to say?
+        if self._saying_text is None and len(self._next_texts_to_say) > 0:
+            self._saying_text = self._next_texts_to_say.pop(0)
+            self._voice_out.say(self._saying_text)
+
+        # Voice In
+        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and self._voice_in is not None:
+            
+            self._voice_in.update()
+
+            if self.listening_indicator is not None:
+                voice_indicator_text = "LISTENING..."
+                if self.listening_indicator.get_text() != voice_indicator_text:
+                    self.listening_indicator.set_text(voice_indicator_text)
+
+            if self.command_listener is not None:
+                self.command_listener.update()
+
+            # Stop voice in?
+            if self._should_stop_voice_in and self._voice_in.is_recording():
+                self._voice_in.stop_recording()
+                logging.debug(f'Just called self._voice_in.stop_recording() and self._voice_in is {self._voice_in}')
+                self._should_stop_voice_in = False
+                self.command_listener = None
+
+                self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+                # self.say("Okay")
+
+        # Update components
+        for c in self.content():
+            if hasattr(c, 'on_update'):
+                c.on_update(dt)
+
+
+    def draw(self):
+        if self._content:
+            self._content.draw()
+
+        # # @debug Draw strokes
+        # for stroke in self._strokes:
+        #     points = self._strokes[stroke]
+            
+        #     # Convert the list of points to a ctypes array of SDL_Point structures
+        #     point_array = (sdl2.SDL_Point * len(points))(*points)
+
+        #     if len(points) > 1:
+        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
+        #         sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
+        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+
+
+    def push_focus_ring(self, focusRing):
+        assert(focusRing is not None)
+        self.focus_stack.append(focusRing)
+
+
+    def pop_focus_ring(self):
+        if len(self.focus_stack) > 1:
+            return self.focus_stack.pop()
+        return None
+
+
+    def get_focus_ring(self):
+        return self.focus_stack[-1] if len(self.focus_stack) > 0 else None
+
+
+    def get_focus(self):
+        return self._focused_control
+    
+    
+    def set_focus(self, control: "GUIControl", focus_it=True):
+        if focus_it:
+            # Can't focus on a control that can't be focused.
+            # @note @todo shouldn't this happen automatically?
+
+            if not control.can_focus:
+                return False
+        
+            # If another control has focus, then remove focus from it.
+            if focus_it and \
+                self._focused_control is not None and \
+                self._focused_control != control:
+
+                    self._focused_control._set_focus(False)
+                    self._focused_control = None
+
+            self._focused_control = control
+            
+            # containing_ring = control.containing_focus_ring()
+            # if containing_ring is not None:
+            #     currentFocusRing = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
+
+            #     if currentFocusRing != containing_ring:
+            #         self.focus_stack.append(containing_ring)
+                    
+            return self._focused_control._set_focus(True)
+        else:
+            # Make sure it's not focused.
+            if self._focused_control == control:
+                self._focused_control = None
+            return control._set_focus(False)
+        
+
+    def check_hit(self, x: int, y: int) -> "Union[GUIControl, None]":
+        p = sdl2.SDL_Point(x, y)
+        
+        q = list(self.content())
+        while len(q) > 0:
+            child = q.pop()
+            if sdl2.SDL_PointInRect(p, child.get_world_rect()):
+                return child
+            else:
+                if hasattr(child, "children"):
+                    q.extend(child.children)
+            # print(len(q))
+        return None
+    
+
+    def get_ancestor_chain(self, control):
+        chain = []
+        while control is not None:
+            chain.append(control)
+            control = control.parent
+        chain.reverse()
+        chain.pop()  # Don't want the control, itself
+        return chain
+    
+
+    def save(self):        
+        utc_now = datetime.datetime.now(pytz.utc)
+        local_timezone = get_localzone()
+        local_now = utc_now.astimezone(local_timezone)
+
+        logging.info("Saving GUI...")
+        with open(self.workspace_filename, "w") as f:
+            gui_json = {
+                "saved_at_utc": utc_now.isoformat(),
+                "saved_at_local": local_now.isoformat(),
+                "gui": self.__json__()
+            }
+            json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
+        logging.info("GUI saved.")
+
+
+    def load(self):
+        bak_content = self._content
+        bak_focused_control = self._focused_control
+        self.focus_stack = []
+
+        logging.info("Loading GUI...")
+        try:
+            with open(self.workspace_filename, "r") as f:
+                gui_json = json.load(f)
+                content_json = gui_json["gui"]["content"]
+                gui_class = GUI.control_class(content_json["class"])
+                self._content = gui_class.from_json(content_json, gui=self, renderer=self.renderer, font_manager=self.font_manager)
+                self.push_focus_ring(self._content.focusRing)
+
+                focusRing = self.get_focus_ring()
+                assert(focusRing is not None)
+                focusRing.focus_first()
+
+        except Exception as e:
+            logging.error("Error loading GUI. Exception: ", str(e))
+            self._content = bak_content
+            self._focused_control = bak_focused_control
+            return False
+        
+        logging.info("GUI loaded.")
+        return True
+
+
+    def voice_input_available(self):
+        """Is speech input available?"""
+        return os.getenv("ASSEMBLYAI_API_KEY") is not None
+    
+
+#===============================================================================
+class GUIControl:
+    def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, **kwargs):
+        self.gui = kwargs.get('gui')
+        self.renderer = kwargs.get('renderer')
+        self.font_manager = kwargs.get('font_manager')
+        self.draw_bounds = kwargs.get('draw_bounds', False)
+        self._draggable = kwargs.get('draggable', False)
+        self._visible = kwargs.get('visible', True)
+        self._screen_relative = kwargs.get('screen_relative', False)
+
+        assert(self.gui)
+        assert(self.renderer)
+        assert(self.font_manager)
+
+        self.can_focus = can_focus
+        self.parent = None
+        self.set_bounds(x, y, w, h)
+        self.containing_focus_ring = None
+
+
+    def has_focus(self):
+        return self.gui.get_focus() == self
+    
+
+    def set_bounds(self, x, y, w, h):
+        if hasattr(self, "bounding_rect"):
+            self.bounding_rect.x = x
+            self.bounding_rect.y = y
+            self.bounding_rect.w = w
+            self.bounding_rect.h = h
+        else:
+            self.bounding_rect = sdl2.SDL_Rect(x, y, w, h)
+
+
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+
+        if "bounding_rect" in json:
+            x, y, w, h = json["bounding_rect"]
+            kwargs["x"] = x
+            kwargs["y"] = y
+            kwargs["w"] = w
+            kwargs["h"] = h
+
+        if "draggable" in json and json["draggable"]:
+            kwargs["draggable"] = True
+            
+        instance = cls(**kwargs)
+        return instance
+
+
+    def __json__(self):
+        json = {}
+        json["class"] = self.__class__.__name__
+        json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
+        return json
+
+
+    def _on_quit(self):
+        pass
+
+
+    # In local coordinates (relative to parent)
+    def get_position(self):
+        return (self.bounding_rect.x, self.bounding_rect.y)
+
+
+    # In local coordinates (relative to parent)
+    def set_position(self, x, y):
+        self.bounding_rect = sdl2.SDL_Rect(x,
+                                           y,
+                                           self.bounding_rect.w,
+                                           self.bounding_rect.h)
+
+
+    def get_size(self):
+        return (self.bounding_rect.w, self.bounding_rect.h)
+
+
+    def set_size(self, w, h, updateLayout=True):
+        self.bounding_rect = sdl2.SDL_Rect(self.bounding_rect.x,
+                                           self.bounding_rect.y,
+                                           w,
+                                           h)
+        if updateLayout:
+            self.updateLayout()
+            if self.parent is not None:
+                self.parent.updateLayout()
+        
+
+    def updateLayout(self):
+        pass
+
+    
+    def get_world_rect(self):
+        if self.parent:
+            parent_rect = self.parent.get_world_rect()
+            wr = sdl2.SDL_Rect(parent_rect.x + self.bounding_rect.x,
+                                 parent_rect.y + self.bounding_rect.y,
+                                 self.bounding_rect.w,
+                                 self.bounding_rect.h)
+        else:
+            wr = self.bounding_rect
+            wr = sdl2.SDL_Rect(wr.x + self.gui._content_pan[0],
+                           wr.y + self.gui._content_pan[1],
+                           wr.w,
+                           wr.h)
+        return wr
+        
+
+    def _set_focus(self, has_focus):
+        if self.can_focus:
+            if self.has_focus() and self.parent and has_focus == False:
+                self.parent.focused_child = None  # @todo still need this? GUI should handle this @todo
+            return True
+        else:
+            return False
+
+
+    def handle_event(self, event):
+        return self.parent_handle_event(event)
+    
+
+    def parent_handle_event(self, event):
+        # Pass unhandled events up the runtime child/parent hierarchy.
+        if self.parent:
+            return self.parent.handle_event(event)
+        else:
+            return False            
+
+
+#===============================================================================
+class GUIContainer(GUIControl):
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        gui = kwargs.get('gui')
+
+        instance = gui.create_control(json["class"], **kwargs)
+        instance.set_bounds(*json["bounding_rect"])
+
+        for child_json in json["children"]:
+            child_class = GUI.control_class(child_json["class"])
+            instance.add_child(child_class.from_json(child_json, **kwargs))
+
+        if "layout" in json:
+            layout_class_name = json["layout"]
+            if layout_class_name == "ColumnLayout":
+                instance.set_layout(ColumnLayout())
+        return instance
+    
+
+    def __init__(self, children=None, layout=None, **kwargs):
+        super().__init__(**kwargs)
+        self.draw_bounds = False  #kwargs.get('draw_bounds', True)
+        
+        self.children = children if children is not None else []
+
+        self.set_layout(layout)
+        self.focusRing = FocusRing(gui=self.gui)
+
+
+    def __iter__(self):
+        self._iter_index = 0
+        return self
+
+
+    def __next__(self):
+        if self._iter_index < len(self.children):
+            result = self.children[self._iter_index]
+            self._iter_index += 1
+            return result
+        else:
+            raise StopIteration
+
+
+    def __json__(self):
+        json = super().__json__()
+        json["class"] = self.__class__.__name__
+        json["layout"] =  self.layout.__class__.__name__ if self.layout else None
+
+
+        json["children"] = []
+        for child in self.children:
+            child_json = child.__json__()
+            assert(child_json is not None)
+            json["children"].append(child_json)
+        
+        return json
+
+
+    def set_layout(self, layout):
+        self.layout = layout
+        if layout is not None:
+            self.layout.set_container(self)
+            if self.children:
+                self.updateLayout()
+
+
+    def on_update(self, dt):
+        for c in self:
+            if hasattr(c, 'on_update'):
+                c.on_update(dt)
+
+
+    def draw(self):
+        if not self._visible:
+            return
+        
+        # Draw own bounding rect
+        if self.draw_bounds and self.bounding_rect is not None:
+            # Save the current color
+            r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+            sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+            old_color = (r.value, g.value, b.value, a.value)
+
+            # Set the new color
+            r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+            # Draw the bounding rectangle
+            wr = self.get_world_rect()
+            sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
+
+            # Reset to the old color
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+        # Draw children
+        for child in self:
+            if child._visible:
+                child.draw()
+
+
+    def get_children(self):
+        return self.children if self.children else []
+
+
+    def add_child(self, child, add_to_focus_ring=True):
+        child.parent = self
+        self.children.append(child)
+
+        self.updateLayout()
+
+        child_rect_wrt_my_parent = sdl2.SDL_Rect(child.bounding_rect.x + self.bounding_rect.x,
+                                                 child.bounding_rect.y + self.bounding_rect.y,
+                                                 child.bounding_rect.w,
+                                                 child.bounding_rect.h)
+        self.bounding_rect = rect_union(self.bounding_rect, child_rect_wrt_my_parent)
+        
+        if add_to_focus_ring:
+            self.focusRing.add(child)
+            self.focusRing.focus(child)
+
+
+    def remove_child(self, child):
+        child.parent = None
+        self.children.remove(child)
+        self.updateLayout()
+
+
+    def updateLayout(self):
+        if self.layout is not None:
+            self.layout.update()
+
+        self.sizeToChildren()
+
+        if self.parent is not None:
+            self.parent.updateLayout()
+
+
+    def sizeToChildren(self):
+        # @todo DRY
+        INSET_X = 1
+        INSET_Y = 1
+
+        if self.children:
+            w = max([child.bounding_rect.x + child.bounding_rect.w for child in self])
+            h = max([child.bounding_rect.y + child.bounding_rect.h for child in self])
+            self.set_size(w + INSET_X, h + INSET_Y, updateLayout=False)
+
+
+    def handle_event(self, event):
+        return self.parent_handle_event(event)
+    
+
+GUI.register_control_type("GUIContainer", GUIContainer)
+GUI.register_control_type("GUIControl", GUIControl)
+
+

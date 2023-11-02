@@ -6,8 +6,8 @@ TREE=$(tree)
 echo "Project directory and file layout:"
 echo "$TREE"
 
-# Use find to get all .py files and read into an array
-files=("${(@f)$(find . -name "*.py")}")
+# Use find to get all .py files, .gitignore files, Makefile but excluding .git directories and read into an array
+files=("${(@f)$(find . -name '.git' -prune -false -o -name "*.py" -o -name ".gitignore" -o -name "Makefile")}")
 
 # Loop through each file
 for file in "${files[@]}"; do
