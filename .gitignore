@@ -13,3 +13,8 @@ dist
 *.spec
 
 results.txt
+
+# Some resources, but only in the project dir itself.
+*.zip
+*.mp4
+
