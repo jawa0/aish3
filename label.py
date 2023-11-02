@@ -37,8 +37,9 @@ class Label(GUIControl):
 
     def __json__(self):
         json = super().__json__()
-        json["class"] = self.__class__.__name__
-        json["text"] = self._text
+        if json is not None:    # Could be None on save, if control is not saveable. @todo DRY every derived class will have to do this. Boo.
+            json["class"] = self.__class__.__name__
+            json["text"] = self._text
         return json
 
 

@@ -49,8 +49,9 @@ class TextArea(GUIControl):
 
     def __json__(self):
         json = super().__json__()
-        json["class"] = self.__class__.__name__
-        json["text"] = self.text_buffer.get_text()
+        if json is not None:  # Could be None for a non-saveable control, on save. @todo DRY every derived class will have to do this. Boo.
+            json["class"] = self.__class__.__name__
+            json["text"] = self.text_buffer.get_text()
         return json
     
     
