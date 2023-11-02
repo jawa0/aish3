@@ -253,16 +253,5 @@ class LLMChatContainer(GUIContainer):
         }
 
 
-    def load(self):
-        try:
-            with open("aish_workspace.json", "r") as f:
-                data = json.load(f)
-                self.system.text_area.text_buffer.set_text(data["system_text"])
-                self.system.text_area.text_buffer.move_point_to_start()
-                self.system.text_area.text_buffer.clear_mark()
-        except FileNotFoundError:
-            self.save()
-
-
 GUI.register_control_type("LLMChatContainer", LLMChatContainer)
 GUI.register_control_type("ChatMessageUI", LLMChatContainer.ChatMessageUI)

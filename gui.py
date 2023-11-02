@@ -30,7 +30,7 @@ from voice_out import VoiceOut
 from voice_wakeup import PhraseListener
 from transcribe_audio import VoiceTranscriber
 from command_listener import VoiceCommandListener
-
+import utils
 
 #===============================================================================
 class GUI:
@@ -590,6 +590,13 @@ class GUI:
         local_now = utc_now.astimezone(local_timezone)
 
         logging.info("Saving GUI...")
+
+        unique_filename = utils.unique_filename(self.workspace_filename)
+        if unique_filename != self.workspace_filename:
+            logging.info(f"Backing up existing workspace file to \"{os.path.abspath(unique_filename)}\"")
+            os.rename(self.workspace_filename, unique_filename)
+        logging.info(f"Saving workspace file to \"{os.path.abspath(self.workspace_filename)}\"")
+
         with open(self.workspace_filename, "w") as f:
             gui_json = {
                 "saved_at_utc": utc_now.isoformat(),
