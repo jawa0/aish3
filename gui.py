@@ -633,7 +633,7 @@ class GUI:
 
 #===============================================================================
 class GUIControl:
-    def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, **kwargs):
+    def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, saveable=True, **kwargs):
         self.gui = kwargs.get('gui')
         self.renderer = kwargs.get('renderer')
         self.font_manager = kwargs.get('font_manager')
@@ -641,6 +641,7 @@ class GUIControl:
         self._draggable = kwargs.get('draggable', False)
         self._visible = kwargs.get('visible', True)
         self._screen_relative = kwargs.get('screen_relative', False)
+        self.saveable = saveable
 
         assert(self.gui)
         assert(self.renderer)
@@ -669,6 +670,8 @@ class GUIControl:
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        saveable = True if "saveable" not in json else json["saveable"]
+        kwargs["saveable"] = saveable
 
         if "bounding_rect" in json:
             x, y, w, h = json["bounding_rect"]
@@ -685,6 +688,9 @@ class GUIControl:
 
 
     def __json__(self):
+        if not self.saveable:
+            return None
+            
         json = {}
         json["class"] = self.__class__.__name__
         json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
@@ -769,14 +775,21 @@ class GUIContainer(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
-        gui = kwargs.get('gui')
-
-        instance = gui.create_control(json["class"], **kwargs)
-        instance.set_bounds(*json["bounding_rect"])
-
+        instance = super().from_json(json, **kwargs)
         for child_json in json["children"]:
-            child_class = GUI.control_class(child_json["class"])
-            instance.add_child(child_class.from_json(child_json, **kwargs))
+            if child_json is not None:
+                child_class = GUI.control_class(child_json["class"])
+                instance.add_child(child_class.from_json(child_json, **kwargs))
+
+        # assert(json["class"] == cls.__name__)
+        # gui = kwargs.get('gui')
+
+        # instance = gui.create_control(json["class"], **kwargs)
+        # instance.set_bounds(*json["bounding_rect"])
+
+        # for child_json in json["children"]:
+        #     child_class = GUI.control_class(child_json["class"])
+        #     instance.add_child(child_class.from_json(child_json, **kwargs))
 
         if "layout" in json:
             layout_class_name = json["layout"]
@@ -811,6 +824,9 @@ class GUIContainer(GUIControl):
 
     def __json__(self):
         json = super().__json__()
+        if json == None:
+            return None
+
         json["class"] = self.__class__.__name__
         json["layout"] =  self.layout.__class__.__name__ if self.layout else None
 
@@ -818,8 +834,8 @@ class GUIContainer(GUIControl):
         json["children"] = []
         for child in self.children:
             child_json = child.__json__()
-            assert(child_json is not None)
-            json["children"].append(child_json)
+            if child_json is not None:
+                json["children"].append(child_json)
         
         return json
 
