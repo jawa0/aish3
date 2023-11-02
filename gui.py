@@ -782,9 +782,21 @@ class GUIContainer(GUIControl):
         assert(json["class"] == cls.__name__)
         instance = super().from_json(json, **kwargs)
         for child_json in json["children"]:
-            if child_json is not None:
-                child_class = GUI.control_class(child_json["class"])
-                instance.add_child(child_class.from_json(child_json, **kwargs))
+            # print(f'child_json: {child_json}')
+            if child_json is None:
+                logging.warning('child_json is None')
+                continue
+
+            child_class = GUI.control_class(child_json["class"])
+            if child_class is None:
+                logging.warning(f'Could not find class {child_json["class"]}')
+                continue
+
+            # print(f'child_class: {child_class}')
+            child = child_class.from_json(child_json, **kwargs)
+            # print(f'child: {child}')
+            if child is not None:
+                instance.add_child(child)
 
         # assert(json["class"] == cls.__name__)
         # gui = kwargs.get('gui')
