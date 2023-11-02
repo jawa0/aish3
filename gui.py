@@ -780,8 +780,21 @@ class GUIContainer(GUIControl):
         instance.set_bounds(*json["bounding_rect"])
 
         for child_json in json["children"]:
+            # print(f'child_json: {child_json}')
+            if child_json is None:
+                logging.warning('child_json is None')
+                continue
+
             child_class = GUI.control_class(child_json["class"])
-            instance.add_child(child_class.from_json(child_json, **kwargs))
+            if child_class is None:
+                logging.warning(f'Could not find class {child_json["class"]}')
+                continue
+
+            # print(f'child_class: {child_class}')
+            child = child_class.from_json(child_json, **kwargs)
+            # print(f'child: {child}')
+            if child is not None:
+                instance.add_child(child)
 
         if "layout" in json:
             layout_class_name = json["layout"]
