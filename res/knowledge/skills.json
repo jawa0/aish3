@@ -1,0 +1,1127 @@
+{
+  "saved_at_utc": "2023-11-02T15:25:29.524047+00:00",
+  "saved_at_local": "2023-11-02T11:25:29.524047-04:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        -10,
+        0,
+        1822,
+        782
+      ],
+      "layout": null,
+      "children": [
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            9,
+            125,
+            354,
+            656
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                103,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "If there is a Python package available online using pip install, is there a way to cache everything locally?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                185,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Yes, you can cache Python packages locally using pip's wheel command. Here is an example of how you can cache a package (example-package) and its dependencies:\n\n```bash\npip install wheel\npip wheel --wheel-dir=/local/dir example-package\n```\n\nHere, the `wheel-dir` option specifies the directory where the .whl files will be stored. The second command will download the `example-package` and all its dependencies in the directory you specified in a binary wheel format."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                267,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "What about using pip download?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                349,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Yes, you can use `pip download` command to download a Python package and its dependencies for offline use. Here's an example:\n\n```bash\npip download -d /local/dir example-package\n```\n\nThis command will download `example-package` and its dependencies into `/local/dir` directory. You can then install the packages offline using:\n\n```bash\npip install --no-index --find-links=/local/dir example-package\n```"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                431,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Great, that's more what I was thinking.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                513,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "Alright, you're welcome! If you have any more questions or need further clarification, feel free to ask."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            373,
+            125,
+            354,
+            656
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                103,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "How can you find out which system architectures pip has for a given package?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                185,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "You can use pip show with the --files option. This will provide a list of all files for the installed package, from which you can infer the package's architecture. Here is an example for a package named 'Package':\n\n```python\npip show --files Package\n```"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                267,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Cool, what about using PyPi's JSON API?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                349,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "You can use the PyPI's JSON API to retrieve information about specific packages and all associated distributions. Here's how you can do it:\n\n```python\nimport requests\nresponse = requests.get('https://pypi.org/pypi/Package/json')\ndata = response.json()\nreleases = data['releases']\nfor version in releases:\n  for release in releases[version]:\n      print(release['python_version'], release['url'], release['packagetype'])\n```"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                431,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "What about just downloading the JSON file with curl? Assume a that the package name is \"package_name\"\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                513,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "You can use the `curl` command to download the JSON file from PyPI. Here's how:\n\n```bash\ncurl -o package_info.json https://pypi.org/pypi/package_name/json\n```"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            6,
+            32,
+            160,
+            80
+          ],
+          "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            5,
+            5,
+            200,
+            20
+          ],
+          "text": "Listening for WAKEUP"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            374,
+            17,
+            160,
+            80
+          ],
+          "text": "LLaMA: https://github.com/ggerganov/llama.cpp"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            548,
+            17,
+            160,
+            80
+          ],
+          "text": "Whisper.cpp: https://github.com/ggerganov/whisper.cpp"
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            740,
+            126,
+            354,
+            492
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                103,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "How would I exactly copy the directory hierarchy rooted at \"/Users/jaba/devel/whisper.cpp\" to \"/Volumes/Seagate Portable Drive/Jaba/Dropbox/Digital_SHTF/Archive/AI-Models/whisper.cpp\", assuming the destination doesn't already exist. Make sure it gets everything (recursive)"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                185,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "You can use the `rsync` command as follows:\n\n```bash\nrsync -a /Users/jaba/devel/whisper.cpp /Volumes/Seagate\\ Portable\\ Drive/Jaba/Dropbox/Digital_SHTF/Archive/AI-Models/\n```"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                267,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "What about showing progress?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                349,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "You can use the `--progress` option with `rsync` as follows:\n\n```bash\nrsync -a --progress /Users/jaba/devel/whisper.cpp /Volumes/Seagate\\ Portable\\ Drive/Jaba/Dropbox/Digital_SHTF/Archive/AI-Models/\n```"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            5,
+            5,
+            200,
+            20
+          ],
+          "text": "Listening for WAKEUP"
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            1100,
+            126,
+            354,
+            328
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                103,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "How would I use ffmpeg to truncate an mp4 video. It's 3:40 long, and I just want to keep 3:28"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                185,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "You can use the `-t` or `-to` option in `ffmpeg` for that. \n\nHere is a command you can use:\n\n```bash\nffmpeg -i input.mp4 -t 00:03:28 -c copy output.mp4\n```"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            5,
+            5,
+            200,
+            20
+          ],
+          "text": "Listening for WAKEUP"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            52,
+            601,
+            1395,
+            60
+          ],
+          "text": ""
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            1467,
+            125,
+            354,
+            656
+          ],
+          "layout": "ColumnLayout",
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                1,
+                1,
+                350,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                21,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "System"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Assume that I have an undergraduate degree in computer engineering and also an undergraduate degree in biophysics. I have worked in a machine learning and neuroscience lab as a student researcher. I also have a background in computer game development and graphics development.\n\nPlease keep your answers concise and to the point without too many follow-up explanations. Especially for code listings, do not explain the code, just provide the code. If I want you to explain the code or to give installation instructions I will ask. Also if I give you feedback or critique your response, do not apologize simply acknowledge the notes and modify response please.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                103,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "How would I recursively list all Python files under a directory?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                185,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "You can do that with the `os` and `fnmatch` modules in Python. Here's an example of how to do this:\n\n```python\nimport os\nimport fnmatch\n\ndef list_python_files(directory):\n    for root, dir, files in os.walk(directory):\n        for item in files:\n            if fnmatch.fnmatch(item, '*.py'):\n                print(os.path.join(root, item))\n\nlist_python_files('/path/to/your/directory')\n```\nThis script visits each directory starting from the root directory, listing .py files if any."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                267,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Why use fnmatch?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                349,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "The `fnmatch` module is used to compare filenames against glob-style patterns such as '*.py'. In the provided script, `fnmatch` is used to check if the current file ends with '.py', which is the file extension for Python files. This is how the script identifies Python files."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                431,
+                352,
+                82
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "User"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    60
+                  ],
+                  "text": "Why not just use glob? What are the advantages and disadvantages of using fnmatch?"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                1,
+                513,
+                352,
+                142
+              ],
+              "layout": "ColumnLayout",
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    1,
+                    1,
+                    350,
+                    20
+                  ],
+                  "text": "Assistant"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    1,
+                    21,
+                    350,
+                    120
+                  ],
+                  "text": "Both `glob` and `fnmatch` can be used to match filename patterns, but they serve slightly different purposes. \n\n`glob` is typically used when you want to list files in a specified directory that match a certain pattern. It can't match subdirectories unless you manually write a recursive function.\n\nOn the other hand, `fnmatch` is used along with `os.walk()`, as demonstrated in the script. This combination allows you to recursively visit all subdirectories and files, making it more convenient to match files in a directory tree.\n\nOne of the advantages of using `glob` is that it can sort the results, while `fnmatch` cannot. However, `glob` does not support efficient recursive file searching, which is a point for `fnmatch`.\n\nChoosing between the two depends on the exact use case and requirements."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
