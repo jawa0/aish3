@@ -10,10 +10,16 @@ _In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common infor
 This is a Python command-line (CLI) application. The goal is to have a portable hands-free AI assistant and playground.
 Features:
 * Have multiple LLM chats (with ChatGPT)
-* Voice-in speech-to-text transcription
-* Voice-out reading of chat results and other text
-* Make notes in TextAreas
-* Save and Load workspaces
+    * Save and load workspaces containing everything as JSON files
+* Working towards (optional) full hands-free operation
+    * Voice-in speech-to-text transcription
+    * Voice-out reading of chat results and other text
+    * Voice commands
+* Working towards Miro-like note-taking
+    * Boxes (done) and arrows (todo. Pan around huge workspace. Zoom in and out (todo)
+* Working towards no-code app building
+    * Define GUI in native app and then deploy to web and mobile (todo)
+
 
 ### Running it
 
