@@ -13,24 +13,11 @@
 # limitations under the License.
 
 
-import ctypes
-import datetime
-import json
 import logging
-import pytz
 from rect_utils import rect_union
 import sdl2
-from typing import Union
-from tzlocal import get_localzone
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
-import weakref
-import os
-from voice_out import VoiceOut
-from voice_wakeup import PhraseListener
-from transcribe_audio import VoiceTranscriber
-from command_listener import VoiceCommandListener
-import utils
 from .gui_control import GUIControl
 import gui
 
