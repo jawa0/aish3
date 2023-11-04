@@ -156,7 +156,7 @@ class LLMChatContainer(GUIContainer):
                 
                 # Cmd+U creates a new user message
                 elif keySymbol == sdl2.SDLK_u: 
-                    user = self.ChatMessageUI(role="User", renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
+                    user = self.ChatMessageUI(role="User", gui=self.gui)
                     self.add_child(user, add_to_focus_ring=False)
                     self.utterances.append(user)
                     self.focusRing.add(user.text_area)
