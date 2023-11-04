@@ -79,7 +79,7 @@ class GUI:
         assert(self.renderer)
         assert(self.font_manager)
 
-        self._content = GUIContainer(gui=self, renderer=self.renderer, font_manager=self.font_manager)
+        self._content = GUIContainer(gui=self)
         assert(self._content.focusRing is not None)
         self.focus_stack = []
         self.push_focus_ring(self._content.focusRing)
@@ -630,7 +630,7 @@ class GUI:
                 gui_json = json.load(f)
                 content_json = gui_json["gui"]["content"]
                 gui_class = GUI.control_class(content_json["class"])
-                self._content = gui_class.from_json(content_json, gui=self, renderer=self.renderer, font_manager=self.font_manager)
+                self._content = gui_class.from_json(content_json, gui=self)
                 self.push_focus_ring(self._content.focusRing)
 
                 focusRing = self.get_focus_ring()

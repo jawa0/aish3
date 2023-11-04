@@ -43,6 +43,7 @@ class Session:
     def __init__(self):
         logging.debug("Client Session.__init__")
 
+        # @question: should we be setting these here?
         openai.api_key = os.getenv("OPENAI_API_KEY")
         openai.organization = os.getenv("OPENAI_ORGANIZATION")
 
