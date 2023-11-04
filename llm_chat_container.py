@@ -109,7 +109,8 @@ class LLMChatContainer(GUIContainer):
             self.add_child(Label(text="LLM Chat [gpt-4]", w=PANEL_WIDTH, h=20, **kwargs),
                            add_to_focus_ring=False)
 
-            self.system = self.ChatMessageUI(role="System", **kwargs)
+            text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
+            self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
             # self.gui.set_focus(self.system)
 
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]

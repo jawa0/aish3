@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import logging
 import os
 import pvporcupine
@@ -17,9 +16,6 @@ class PhraseListener:
 
     def __init__(self, detected_callback: callable = None):
         logging.debug('PhraseListener.__init__()')
-        load_dotenv()
-        self.PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
-
         self._on_detected_callback = detected_callback
 
     
@@ -31,7 +27,7 @@ class PhraseListener:
         PhraseListener._audio_q = None
 
         self._pv_handle = pvporcupine.create(
-            access_key=self.PICOVOICE_ACCESS_KEY,
+            access_key=os.getenv("PICOVOICE_ACCESS_KEY"),
             keyword_paths=["./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn"]
         )
 
