@@ -1,3 +1,6 @@
+"""This file should be imported from your main application script to make sure
+that the app configuration is loaded, before it's needed."""
+
 # Copyright 2023 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +20,6 @@ import sdl2
 import json
 import logging
 import os
-from dotenv import load_dotenv
 import openai
 
 from record_audio import MicrophoneStream, N_SAMPLES_PER_SECOND, N_CHUNK_SAMPLES, N_SAMPLE_BYTES
@@ -33,7 +35,6 @@ from datetime import datetime
 from utils import unique_filename
 
 
-load_dotenv()
 aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
 

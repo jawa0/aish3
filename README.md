@@ -44,6 +44,11 @@ And finally, to use the wakeup phrase detection, you'll need a PicoVoice access 
 
     PICOVOICE_ACCESS_KEY="..."
 
+If you get tired of entering System prompt text into LLM chats, you can set
+a default system prompt using:
+
+    DEFAULT_SYSTEM_PROMPT="..."
+
 ### Keyboard Commands
 
 |Command|Description|

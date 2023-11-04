@@ -6,6 +6,8 @@ import os.path
 from pathlib import Path
 
 
+load_dotenv()   # Load the .env file
+
 # Ensure app user config dir exists
 app_name = "aish3"
 
@@ -53,8 +55,4 @@ def setup_logging():
     logging.getLogger("openai").setLevel(logging.DEBUG)
 
 
-def load():
-    load_dotenv()   # Load the .env file
-    setup_logging()
-
-
+setup_logging()
