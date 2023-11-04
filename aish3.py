@@ -163,9 +163,6 @@ def run(fullscreen, width, height, workspace_filename):
 
 
 if __name__ == "__main__":
-    
-    config.load()
-
     parser = argparse.ArgumentParser(description='AISH window application.')
     parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
     parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
