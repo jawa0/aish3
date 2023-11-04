@@ -18,18 +18,20 @@ import datetime
 import json
 import logging
 import pytz
-from rect_utils import rect_union
 import sdl2
 from typing import Union
 from tzlocal import get_localzone
 import weakref
 import os
+
+from command_listener import VoiceCommandListener
+from .fonts import FontRegistry
+from .gui_container import GUIContainer
+from rect_utils import rect_union
+from transcribe_audio import VoiceTranscriber
+import utils
 from voice_out import VoiceOut
 from voice_wakeup import PhraseListener
-from transcribe_audio import VoiceTranscriber
-from command_listener import VoiceCommandListener
-import utils
-from .gui_container import GUIContainer
 
 
 class GUI:
@@ -60,24 +62,24 @@ class GUI:
 
             if not "renderer" in kwargs:
                 kwargs["renderer"] = gui.renderer
-            if not "font_manager" in kwargs:
-                kwargs["font_manager"] = gui.font_manager
+            if not "font_descriptor" in kwargs:
+                kwargs["font_descriptor"] = gui.font_descriptor
 
             return control_class(**kwargs)
         else:
             return None
 
 
-    def __init__(self, renderer, font_manager, workspace_filename="aish_workspace.json", client_session=None):        
+    def __init__(self, renderer, font_descriptor, workspace_filename="aish_workspace.json", client_session=None):        
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
 
         self.renderer = renderer
-        self.font_manager = font_manager
+        self.font_descriptor = font_descriptor
 
         assert(self.renderer)
-        assert(self.font_manager)
+        assert(self.font_descriptor)
 
         self._content = GUIContainer(gui=self)
         assert(self._content.focusRing is not None)
@@ -323,7 +325,7 @@ class GUI:
         wr = self.content().get_world_rect()
 
         # self.content().sizeToChildren()
-        label = self.create_control("Label", text="New Label", x=x.value-wr.x, y=y.value-wr.y)
+        label = self.create_control("Label", text="New Label", font_descriptor="large-label", w=200, h=30, x=x.value-wr.x, y=y.value-wr.y)
         self.content().add_child(label)
         self.set_focus(label)
 

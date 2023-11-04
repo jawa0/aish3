@@ -14,8 +14,10 @@
 
 
 import sdl2
-from gui import GUI, GUIControl
+from gui.fonts import font_descriptor_to_json_string
 from draw import draw_text
+from gui import GUI, GUIControl
+from gui.fonts import json_to_font_descriptor
 
 
 class Label(GUIControl):
@@ -27,11 +29,17 @@ class Label(GUIControl):
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
         instance._text = json["text"]
+        instance.font_descriptor = json_to_font_descriptor(json['font_descriptor'])
+        # print(f'Label.from_json(): instance.font_descriptor={instance.font_descriptor}')
         return instance
+
 
     def __init__(self, **kwargs):
         super().__init__(can_focus=False, **kwargs)
         self._text = kwargs.get('text', '')
+        
+        self.font_descriptor = kwargs.get('font_descriptor', "default")
+
         self.combined_text_texture = None
 
 
@@ -40,6 +48,7 @@ class Label(GUIControl):
         if json is not None:    # Could be None on save, if control is not saveable. @todo DRY every derived class will have to do this. Boo.
             json["class"] = self.__class__.__name__
             json["text"] = self._text
+            json["font_descriptor"] = font_descriptor_to_json_string(self.font_descriptor)
         return json
 
 
@@ -68,7 +77,7 @@ class Label(GUIControl):
         if self.combined_text_texture is None:
             surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)
 
-            draw_text(self.renderer, self.font_manager, self._text, r.x, r.y, bounding_rect=r, dst_surface=surf)
+            draw_text(self.renderer, self.font_descriptor, self._text, r.x, r.y, bounding_rect=r, dst_surface=surf)
 
             self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
             sdl2.SDL_FreeSurface(surf)
