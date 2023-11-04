@@ -9,7 +9,7 @@ FontDescriptor = Union[str, Tuple[str, int, Tuple[int, int, int]]]
 
 
 # Function to convert a FontDescriptor to a string for saving to JSON.
-def font_descriptor_to_json_string(font_descriptor: FontDescriptor) -> str:
+def json_str_from_font_descriptor(font_descriptor: FontDescriptor) -> str:
     if isinstance(font_descriptor, str):
         font_desc_json_str = f'{{"font_descriptor": "{font_descriptor}"}}'
     else:
@@ -18,12 +18,24 @@ def font_descriptor_to_json_string(font_descriptor: FontDescriptor) -> str:
     return font_desc_json_str
     
 
-# Function to convert a JSON to a FontDescriptor
-def json_to_font_descriptor(json_string: str) -> FontDescriptor:
-    data = json.loads(json_string)
-    
-    if "font_descriptor" in data:
-        return data["font_descriptor"]
+# Function to convert a JSON stringto a FontDescriptor
+def font_descriptor_from_json_str(json_string: str) -> FontDescriptor:
+    try:
+        data = json.loads(json_string)
+        # print('Got valid JSON')
+        # print(data)
+        if "font_descriptor" in data:
+            fdesc_maybe_dict = data["font_descriptor"]
+            # print(fdesc_maybe_dict)
+            if isinstance(fdesc_maybe_dict, str):
+                return fdesc_maybe_dict
+            else:
+                filename = fdesc_maybe_dict["filename"]
+                size = fdesc_maybe_dict["size"]
+                color = fdesc_maybe_dict["color"]
+                return filename, size, color
+    except:
+        return "default"
 
 
 class FontRegistry:
@@ -43,7 +55,7 @@ class FontRegistry:
         key: FontDescriptor = string_key if string_key else (filename, size, color)
         
         print(f'FontRegistry.create_fontmanager(): key={key}')
-        print(f'fontdescriptor_to_json_string(key)={font_descriptor_to_json_string(key)}')
+        print(f'fontdescriptor_to_json_string(key)={json_str_from_font_descriptor(key)}')
 
         if key not in self._instance._registry:
             font_path = os.path.join(self._default_path, filename)

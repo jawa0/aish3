@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-09-29T17:30:53.204022+00:00",
-  "saved_at_local": "2023-09-29T13:30:53.204022-04:00",
+  "saved_at_utc": "2023-11-04T15:45:16.682517+00:00",
+  "saved_at_local": "2023-11-04T11:45:16.682517-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -8,8 +8,8 @@
       "bounding_rect": [
         0,
         0,
-        1182,
-        507
+        1401,
+        796
       ],
       "layout": null,
       "children": [
@@ -31,7 +31,8 @@
                 350,
                 20
               ],
-              "text": "GPT-4 Chat"
+              "text": "GPT-4 Chat",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
             },
             {
               "class": "ChatMessageUI",
@@ -51,7 +52,8 @@
                     350,
                     20
                   ],
-                  "text": "System"
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
                 },
                 {
                   "class": "TextArea",
@@ -83,7 +85,8 @@
                     350,
                     20
                   ],
-                  "text": "User"
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
                 },
                 {
                   "class": "TextArea",
@@ -117,7 +120,8 @@
                 350,
                 20
               ],
-              "text": "GPT-4 Chat"
+              "text": "GPT-4 Chat",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
             },
             {
               "class": "ChatMessageUI",
@@ -137,7 +141,8 @@
                     350,
                     20
                   ],
-                  "text": "System"
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
                 },
                 {
                   "class": "TextArea",
@@ -169,7 +174,8 @@
                     350,
                     20
                   ],
-                  "text": "User"
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
                 },
                 {
                   "class": "TextArea",
@@ -193,7 +199,8 @@
             120,
             20
           ],
-          "text": "This is a Label"
+          "text": "This is a Label",
+          "font_descriptor": "{\"font_descriptor\": \"default\"}"
         },
         {
           "class": "TextArea",
@@ -204,6 +211,28 @@
             100
           ],
           "text": "This is a TextArea."
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            405,
+            78,
+            200,
+            30
+          ],
+          "text": "New Label",
+          "font_descriptor": "{\"font_descriptor\": \"default\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            675,
+            63,
+            200,
+            30
+          ],
+          "text": "New Label",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         }
       ]
     }

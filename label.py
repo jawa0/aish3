@@ -13,11 +13,13 @@
 # limitations under the License.
 
 
+from json import JSONDecodeError, loads
+
 import sdl2
-from gui.fonts import font_descriptor_to_json_string
+from gui.fonts import json_str_from_font_descriptor
 from draw import draw_text
 from gui import GUI, GUIControl
-from gui.fonts import json_to_font_descriptor
+from gui.fonts import FontDescriptor, font_descriptor_from_json_str
 
 
 class Label(GUIControl):
@@ -26,11 +28,24 @@ class Label(GUIControl):
         assert(json["class"] == cls.__name__)
         gui = kwargs.get('gui')
 
+        # print('\n\n******\n\n\n\n')
+
+        # The font descriptor may be just a string, or it may be a dict.
+        
+        font_desc_maybe_json_str = json.get('font_descriptor', 'default')
+        # print(f'font_desc_json_str: {font_desc_maybe_json_str}')
+        
+        font_desc = font_descriptor_from_json_str(font_desc_maybe_json_str)
+        # print(f'font_desc: {font_desc}')
+
+        # print('\n\n******\n\n\n\n')
+
+        kwargs["font_descriptor"] = font_desc
+
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
         instance._text = json["text"]
-        instance.font_descriptor = json_to_font_descriptor(json['font_descriptor'])
-        # print(f'Label.from_json(): instance.font_descriptor={instance.font_descriptor}')
+
         return instance
 
 
@@ -48,7 +63,7 @@ class Label(GUIControl):
         if json is not None:    # Could be None on save, if control is not saveable. @todo DRY every derived class will have to do this. Boo.
             json["class"] = self.__class__.__name__
             json["text"] = self._text
-            json["font_descriptor"] = font_descriptor_to_json_string(self.font_descriptor)
+            json["font_descriptor"] = json_str_from_font_descriptor(self.font_descriptor)
         return json
 
 
