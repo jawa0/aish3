@@ -294,27 +294,21 @@ class GUI:
         return handled
     
 
-    def cmd_new_text_area(self):
+    def cmd_new_text_area(self, x: int, y: int) -> None:
         logging.info('Command: create new text area')
         wr = self.content().get_world_rect()
-        x = ctypes.c_int()
-        y = ctypes.c_int()                
-        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
 
-        self.content().sizeToChildren()
+        # self.content().sizeToChildren()
         textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
         self.content().add_child(textArea)
         self.set_focus(textArea)
 
 
-    def cmd_new_llm_chat(self):
+    def cmd_new_llm_chat(self, x: int, y: int) -> None:
         logging.info('Command: create new LLM chat')
         wr = self.content().get_world_rect()
-        x = ctypes.c_int()
-        y = ctypes.c_int()                
-        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
 
-        self.content().sizeToChildren()
+        # self.content().sizeToChildren()
 
         argx = x.value-wr.x
         argy = y.value-wr.y
@@ -324,6 +318,16 @@ class GUI:
         self.content().add_child(chat)
 
 
+    def cmd_new_label(self, x: int, y: int) -> None:
+        logging.info('Command: create new Label')
+        wr = self.content().get_world_rect()
+
+        # self.content().sizeToChildren()
+        label = self.create_control("Label", text="New Label", x=x.value-wr.x, y=y.value-wr.y)
+        self.content().add_child(label)
+        self.set_focus(label)
+
+
     def handle_keydown(self, event):
         wr = self.content().get_world_rect()
 
@@ -331,6 +335,15 @@ class GUI:
         cmdPressed = event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
 
         if cmdPressed:
+            x = ctypes.c_int()
+            y = ctypes.c_int()                
+            sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+
+            # Cmd+B creates a new Label
+            if keySym == sdl2.SDLK_b:
+                self.cmd_new_label(x, y)
+                return True
+            
             # Cmd+S saves GUI
             if keySym == sdl2.SDLK_s:
                 self.save()
@@ -342,7 +355,7 @@ class GUI:
             
             # Cmd+N add new LLM chat
             if keySym == sdl2.SDLK_n:
-                self.cmd_new_llm_chat()
+                self.cmd_new_llm_chat(x, y)
                 return True  # event was handled
 
             # Cmd+R say something
@@ -355,7 +368,7 @@ class GUI:
             
             # Cmd+T creaes a new TextArea
             if keySym == sdl2.SDLK_t:
-                self.cmd_new_text_area()
+                self.cmd_new_text_area(x, y)
                 return True
 
             if keySym == sdl2.SDLK_RETURN:

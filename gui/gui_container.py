@@ -20,6 +20,7 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 from .gui_control import GUIControl
 import gui
+import math
 
 
 class GUIContainer(GUIControl):
@@ -181,6 +182,30 @@ class GUIContainer(GUIControl):
             w = max([child.bounding_rect.x + child.bounding_rect.w for child in self])
             h = max([child.bounding_rect.y + child.bounding_rect.h for child in self])
             self.set_size(w + INSET_X, h + INSET_Y, updateLayout=False)
+
+
+        # # Child coordinates are always relative to us. Make sure to handle the case where some of
+        # # them are negative. Also, maybe we deleted our leftmost or topmost. So in these cases,
+        # # our position will also change.
+
+        # x_min = math.inf
+        # x_max = -math.inf
+        # y_min = math.inf
+        # y_max = -math.inf
+
+        # for c in self.children:
+        #     x_min = min(x_min, c.bounding_rect.x)
+        #     x_max = max(x_max, c.bounding_rect.x + c.bounding_rect.w)
+        #     y_min = min(y_min, c.bounding_rect.y)
+        #     y_max = max(y_max, c.bounding_rect.y + c.bounding_rect.h)
+
+        # new_width = x_max - x_min + INSET_X
+        # new_height = y_max - y_min + INSET_Y
+
+        # # self.set_position(x_min, y_min, updateLayout=False)
+        # self.set_bounds(x_min, y_min, new_width, new_height)
+
+        # self.set_size(new_width, new_height, updateLayout=False)        
 
 
     def handle_event(self, event):

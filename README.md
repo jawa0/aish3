@@ -53,6 +53,7 @@ And finally, to use the wakeup phrase detection, you'll need a PicoVoice access 
 |Cmd+G|Send messages to GPT-4 for chat completion|
 |Cmd+U|Add another "user" message text field|
 |Cmd+Delete|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
+|Cmd+B|Add a new Label at the current cursor position|
 |Cmd+R|Use Voice out to say some sample text|
 |Cmd+Enter|Toggle active listening mode (speech to text transcription)|
 |Cmd+T|Create a new TextArea (use it like a post-it note)|

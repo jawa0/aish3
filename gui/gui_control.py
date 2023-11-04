@@ -18,14 +18,34 @@ import sdl2
 
 class GUIControl:
     def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, saveable=True, **kwargs):
+        """
+        Initializer method (constructor0 for the class.
+        
+        Keyword arguments are used to fetch 'gui', 'renderer', 'font_manager', 'draw_bounds', 
+        'draggable', 'visible', 'screen_relative', and 'saveable' values.
+
+        When 'renderer' or 'font_manager' keyword arguments are missing,
+        and 'gui' is not None, 'gui.renderer' and/or 'gui.font_manager' are used
+        as the default value for missing ones.
+
+        Keyword Args:
+            gui (Object): GUI object, default is None
+            renderer (Object): renderer object, default is gui.renderer if gui exists else None
+            font_manager (Object): font_manager object, default is gui.font_manager if gui exists else None
+            draw_bounds (bool): whether to draw bounds, default is False
+            draggable (bool): whether it's draggable, default is False
+            visible (bool): whether it's visible, default is True
+            screen_relative (bool): whether it's screen relative, default is False
+            saveable (bool): whether it's saveable, default is True
+        """
         self.gui = kwargs.get('gui')
-        self.renderer = kwargs.get('renderer')
-        self.font_manager = kwargs.get('font_manager')
+        self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
+        self.font_manager = kwargs.get('font_manager', self.gui.font_manager if self.gui else None)
         self.draw_bounds = kwargs.get('draw_bounds', False)
         self._draggable = kwargs.get('draggable', False)
         self._visible = kwargs.get('visible', True)
         self._screen_relative = kwargs.get('screen_relative', False)
-        self.saveable = saveable
+        self._saveable = saveable
 
         assert(self.gui)
         assert(self.renderer)
@@ -72,7 +92,7 @@ class GUIControl:
 
 
     def __json__(self):
-        if not self.saveable:
+        if not self._saveable:
             return None
             
         json = {}
