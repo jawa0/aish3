@@ -165,7 +165,6 @@ class GUI:
 
     def say(self, text):
         logging.debug(f'GUI.say({text})')
-        return
 
         if self._saying_text is None:
             self._saying_text = text
@@ -301,7 +300,7 @@ class GUI:
         wr = self.content().get_world_rect()
 
         # self.content().sizeToChildren()
-        textArea = self.create_control("TextArea", w=160, h=80, x=x.value-wr.x, y=y.value-wr.y)
+        textArea = self.create_control("TextArea", w=240, h=100, x=x.value-wr.x, y=y.value-wr.y)
         self.content().add_child(textArea)
         self.set_focus(textArea)
 
@@ -330,17 +329,58 @@ class GUI:
         self.set_focus(label)
 
 
+    def cmd_set_viewport_bookmark(self, index: int) -> None:
+        logging.info(f'Command: set viewport bookmark {index}')
+        logging.debug(f'Bookmarks: {self._viewport_bookmarks}')
+
+        s_index: str = str(index)
+        self._viewport_bookmarks[s_index] = self._viewport_pos
+        logging.debug(f'Bookmarks: {self._viewport_bookmarks}')
+
+
+    def cmd_goto_viewport_bookmark(self, index: int) -> None:
+        logging.info(f'Command: goto viewport bookmark {index}')
+        logging.debug(f'Bookmarks: {self._viewport_bookmarks}')
+
+        s_index: str = str(index)
+        if s_index in self._viewport_bookmarks:
+            self._viewport_pos = self._viewport_bookmarks[s_index]
+        else:
+            logging.warning(f'Viewport bookmark {index} does not exist.')
+
+
     def handle_keydown(self, event):
         wr = self.content().get_world_rect()
 
         keySym = event.key.keysym.sym
-        cmdPressed = event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
+        cmdPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
+        shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
+        altPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LALT | sdl2.KMOD_RALT)
+        ctrlPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL)
+
+        # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
         if cmdPressed:
             x = ctypes.c_int()
             y = ctypes.c_int()                
             sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
 
+            # Shift+Cmd+digit sets viewport bookmark
+            if shiftPressed and not altPressed and not ctrlPressed and \
+                keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
+
+                i_bookmark: int = int(keySym - sdl2.SDLK_0)
+                self.cmd_set_viewport_bookmark(i_bookmark)
+                return True
+            
+            # Cmd+digit goes to viewport bookmark
+            if not shiftPressed and not altPressed and not ctrlPressed and \
+                keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
+
+                i_bookmark: int = int(keySym - sdl2.SDLK_0)
+                self.cmd_goto_viewport_bookmark(i_bookmark)
+                return True
+            
             # Cmd+B creates a new Label
             if keySym == sdl2.SDLK_b:
                 self.cmd_new_label(x, y)
@@ -424,11 +464,11 @@ class GUI:
             focusRing = self.get_focus_ring()
             assert(focusRing is not None)
 
-            if event.key.keysym.mod & sdl2.KMOD_LCTRL:
+            if ctrlPressed:
                 # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
                 pass
             else:
-                if event.key.keysym.mod & sdl2.KMOD_SHIFT:  # if shift was also held
+                if shiftPressed:  # if shift was also held
                     if focusRing.focus_previous():
                         return True  # event was handled
                 else:
@@ -612,10 +652,13 @@ class GUI:
         logging.info(f"Saving workspace file to \"{os.path.abspath(self.workspace_filename)}\"")
 
         with open(self.workspace_filename, "w") as f:
+            print(self._viewport_bookmarks)
+
             gui_json = {
                 "saved_at_utc": utc_now.isoformat(),
                 "saved_at_local": local_now.isoformat(),
-                "gui": self.__json__()
+                "gui": self.__json__(),
+                "viewport_bookmarks": self._viewport_bookmarks
             }
             json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
         logging.info("GUI saved.")
@@ -638,6 +681,10 @@ class GUI:
                 focusRing = self.get_focus_ring()
                 assert(focusRing is not None)
                 focusRing.focus_first()
+
+                print(gui_json["viewport_bookmarks"])
+                # self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
+                self._viewport_bookmarks = gui_json["viewport_bookmarks"]
 
         except Exception as e:
             logging.error("Error loading GUI. Exception: ", str(e))
