@@ -40,16 +40,18 @@ class GUIControl:
         """
         self.gui = kwargs.get('gui')
         self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
-        self.font_manager = kwargs.get('font_manager', self.gui.font_manager if self.gui else None)
+        self.font_descriptor = kwargs.get('font_descriptor', self.gui.font_descriptor if self.gui else "default")
         self.draw_bounds = kwargs.get('draw_bounds', False)
         self._draggable = kwargs.get('draggable', False)
         self._visible = kwargs.get('visible', True)
         self._screen_relative = kwargs.get('screen_relative', False)
         self._saveable = saveable
 
+        # print(f'GUIControl.__init__(): self.font_descriptor={self.font_descriptor}')
+
         assert(self.gui)
         assert(self.renderer)
-        assert(self.font_manager)
+        assert(self.font_descriptor)
 
         self.can_focus = can_focus
         self.parent = None

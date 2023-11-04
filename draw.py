@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from gui.fonts import FontRegistry
 import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
@@ -20,9 +21,10 @@ import sdl2.sdlttf as ttf
 
 _char_width_cache = {}
 
-def get_char_width(font_manager, char):
+def get_char_width(font_descriptor, char):
     global _char_width_cache
 
+    font_manager = FontRegistry().get_fontmanager(font_descriptor)
     font_name = font_manager.default_font
     font_size = font_manager.size
     key = (font_name, font_size, char)
@@ -38,10 +40,14 @@ def get_char_width(font_manager, char):
     return char_width
 
 
-def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
+def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
     if len(text.strip()) == 0:
         return
     
+    # print(f'draw_text: font_descriptor={font_descriptor}')
+    font_manager = FontRegistry().get_fontmanager(font_descriptor)
+    # print(f'draw_text: font_manager={font_manager}')
+
     # Keep track of initial x, and y since we will be updating x, y for each character.
     # We need to know where each character is relative to the starting point in order
     # to blit our various surfaces correctly.
@@ -129,7 +135,7 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         sdl2.SDL_FreeSurface(text_surface)
 
 
-def draw_cursor(renderer, font_manager, 
+def draw_cursor(renderer, font_descriptor, 
                 text_buffer, 
                 row_spacing, 
                 x, y, 
@@ -145,9 +151,9 @@ def draw_cursor(renderer, font_manager,
     x_offset = 0
     for char in line_unexpanded[:col_unexpanded]:
         if char == '\t':
-            width = text_buffer.get_tab_spaces() * get_char_width(font_manager, ' ')
+            width = text_buffer.get_tab_spaces() * get_char_width(font_descriptor, ' ')
         else:
-            width = get_char_width(font_manager, char)
+            width = get_char_width(font_descriptor, char)
 
         x_offset += width
 

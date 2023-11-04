@@ -365,13 +365,13 @@ class TextArea(GUIControl):
                         elif i == sel_rc1[0]:
                             c_end = sel_rc1[1]
 
-                        draw_text(self.renderer, self.font_manager, 
+                        draw_text(self.renderer, self.font_descriptor, 
                                 line, 
                                 x, y, bounding_rect=wr,
                                 dst_surface=surf, 
                                 selection_start=c_start, selection_end=c_end)
                     else:
-                        draw_text(self.renderer, self.font_manager, line, x, y, bounding_rect=wr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_descriptor, line, x, y, bounding_rect=wr, dst_surface=surf)
 
                 y += self.row_spacing
 
@@ -402,7 +402,7 @@ class TextArea(GUIControl):
             row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
             line = lines[row]
             if line is not None and col is not None:
-                draw_cursor(self.renderer, self.font_manager, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
+                draw_cursor(self.renderer, self.font_descriptor, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
 
 
     def scroll_by(self, dx=0, dy=0):
@@ -414,7 +414,7 @@ class TextArea(GUIControl):
     def scroll_cursor_into_view(self):
         # Where is the cursor?
         wr = self.get_world_rect()
-        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_manager, 
+        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_descriptor, 
                                          self.text_buffer, 
                                          self.row_spacing, 
                                          wr.x, wr.y, wr, 

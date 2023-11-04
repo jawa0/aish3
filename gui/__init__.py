@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .fonts import FontRegistry
 from .gui_control import GUIControl
 from .gui_container import GUIContainer
 from .gui import GUI

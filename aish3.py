@@ -38,7 +38,7 @@ import logging
 import time
 
 import config
-from gui import GUI
+from gui import GUI, FontRegistry
 from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
 from draw import draw_text
@@ -68,17 +68,14 @@ def run(fullscreen, width, height, workspace_filename):
                                         flags=sdl2.SDL_RENDERER_ACCELERATED | 
                                         sdl2.SDL_RENDERER_PRESENTVSYNC)
 
-        WHITE = sdl2.ext.Color(255, 255, 255)
-        font_path = "./res/fonts/FiraCode-Regular.ttf"
-        # font_path = "./res/fonts/Menlo-Regular.ttf"
-        font_size = 12
-        font_manager = sdl2.ext.FontManager(font_path, size=font_size, color=WHITE)
-
+        font_filename = "FiraCode-Regular.ttf"
+        font_descriptor = FontRegistry().create_fontmanager(font_filename, 12, string_key="default")
+        FontRegistry().create_fontmanager(font_filename, 24, string_key="large-label")
 
         session: Session = Session()
         session.start()
 
-        gui = GUI(renderer, font_manager, workspace_filename=workspace_filename, client_session=session)
+        gui = GUI(renderer, font_descriptor, workspace_filename=workspace_filename, client_session=session)
         logging.info(f'Voice input available? {gui.voice_input_available()}')
 
         # @hack
@@ -146,7 +143,7 @@ def run(fullscreen, width, height, workspace_filename):
                 fps = 1.0 / elapsed
                 fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
                 fps_str = f"FPS: {fps_smoothed:.2f}"
-                draw_text(renderer, font_manager, fps_str, width - 100, 10)
+                draw_text(renderer, font_descriptor, fps_str, width - 100, 10)
                 # print(fps_str)
 
                 renderer.present()
