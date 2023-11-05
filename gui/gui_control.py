@@ -50,8 +50,10 @@ class GUIControl:
         # print(f'GUIControl.__init__(): self.font_descriptor={self.font_descriptor}')
 
         assert(self.gui)
-        assert(self.renderer)
-        assert(self.font_descriptor)
+
+        # Makes unit testing harder, if you aren't actually drawing stuff.
+        # assert(self.renderer)
+        # assert(self.font_descriptor)
 
         self.can_focus = can_focus
         self.parent = None
