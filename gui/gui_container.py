@@ -124,8 +124,8 @@ class GUIContainer(GUIControl):
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
 
             # Draw the bounding rectangle
-            wr = self.get_world_rect()
-            sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
+            vr = self.get_view_rect()
+            sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
 
             # Reset to the old color
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])

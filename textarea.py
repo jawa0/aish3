@@ -323,12 +323,12 @@ class TextArea(GUIControl):
         
         # @todo should each specialized control need to implement this?
         if self._screen_relative:
-            wr = self.bounding_rect
+            vr = self.bounding_rect
         else:
-            wr = self.get_world_rect()
+            vr = self.get_view_rect()
 
-        x = wr.x - self.x_scroll
-        y = wr.y - self.y_scroll
+        x = vr.x - self.x_scroll
+        y = vr.y - self.y_scroll
 
         # Determine start and end of selection
         selected = self.text_buffer.get_selection()
@@ -367,11 +367,11 @@ class TextArea(GUIControl):
 
                         draw_text(self.renderer, self.font_descriptor, 
                                 line, 
-                                x, y, bounding_rect=wr,
+                                x, y, bounding_rect=vr,
                                 dst_surface=surf, 
                                 selection_start=c_start, selection_end=c_end)
                     else:
-                        draw_text(self.renderer, self.font_descriptor, line, x, y, bounding_rect=wr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_descriptor, line, x, y, bounding_rect=vr, dst_surface=surf)
 
                 y += self.row_spacing
 
@@ -379,7 +379,7 @@ class TextArea(GUIControl):
             sdl2.SDL_FreeSurface(surf)
 
         assert(self.combined_text_texture is not None)
-        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, wr)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, vr)
 
         # Draw the bounding rectangle after all text has been drawn
         # Save the current color
@@ -392,7 +392,7 @@ class TextArea(GUIControl):
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
 
         # Draw the bounding rectangle
-        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
 
         # Reset to the old color
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
@@ -402,7 +402,7 @@ class TextArea(GUIControl):
             row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
             line = lines[row]
             if line is not None and col is not None:
-                draw_cursor(self.renderer, self.font_descriptor, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
+                draw_cursor(self.renderer, self.font_descriptor, self.text_buffer, self.row_spacing, vr.x, vr.y, vr, self.x_scroll, self.y_scroll)
 
 
     def scroll_by(self, dx=0, dy=0):

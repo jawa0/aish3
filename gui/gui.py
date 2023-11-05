@@ -90,12 +90,12 @@ class GUI:
         self._focused_control = None
 
         self._strokes = {}
-        # self._content_pan = (0, 0)
-        self._viewport_pos = (0, 0)
         self._drag_control = None
 
+        self._viewport_pos = (0, 0)
+        self._viewport_bookmarks = {}
+
         self.workspace_filename = workspace_filename
-        
         self.load()
 
         self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
@@ -142,6 +142,11 @@ class GUI:
 
         if self.listening_indicator is not None:
             self.listening_indicator.set_text("")
+
+
+    def set_view_pos(self, x: int, y: int) -> None:
+        logging.debug(f'GUI.set_view_pos({x}, {y})')
+        self._viewport_pos = (x, y)
 
 
     def content(self):
@@ -287,8 +292,7 @@ class GUI:
                                                self._drag_control.bounding_rect.h)
                         self._drag_control.bounding_rect = new_r
                     else:
-                        # self._content_pan = (self._content_pan[0] + dx, self._content_pan[1] + dy)
-                        self._viewport_pos = (self._viewport_pos[0] - dx, self._viewport_pos[1] - dy)
+                        self.set_view_pos(self._viewport_pos[0] - dx, self._viewport_pos[1] - dy)
 
                     return True
                 
@@ -344,13 +348,14 @@ class GUI:
 
         s_index: str = str(index)
         if s_index in self._viewport_bookmarks:
-            self._viewport_pos = self._viewport_bookmarks[s_index]
+            vx, vy = self._viewport_bookmarks[s_index]
+            self.set_view_pos(vx, vy)
         else:
             logging.warning(f'Viewport bookmark {index} does not exist.')
 
 
     def handle_keydown(self, event):
-        wr = self.content().get_world_rect()
+        vr = self.content().get_view_rect()
 
         keySym = event.key.keysym.sym
         cmdPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
@@ -365,7 +370,7 @@ class GUI:
             y = ctypes.c_int()                
             sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
 
-            # Shift+Cmd+digit sets viewport bookmark
+            # Shift+Cmd+[1-9] sets viewport bookmark
             if shiftPressed and not altPressed and not ctrlPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
@@ -373,11 +378,23 @@ class GUI:
                 self.cmd_set_viewport_bookmark(i_bookmark)
                 return True
             
-            # Cmd+digit goes to viewport bookmark
+            # Cmd+[0-9] goes to viewport bookmark
             if not shiftPressed and not altPressed and not ctrlPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
                 i_bookmark: int = int(keySym - sdl2.SDLK_0)
+
+                # Bookmark 0 is not settable, but will always go to the coordinates of
+                # the currently focused control. Helpful if we're lost in space.
+
+                if i_bookmark == 0:
+                    if self.get_focus() is not None:
+                        wr = self.get_focus().get_world_rect()
+                        self.set_view_pos(wr.x, wr.y)
+                    else:
+                        self.set_view_pos(0, 0)
+                    return True
+                
                 self.cmd_goto_viewport_bookmark(i_bookmark)
                 return True
             
@@ -477,6 +494,11 @@ class GUI:
 
 
     def update(self, dt):
+        # print(f'****\nViewport pos: {self._viewport_pos}')
+        # print(f'  gui.content().bounding_rect: {self.content().bounding_rect}')
+        # print(f'  gui.content().get_world_rect(): {self.content().get_world_rect()}')
+        # print(f'  gui.content().get_view_rect(): {self.content().get_view_rect()}')
+
         #
         # Should we enable or disable wake word listening?
         #
@@ -653,12 +675,14 @@ class GUI:
 
         with open(self.workspace_filename, "w") as f:
             print(self._viewport_bookmarks)
+            print(f'Viewport pos: {self._viewport_pos}')
 
             gui_json = {
                 "saved_at_utc": utc_now.isoformat(),
                 "saved_at_local": local_now.isoformat(),
                 "gui": self.__json__(),
-                "viewport_bookmarks": self._viewport_bookmarks
+                "viewport_bookmarks": self._viewport_bookmarks,
+                "viewport_pos": self._viewport_pos
             }
             json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
         logging.info("GUI saved.")
@@ -683,8 +707,11 @@ class GUI:
                 focusRing.focus_first()
 
                 print(gui_json["viewport_bookmarks"])
-                # self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
-                self._viewport_bookmarks = gui_json["viewport_bookmarks"]
+                self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
+                
+                vx, vy = gui_json.get("viewport_pos", (0, 0))
+                self.set_view_pos(vx, vy)
+                
 
         except Exception as e:
             logging.error("Error loading GUI. Exception: ", str(e))
@@ -692,8 +719,10 @@ class GUI:
             self._focused_control = bak_focused_control
             return False
         
-        self._content.sizeToChildren()
-        self._viewport_pos = self.content().bounding_rect.x, self.content().bounding_rect.y
+        # self._content.sizeToChildren()
+        
+        # self._viewport_pos = self.content().bounding_rect.x, self.content().bounding_rect.y
+
 
         logging.info("GUI loaded.")
         return True
