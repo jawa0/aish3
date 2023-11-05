@@ -75,9 +75,13 @@ def run(fullscreen, width, height, workspace_filename):
         session: Session = Session()
         session.start()
 
-        gui = GUI(renderer, font_descriptor, workspace_filename=workspace_filename, client_session=session)
-        logging.info(f'Voice input available? {gui.voice_input_available()}')
-
+        gui = GUI(renderer, 
+                  font_descriptor, 
+                  workspace_filename=workspace_filename, 
+                  client_session=session,
+                  enable_voice_in=True,
+                  enable_voice_out=True)
+        
         # @hack
         gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
         gui.content().add_child(gui.listening_indicator)

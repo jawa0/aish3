@@ -70,7 +70,7 @@ class GUI:
             return None
 
 
-    def __init__(self, renderer, font_descriptor, workspace_filename="aish_workspace.json", client_session=None):        
+    def __init__(self, renderer, font_descriptor, workspace_filename=None, client_session=None, enable_voice_in=False, enable_voice_out=False):        
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
@@ -78,8 +78,9 @@ class GUI:
         self.renderer = renderer
         self.font_descriptor = font_descriptor
 
-        assert(self.renderer)
-        assert(self.font_descriptor)
+        # Makes unit testing harder.
+        # assert(self.renderer)
+        # assert(self.font_descriptor)
 
         self._content = GUIContainer(gui=self)
         assert(self._content.focusRing is not None)
@@ -96,16 +97,22 @@ class GUI:
         self._viewport_bookmarks = {}
 
         self.workspace_filename = workspace_filename
-        self.load()
+        if self.workspace_filename is not None:
+            self.load()
 
-        self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
+        if enable_voice_out:
+            self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
+        else:
+            self._voice_out = None
         self._saying_text = None
         self._next_texts_to_say = []
 
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
         self._voice_wakeup = None
-        self._voice_in = VoiceTranscriber(session=self.session)
+
+        if enable_voice_in:
+            self._voice_in = VoiceTranscriber(session=self.session)
         self._should_stop_voice_in = False
 
         self.command_listener = None
