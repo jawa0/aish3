@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import unittest
 from text_edit_buffer import TextEditBuffer
-from gui import GUI, GUIControl
+from gui import GUI, GUIContainer, GUIControl
 from session import Session
 
 
@@ -143,10 +143,79 @@ class TestTextEditBuffer(unittest.TestCase):
         self.assertEqual(obj.get_point(), 5)
 
 
-    def test_world_rect_1(self):
+    def test_content_init_world_rect(self):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        r_content = g.content().bounding_rect
+        self.assertEqual(r_content.x, 0)
+        self.assertEqual(r_content.y, 0)
+
+    
+    def test_unparented_control_coordinates(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        c = GUIControl(gui=g)
+        c.set_position(5, 7)
+
+        r = c.bounding_rect
+        self.assertEqual(r.x, 5)
+        self.assertEqual(r.y, 7)
+
+        wr = c.get_world_rect()
+        self.assertEqual(wr.x, 5)
+        self.assertEqual(wr.y, 7)
+
+        vr = c.get_view_rect()
+        self.assertEqual(vr.x, 5)
+        self.assertEqual(vr.y, 7)
+
+
+    def test_unparented_control_coordinates_negative(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        c = GUIControl(gui=g)
+        c.set_position(-5, -7)
+
+        r = c.bounding_rect
+        self.assertEqual(r.x, -5)
+        self.assertEqual(r.y, -7)
+
+        wr = c.get_world_rect()
+        self.assertEqual(wr.x, -5)
+        self.assertEqual(wr.y, -7)
+
+        vr = c.get_view_rect()
+        self.assertEqual(vr.x, -5)
+        self.assertEqual(vr.y, -7)
         
+
+    def test_parented_control_coordinates(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        c0 = GUIContainer(gui=g)
+        g.content().add_child(c0)
+        c0.set_position(5, 7)
+
+        c = GUIControl(gui=g)
+        c0.add_child(c)
+        c.set_position(5, 7)
+
+        r = c.bounding_rect
+        self.assertEqual(r.x, 5)
+        self.assertEqual(r.y, 7)
+
+        wr = c.get_world_rect()
+        self.assertEqual(wr.x, 10)
+        self.assertEqual(wr.y, 14)
+
+        vr = c.get_view_rect()
+        self.assertEqual(vr.x, 10)
+        self.assertEqual(vr.y, 14)
+
 
 
 if __name__ == '__main__':
