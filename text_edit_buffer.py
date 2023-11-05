@@ -20,7 +20,14 @@ class TextEditBuffer(object):
     def __init__(self, text="", tab_spaces=4, **kwargs):
         self.TEXT_BUFFER = text
         self.TAB_SPACES = tab_spaces
-        self.POINT = len(text)
+        
+        # @note: This code is contradicts the comment abocve about not moving point to the end.
+        # I'm not sure why I did this. Trying to get automated test working again, and a test
+        # of POINT after creation is failing due to this. I'm going to change it back to setting
+        # POINT to 0 and see how the app behaves... 2023-11-05
+        
+        # self.POINT = len(text)
+        self.POINT = 0
 
         # @note: POINT has no knowledge of expanded tabs. It's an index into the
         # un-expanded TEXT_BUFFER. It's between 0 and len(TEXT_BUFFER). @note that
@@ -59,6 +66,21 @@ class TextEditBuffer(object):
 
         
     def expand_tabs(self, text):
+        """
+        Replace the tab characters in the given text with the appropriate number of space characters.
+
+        Tab width is important for maintaining consistent visual representation in different text editors. 
+
+        Parameters:
+        text (str): The text to process.
+
+        Returns:
+        str: The passed text, but with tab characters replaced by the appropriate number of spaces.
+
+        See Also:
+        get_tab_spaces: Method to get the current number of spaces per tab.
+        set_tab_spaces: Method to set the number of spaces to be used per tab.
+        """
         return text.replace('\t', ' ' * self.TAB_SPACES)
     
 
@@ -104,7 +126,7 @@ class TextEditBuffer(object):
         row = None
         col = None
 
-        lines = self.get_lines(expand_tabs=False)  # Do not expand tabs!
+        lines = self.get_lines(expand_tabs=False)
         cumulative_length = 0
         for row, line in enumerate(lines):
             line_length = len(line) + 1   # +1 for the '\n' character
@@ -113,8 +135,6 @@ class TextEditBuffer(object):
                 return row, col
             cumulative_length += line_length
         return len(lines) - 1, line_length
-    
-        print('*********')
     
 
     def get_point(self):
