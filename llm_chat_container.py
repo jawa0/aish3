@@ -26,7 +26,7 @@ from gui_focus import FocusRing
 from session import ChatCompletionHandler
 
 
-PANEL_WIDTH = 350
+PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
 
 
@@ -210,8 +210,10 @@ class LLMChatContainer(GUIContainer):
         handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
                                         chunk_handler=self.on_llm_response_chunk,
                                         done_handler=self.on_llm_response_done)
-        
-        self.gui.session.llm_send_streaming_chat_request("gpt-4", messages, handlers=[handler])
+
+        model = 'gpt-4-1106-preview'
+        # model = 'gpt-4'
+        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
@@ -229,16 +231,17 @@ class LLMChatContainer(GUIContainer):
         self.accumulated_response_text = ""
 
 
-    def on_llm_response_chunk(self, chunk_text: str) -> None:
+    def on_llm_response_chunk(self, chunk_text: str | None) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
         assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
 
-        answer.text_area.text_buffer.move_point_to_end()
-        answer.text_area.text_buffer.insert(chunk_text)
-        answer.text_area.set_needs_redraw()
+        if chunk_text is not None:
+            answer.text_area.text_buffer.move_point_to_end()
+            answer.text_area.text_buffer.insert(chunk_text)
+            answer.text_area.set_needs_redraw()
 
-        self.accumulated_response_text += chunk_text
+            self.accumulated_response_text += chunk_text
 
 
     def on_llm_response_done(self) -> None:
