@@ -141,6 +141,8 @@ class GUIContainer(GUIControl):
 
 
     def add_child(self, child, add_to_focus_ring=True):
+        # print(f'GUIContainer.add_child(): child={child}')
+
         child.parent = self
         self.children.append(child)
 
@@ -164,6 +166,7 @@ class GUIContainer(GUIControl):
 
 
     def updateLayout(self):
+        # print(f'GUIContainer.updateLayout(): self={self}')
         if self.layout is not None:
             self.layout.update()
 
@@ -173,39 +176,60 @@ class GUIContainer(GUIControl):
             self.parent.updateLayout()
 
 
-    def sizeToChildren(self):
-        # @todo DRY
-        INSET_X = 1
-        INSET_Y = 1
+    def sizeToChildren(self, inset_x=1, inset_y=1):
+        # print(f'GUIContainer.sizeToChildren(): self={self}')
+        if not self.children:
+            return
+        else:
+            container_x_min_wrt_parent = self.bounding_rect.x
+            container_y_min_wrt_parent = self.bounding_rect.y
 
-        if self.children:
-            w = max([child.bounding_rect.x + child.bounding_rect.w for child in self])
-            h = max([child.bounding_rect.y + child.bounding_rect.h for child in self])
-            self.set_size(w + INSET_X, h + INSET_Y, updateLayout=False)
+            # print(f'GUIContainer.sizeToChildren(): container_x_min_wrt_parent={container_x_min_wrt_parent}, container_y_min_wrt_parent={container_y_min_wrt_parent}')
 
+            # Child coordinates are always relative to us. Make sure to handle the case where some of
+            # them are negative. Also, maybe we deleted our leftmost or topmost. So in these cases,
+            # our position will also change.
 
-        # # Child coordinates are always relative to us. Make sure to handle the case where some of
-        # # them are negative. Also, maybe we deleted our leftmost or topmost. So in these cases,
-        # # our position will also change.
+            children_x_min_wrt_me = math.inf
+            children_x_max_wrt_me = -math.inf
+            children_y_min_wrt_me = math.inf
+            children_y_max_wrt_me = -math.inf
 
-        # x_min = math.inf
-        # x_max = -math.inf
-        # y_min = math.inf
-        # y_max = -math.inf
+            for c in self.children:
+                children_x_min_wrt_me = min(children_x_min_wrt_me, c.bounding_rect.x)
+                children_x_max_wrt_me = max(children_x_max_wrt_me, c.bounding_rect.x + c.bounding_rect.w)
+                children_y_min_wrt_me = min(children_y_min_wrt_me, c.bounding_rect.y)
+                children_y_max_wrt_me = max(children_y_max_wrt_me, c.bounding_rect.y + c.bounding_rect.h)
 
-        # for c in self.children:
-        #     x_min = min(x_min, c.bounding_rect.x)
-        #     x_max = max(x_max, c.bounding_rect.x + c.bounding_rect.w)
-        #     y_min = min(y_min, c.bounding_rect.y)
-        #     y_max = max(y_max, c.bounding_rect.y + c.bounding_rect.h)
+            # We want to move ourselves so our (0, 0) world coordinates correspond to 
+            # (children_x_min_wrt_me, children_y_min_wrt_me)'s world coordinates.
 
-        # new_width = x_max - x_min + INSET_X
-        # new_height = y_max - y_min + INSET_Y
+            children_x_min_wrt_my_parent = children_x_min_wrt_me + container_x_min_wrt_parent
+            children_y_min_wrt_my_parent = children_y_min_wrt_me + container_y_min_wrt_parent
 
-        # # self.set_position(x_min, y_min, updateLayout=False)
-        # self.set_bounds(x_min, y_min, new_width, new_height)
+            # print(f'GUIContainer.sizeToChildren(): children_x_min_wrt_my_parent={children_x_min_wrt_my_parent}, children_y_min_wrt_my_parent={children_y_min_wrt_my_parent}')
 
-        # self.set_size(new_width, new_height, updateLayout=False)        
+            my_x_shift = children_x_min_wrt_my_parent - container_x_min_wrt_parent
+            my_y_shift = children_y_min_wrt_my_parent - container_y_min_wrt_parent
+
+            # print(f'GUIContainer.sizeToChildren(): my_x_shift={my_x_shift}, my_y_shift={my_y_shift}')
+        
+            child_x_shift = -my_x_shift
+            child_y_shift = -my_y_shift
+
+            # print(f'GUIContainer.sizeToChildren(): child_x_shift={child_x_shift}, child_y_shift={child_y_shift}')
+
+            for c in self.children:
+                c.set_position(c.bounding_rect.x + child_x_shift, c.bounding_rect.y + child_y_shift)
+
+            self.set_position(container_x_min_wrt_parent + my_x_shift, container_y_min_wrt_parent + my_y_shift)
+
+            new_width_local = children_x_max_wrt_me - children_x_min_wrt_me + 2 * inset_x
+            new_height_local = children_y_max_wrt_me - children_y_min_wrt_me + 2 * inset_y
+
+            # print(f'GUIContainer.sizeToChildren(): new_width_local={new_width_local}, new_height_local={new_height_local}')
+
+            self.set_size(new_width_local, new_height_local, updateLayout=False)
 
 
     def handle_event(self, event):

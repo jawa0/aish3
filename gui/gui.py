@@ -151,9 +151,11 @@ class GUI:
             self.listening_indicator.set_text("")
 
 
-    def set_view_pos(self, x: int, y: int) -> None:
-        logging.debug(f'GUI.set_view_pos({x}, {y})')
-        self._viewport_pos = (x, y)
+    def set_view_pos(self, wx: int, wy: int) -> None:
+        """Expects world (workspace) coordinates."""
+        
+        # logging.debug(f'GUI.set_view_pos({x}, {y})')
+        self._viewport_pos = (wx, wy)
 
 
     def content(self):
@@ -260,7 +262,8 @@ class GUI:
 
                     # If it's the left mouse button, then check for a hit on a control.
                     if event.button.button == sdl2.SDL_BUTTON_LEFT:
-                        hit_control = self.check_hit(event.button.x, event.button.y)
+                        wx, wy = self.view_to_world(event.button.x, event.button.y)
+                        hit_control = self.check_hit(wx, wy)
                         if hit_control:
                             self._drag_control = hit_control
                             self.set_focus(hit_control)
@@ -355,8 +358,8 @@ class GUI:
 
         s_index: str = str(index)
         if s_index in self._viewport_bookmarks:
-            vx, vy = self._viewport_bookmarks[s_index]
-            self.set_view_pos(vx, vy)
+            wx, wy = self._viewport_bookmarks[s_index]
+            self.set_view_pos(wx, wy)
         else:
             logging.warning(f'Viewport bookmark {index} does not exist.')
 
@@ -642,8 +645,17 @@ class GUI:
             return control._set_focus(False)
         
 
-    def check_hit(self, x: int, y: int) -> "Union[GUIControl, None]":
-        p = sdl2.SDL_Point(x, y)
+    def view_to_world(self, vx: int, vy: int) -> "tuple[int, int]":
+        """Convert viewport (screen) coordinates to world (workspace) coordinates."""
+        return vx + self._viewport_pos[0], vy + self._viewport_pos[1]
+
+
+    def check_hit(self, world_x: int, world_y: int) -> "Union[GUIControl, None]":
+        """Expects world (workspace) coordinates, not viewport (screen) coordinates.
+        Returns the control that was hit, or None if no control was hit.
+        See also: GUI.view_to_world()"""
+
+        p = sdl2.SDL_Point(world_x, world_y)
         
         q = list(self.content())
         while len(q) > 0:
@@ -725,13 +737,49 @@ class GUI:
             self._content = bak_content
             self._focused_control = bak_focused_control
             return False
-        
+
         # self._content.sizeToChildren()
         
         # self._viewport_pos = self.content().bounding_rect.x, self.content().bounding_rect.y
 
-
         logging.info("GUI loaded.")
+
+
+        logging.debug("Fixing control coordinates (unhack)")
+
+        def depth_first_traversal(c: "GUIControl", f: "callable") -> None:
+            if hasattr(c, "children"):
+                for child in c.children:
+                    depth_first_traversal(child, f)
+            f(c)
+
+        def hack_fix_fucked_coordinates(c_root: "GUIControl") -> None:
+            from math import fabs
+            from random import randint
+
+            COORD_SIZE_THRESHOLD = 1200
+            RECT_ATTR_NAME = "bounding_rect"
+            is_fucked = False
+
+            to_check = []
+            depth_first_traversal(c_root, lambda c: hasattr(c, RECT_ATTR_NAME) and to_check.append(c))
+            
+            # Because of depth-first traversal, all ancestors of a control appear after it in the list
+            # So, we only need to fix individual fucked controls. Not their whole subtree.
+            
+            for c in to_check:
+                x = c.bounding_rect.x
+                y = c.bounding_rect.y
+
+                is_fucked = fabs(x) > COORD_SIZE_THRESHOLD or fabs(y) > COORD_SIZE_THRESHOLD
+                # print(f'(x, y) = {x, y} is_fucked = {is_fucked}')
+                if is_fucked:
+                    print(f'(x, y) = {x, y} is_fucked = {is_fucked}')
+                    c.set_position(randint(0, 500), randint(0, 500))
+
+        # hack_fix_fucked_coordinates(self.content())
+
+        logging.debug("Controls coordinates fixed.")
         return True
 
 
