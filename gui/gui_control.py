@@ -116,6 +116,7 @@ class GUIControl:
 
     # In local coordinates (relative to parent)
     def set_position(self, x, y):
+        # print(f'GUIControl.set_position(): x={x}, y={y}')
         self.bounding_rect = sdl2.SDL_Rect(x,
                                            y,
                                            self.bounding_rect.w,
@@ -138,6 +139,7 @@ class GUIControl:
         
 
     def updateLayout(self):
+        # print(f'GUIControl.updateLayout(): self={self}')
         pass
 
     
@@ -153,29 +155,19 @@ class GUIControl:
         else:
             # Our rect is relative to scene, so it should just be unmodified.
             wr = self.bounding_rect
-            wr = sdl2.SDL_Rect(wr.x - self.gui._viewport_pos[0],
-                           wr.y - self.gui._viewport_pos[1],
-                           wr.w,
-                           wr.h)
+
         return wr
     
     
     def get_view_rect(self):
         """Get our bounding rect in 'view' coordinates. I.e. relative to the viewport position.
         These are what need to be passed to our drawing routines."""
-        if self.parent:
-            # Our rect is relative to parent, so add parent's offset.
-            parent_rect = self.parent.get_view_rect()
-            vr = sdl2.SDL_Rect(parent_rect.x + self.bounding_rect.x,
-                                 parent_rect.y + self.bounding_rect.y,
-                                 self.bounding_rect.w,
-                                 self.bounding_rect.h)
-        else:
-            # Our rect is relative to scene.
-            vr = sdl2.SDL_Rect(self.bounding_rect.x - self.gui._viewport_pos[0],
-                           self.bounding_rect.y - self.gui._viewport_pos[1],
-                           self.bounding_rect.w,
-                           self.bounding_rect.h)
+
+        wr = self.get_world_rect()
+        vr = sdl2.SDL_Rect(wr.x - self.gui._viewport_pos[0],
+                        wr.y - self.gui._viewport_pos[1],
+                        wr.w,
+                        wr.h)
         return vr
         
 

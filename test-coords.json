@@ -1,0 +1,64 @@
+{
+  "saved_at_utc": "2023-11-07T15:39:58.995100+00:00",
+  "saved_at_local": "2023-11-07T10:39:58.995100-05:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        12,
+        26,
+        1402,
+        797
+      ],
+      "layout": null,
+      "children": [
+        {
+          "class": "Label",
+          "bounding_rect": [
+            0,
+            0,
+            200,
+            30
+          ],
+          "text": "New Label",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            8,
+            55,
+            240,
+            100
+          ],
+          "text": "TA 1"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            255,
+            168,
+            240,
+            100
+          ],
+          "text": "TA 2"
+        }
+      ]
+    }
+  },
+  "viewport_bookmarks": {
+    "1": [
+      35,
+      56
+    ],
+    "2": [
+      257,
+      161
+    ]
+  },
+  "viewport_pos": [
+    -1,
+    -9
+  ]
+}
