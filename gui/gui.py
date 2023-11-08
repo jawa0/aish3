@@ -70,7 +70,12 @@ class GUI:
             return None
 
 
-    def __init__(self, renderer, font_descriptor, workspace_filename=None, client_session=None, enable_voice_in=False, enable_voice_out=False):        
+    def __init__(self, renderer, font_descriptor, 
+                 workspace_filename=None, 
+                 client_session=None, 
+                 enable_voice_in=False, 
+                 enable_voice_out=False):        
+        
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
@@ -108,10 +113,12 @@ class GUI:
         self._next_texts_to_say = []
 
 
-        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
+        # Voice Input
+        self.voice_in_enabled = enable_voice_in
         self._voice_wakeup = None
+        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
 
-        if enable_voice_in:
+        if self.voice_in_enabled:
             self._voice_in = VoiceTranscriber(session=self.session)
         self._should_stop_voice_in = False
 
@@ -131,6 +138,8 @@ class GUI:
     
 
     def _start_listening_wakeword(self):
+        if not self.voice_in_enabled:
+            return
         assert(self._voice_wakeup is None)
 
         self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
@@ -143,6 +152,9 @@ class GUI:
 
 
     def _stop_listening_wakeword(self):
+        if not self.voice_in_enabled:
+            return
+        
         assert(self._voice_wakeup is not None)
         self._voice_wakeup.stop()
         self._voice_wakeup = None
@@ -183,11 +195,12 @@ class GUI:
         if self._saying_text is None:
             self._saying_text = text
 
-            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-                self._voice_in.stop_recording()
-            elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
-                self._voice_wakeup.stop()
-                self._voice_wakeup = None
+            if self.voice_in_enabled:
+                if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                    self._voice_in.stop_recording()
+                elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+                    self._voice_wakeup.stop()
+                    self._voice_wakeup = None
 
             self._voice_out.say(text)
         else:
@@ -197,23 +210,25 @@ class GUI:
     def _on_speech_done(self):
         self._saying_text = None
 
-        # If we were actively listening before text_buffer_set_textsaying speech, then return to active listening...
-        if len(self._next_texts_to_say) == 0 and \
-            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
-            not self._voice_in.is_recording():
+        if self.voice_in_enabled:
+            # If we were actively listening before text_buffer_set_textsaying speech, then return to active listening...
+            if len(self._next_texts_to_say) == 0 and \
+                self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+                not self._voice_in.is_recording():
 
-            self._voice_in.start_recording()
-            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                self._voice_in.start_recording()
+                self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
 
-        # If we were waiting for the wakeup phrase, then go back to doing that
-        elif len(self._next_texts_to_say) == 0 and \
-            self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and \
-            self._voice_wakeup is None:
+            # If we were waiting for the wakeup phrase, then go back to doing that
+            elif len(self._next_texts_to_say) == 0 and \
+                self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and \
+                self._voice_wakeup is None:
 
-            self._start_listening_wakeword()
+                self._start_listening_wakeword()
 
 
     def _on_voice_wakeup(self):
+        assert(self.voice_in_enabled)
         logging.info(f'WAKEUP. Stopping voice wakeup. Starting active listening.')
         self._stop_listening_wakeword()
 
@@ -226,6 +241,7 @@ class GUI:
 
     def _on_voice_command(self, command: str) -> None:
         logging.info(f'GUI._on_voice_command({command})')
+        assert(self.voice_in_enabled)
 
         # @todo make sanitization routines
         command = command.replace('"', "")
@@ -509,37 +525,38 @@ class GUI:
         # print(f'  gui.content().get_world_rect(): {self.content().get_world_rect()}')
         # print(f'  gui.content().get_view_rect(): {self.content().get_view_rect()}')
 
-        #
-        # Should we enable or disable wake word listening?
-        #
-        
-        if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
-            self._stop_listening_wakeword()
+        if self.voice_in_enabled:
+            #
+            # Should we enable or disable wake word listening?
+            #
+            
+            if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+                self._stop_listening_wakeword()
 
-        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
-            self._start_listening_wakeword()
+            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is None:
+                self._start_listening_wakeword()
 
-        # Update voice wakeup, if it's active
-        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
-            self._voice_wakeup.update()
+            # Update voice wakeup, if it's active
+            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD and self._voice_wakeup is not None:
+                self._voice_wakeup.update()
 
-        # 
-        # Voice transcription
-        #
-        
-        # Update visibility of voice transcript window...
-        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-            if self.voice_transcript is not None and \
-                not self.voice_transcript._visible:
+            # 
+            # Voice transcription
+            #
+            
+            # Update visibility of voice transcript window...
+            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                if self.voice_transcript is not None and \
+                    not self.voice_transcript._visible:
 
-                self.voice_transcript.text_buffer.set_text("")  # @hack
-                self.voice_transcript._visible = True
-        
-        elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
-            self.voice_transcript is not None and \
-            self.voice_transcript._visible:
+                    self.voice_transcript.text_buffer.set_text("")  # @hack
+                    self.voice_transcript._visible = True
+            
+            elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+                self.voice_transcript is not None and \
+                self.voice_transcript._visible:
 
-            self.voice_transcript._visible = False
+                self.voice_transcript._visible = False
 
 
         # Do we have queued text to say?
