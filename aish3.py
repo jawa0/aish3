@@ -12,23 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# @todo log chat gpt reqeusts and responses
-# @todo animated control resizing - jarring when textareas shrink on chat completion
-# @todo when cycling focus in LLMChatContainer, enlarge focused container, shrink others.
-# @todo token streaming output from gpt
-# @todo selected text should have a more drab background colour if TextArea is not focused
-# @todo move to beginning/end of line
-# @todo move to prev/next word
-# @todo TextArea/TextEditBuffer word wrap
-# @todo focus controls using mouse click
-# @todo @bug weird behaviour when deleting past start of buffer
-# @todo tabs don't just insert spaces, but move to a multiple of tab_spaces
-# @todo hitting line down on last line goes to end of line doesn't affect desired_col
-# @todo hitting line up on first line goes to start of line doesn't affect desired_col
-# @todo flashing cursor
-# @todo key repeat
-# @todo copy text to clipboard
-# @todo @bug ONLY FOR VARIABLE-WIDTH FONT: k and w misalignment between letters and cursor after drawing red boxes
 
 import sdl2
 import sdl2.ext
@@ -79,8 +62,8 @@ def run(fullscreen, width, height, workspace_filename):
                   font_descriptor, 
                   workspace_filename=workspace_filename, 
                   client_session=session,
-                  enable_voice_in=True,
-                  enable_voice_out=True)
+                  enable_voice_in=False,
+                  enable_voice_out=False)
         
         # @hack
         gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
