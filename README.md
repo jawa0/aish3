@@ -27,6 +27,24 @@ Features:
 
 `python aish3.py`
 
+#### Command-line parameters/settings:
+
+`python aish3.py --help`
+
+yields:
+
+    usage: aish3.py [-h] [--fullscreen] [--width WIDTH] [--height HEIGHT] [--voice-in] [--workspace WORKSPACE]
+    
+    AISH window application.
+    
+    options:
+      -h, --help            show this help message and exit
+      --fullscreen          run in fullscreen mode
+      --width WIDTH         window width (default: 1450)
+      --height HEIGHT       window height (default: 800)
+      --voice-in            Enable voice input.
+      --workspace WORKSPACE workspace file (default: aish_workspace.json)
+
 #### Setting up required environment variables
 
 If you want to make GPT API requests, you'll need to provide a couple of environment variables in a .env file:
