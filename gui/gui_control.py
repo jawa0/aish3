@@ -164,11 +164,9 @@ class GUIControl:
         These are what need to be passed to our drawing routines."""
 
         wr = self.get_world_rect()
-        vr = sdl2.SDL_Rect(wr.x - self.gui._viewport_pos[0],
-                        wr.y - self.gui._viewport_pos[1],
-                        wr.w,
-                        wr.h)
-        return vr
+        vx, vy = self.gui.world_to_view(wr.x, wr.y)
+        vr = sdl2.SDL_Rect(vx, vy, wr.w, wr.h)
+        return vr        
         
 
     def _set_focus(self, has_focus):

@@ -181,8 +181,8 @@ class GUIContainer(GUIControl):
         if not self.children:
             return
         else:
-            container_x_min_wrt_parent = self.bounding_rect.x
-            container_y_min_wrt_parent = self.bounding_rect.y
+            container_x_wrt_parent = self.bounding_rect.x
+            container_y_wrt_parent = self.bounding_rect.y
 
             # print(f'GUIContainer.sizeToChildren(): container_x_min_wrt_parent={container_x_min_wrt_parent}, container_y_min_wrt_parent={container_y_min_wrt_parent}')
 
@@ -195,22 +195,34 @@ class GUIContainer(GUIControl):
             children_y_min_wrt_me = math.inf
             children_y_max_wrt_me = -math.inf
 
+            count_non_screen_locked_children = 0
             for c in self.children:
+                # If the child is screen-relative, it should not contribute to our size.
+                if c._screen_relative:
+                    continue
+                count_non_screen_locked_children += 1
+
                 children_x_min_wrt_me = min(children_x_min_wrt_me, c.bounding_rect.x)
                 children_x_max_wrt_me = max(children_x_max_wrt_me, c.bounding_rect.x + c.bounding_rect.w)
                 children_y_min_wrt_me = min(children_y_min_wrt_me, c.bounding_rect.y)
                 children_y_max_wrt_me = max(children_y_max_wrt_me, c.bounding_rect.y + c.bounding_rect.h)
 
+            if count_non_screen_locked_children == 0:
+                children_x_min_wrt_me = 0
+                children_x_max_wrt_me = 1
+                children_y_min_wrt_me = 0
+                children_y_max_wrt_me = 1
+
             # We want to move ourselves so our (0, 0) world coordinates correspond to 
             # (children_x_min_wrt_me, children_y_min_wrt_me)'s world coordinates.
 
-            children_x_min_wrt_my_parent = children_x_min_wrt_me + container_x_min_wrt_parent
-            children_y_min_wrt_my_parent = children_y_min_wrt_me + container_y_min_wrt_parent
+            children_x_min_wrt_my_parent = children_x_min_wrt_me + container_x_wrt_parent
+            children_y_min_wrt_my_parent = children_y_min_wrt_me + container_y_wrt_parent
 
             # print(f'GUIContainer.sizeToChildren(): children_x_min_wrt_my_parent={children_x_min_wrt_my_parent}, children_y_min_wrt_my_parent={children_y_min_wrt_my_parent}')
 
-            my_x_shift = children_x_min_wrt_my_parent - container_x_min_wrt_parent
-            my_y_shift = children_y_min_wrt_my_parent - container_y_min_wrt_parent
+            my_x_shift = children_x_min_wrt_my_parent - container_x_wrt_parent
+            my_y_shift = children_y_min_wrt_my_parent - container_y_wrt_parent
 
             # print(f'GUIContainer.sizeToChildren(): my_x_shift={my_x_shift}, my_y_shift={my_y_shift}')
         
@@ -220,9 +232,13 @@ class GUIContainer(GUIControl):
             # print(f'GUIContainer.sizeToChildren(): child_x_shift={child_x_shift}, child_y_shift={child_y_shift}')
 
             for c in self.children:
+                # If the child is screen-relative, don't move it.
+                if c._screen_relative:
+                    continue
+
                 c.set_position(c.bounding_rect.x + child_x_shift, c.bounding_rect.y + child_y_shift)
 
-            self.set_position(container_x_min_wrt_parent + my_x_shift, container_y_min_wrt_parent + my_y_shift)
+            self.set_position(container_x_wrt_parent + my_x_shift, container_y_wrt_parent + my_y_shift)
 
             new_width_local = children_x_max_wrt_me - children_x_min_wrt_me + 2 * inset_x
             new_height_local = children_y_max_wrt_me - children_y_min_wrt_me + 2 * inset_y
