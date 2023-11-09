@@ -55,12 +55,16 @@ COMMANDS:
 stop_listening
 create_new_chat_with_llm
 create_new_text_area
+create_new_label(label_text)
 
 EXAMPLES:
 "stop_listening" -> stop_listening
 "don't stop listening" -> ""
 "create a new LLM chat" -> create_new_chat_with_llm
 "create a new chat" -> create_new_chat_with_llm
+"create a new label" -> create_new_label("New Label")
+"create a new label with text Hello World" -> create_new_label("Hello World")
+
 """
                     # Get last K transcribed texts, for context. Includes partials.
                     K = 3

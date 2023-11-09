@@ -272,6 +272,18 @@ class GUI:
             x, y = self.get_mouse_position()
             self.cmd_new_text_area(x, y)
 
+        elif command.startswith("create_new_label"):
+            x, y = self.get_mouse_position()
+
+            # Get the optional text
+            text = None
+            if command.startswith("create_new_label("):
+                i_start = len("create_new_label(")
+                i_end = command.find(")")
+                if i_end > i_start:
+                    text = command[i_start:i_end]
+            self.cmd_new_label(x, y, text=text)
+
 
 
     def handle_event(self, event):
@@ -364,12 +376,12 @@ class GUI:
         self.content().add_child(chat)
 
 
-    def cmd_new_label(self, x: int, y: int) -> None:
+    def cmd_new_label(self, x: int, y: int, text: str="New Label") -> None:
         logging.info('Command: create new Label')
         wr = self.content().get_world_rect()
 
         # self.content().sizeToChildren()
-        label = self.create_control("Label", text="New Label", font_descriptor="large-label", w=200, h=30, x=x-wr.x, y=y-wr.y)
+        label = self.create_control("Label", text=text, font_descriptor="large-label", w=200, h=30, x=x-wr.x, y=y-wr.y)
         self.content().add_child(label)
         self.set_focus(label)
 
