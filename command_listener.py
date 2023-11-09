@@ -85,7 +85,8 @@ EXAMPLES:
 
 
     def _chat_completion_chunk(self, chunk_text):
-        self._completion_text += chunk_text
+        if chunk_text is not None:
+            self._completion_text += chunk_text
 
 
     def _chat_completion_done(self):
