@@ -45,8 +45,8 @@ class Session:
         logging.debug("Client Session.__init__")
 
         
-        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), 
-                                    organization=os.getenv("OPENAI_ORGANIZATION"))
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) 
+                                    # organization=os.getenv("OPENAI_ORGANIZATION"))
 
         self._running_completions: Dict[chat.completion, List[ChatCompletionHandler]] = {}
         
@@ -119,7 +119,7 @@ class Session:
     def llm_send_streaming_chat_request(self, model, chat_messages, handlers: List[ChatCompletionHandler]=[]):
         assert(model == 'gpt-4' or model == 'gpt-3.5-turbo' or model == 'gpt-4-1106-preview')
         
-        completion = client.chat.completions.create(model=model, messages=chat_messages, stream=True)
+        completion = self.openai_client.chat.completions.create(model=model, messages=chat_messages, stream=True)
         logging.debug(chat_messages)
         self._running_completions[completion] = handlers
 
