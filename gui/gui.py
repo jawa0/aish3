@@ -265,10 +265,12 @@ class GUI:
             self._should_stop_voice_in = True
 
         elif command == "create_new_chat_with_llm":
-            self.cmd_new_llm_chat()
+            x, y = self.get_mouse_position()
+            self.cmd_new_llm_chat(x, y)
 
         elif command == "create_new_text_area":
-            self.cmd_new_text_area()
+            x, y = self.get_mouse_position()
+            self.cmd_new_text_area(x, y)
 
 
 
@@ -343,7 +345,7 @@ class GUI:
         wr = self.content().get_world_rect()
 
         # self.content().sizeToChildren()
-        textArea = self.create_control("TextArea", w=240, h=100, x=x.value-wr.x, y=y.value-wr.y)
+        textArea = self.create_control("TextArea", w=240, h=100, x=x - wr.x, y=y - wr.y)
         self.content().add_child(textArea)
         self.set_focus(textArea)
 
@@ -354,8 +356,8 @@ class GUI:
 
         # self.content().sizeToChildren()
 
-        argx = x.value-wr.x
-        argy = y.value-wr.y
+        argx = x-wr.x
+        argy = y-wr.y
 
         logging.debug(f"Creating new LLMChatContainer at {argx}, {argy}")
         chat = self.create_control("LLMChatContainer", x=argx, y=argy)
@@ -367,7 +369,7 @@ class GUI:
         wr = self.content().get_world_rect()
 
         # self.content().sizeToChildren()
-        label = self.create_control("Label", text="New Label", font_descriptor="large-label", w=200, h=30, x=x.value-wr.x, y=y.value-wr.y)
+        label = self.create_control("Label", text="New Label", font_descriptor="large-label", w=200, h=30, x=x-wr.x, y=y-wr.y)
         self.content().add_child(label)
         self.set_focus(label)
 
@@ -393,6 +395,14 @@ class GUI:
             logging.warning(f'Viewport bookmark {index} does not exist.')
 
 
+    def get_mouse_position(self) -> "tuple[int, int]":
+        """Returns mouse position in viewport (window) coordinates."""
+        x = ctypes.c_int()
+        y = ctypes.c_int()                
+        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+        return int(x.value), int(y.value)
+    
+    
     def handle_keydown(self, event):
         vr = self.content().get_view_rect()
 
@@ -405,9 +415,7 @@ class GUI:
         # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
         if cmdPressed:
-            x = ctypes.c_int()
-            y = ctypes.c_int()                
-            sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+            x, y = self.get_mouse_position()
 
             # Shift+Cmd+[1-9] sets viewport bookmark
             if shiftPressed and not altPressed and not ctrlPressed and \
