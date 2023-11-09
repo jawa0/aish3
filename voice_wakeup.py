@@ -18,6 +18,11 @@ class PhraseListener:
         logging.debug('PhraseListener.__init__()')
         self._on_detected_callback = detected_callback
 
+        PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
+        if not PICOVOICE_ACCESS_KEY:
+            logging.error("PICOVOICE_ACCESS_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
+            raise Exception("PICOVOICE_ACCESS_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
+
     
     def start(self):
         logging.debug('PhraseListener.start()')

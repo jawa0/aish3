@@ -19,6 +19,7 @@ import sdl2.sdlttf as ttf
 import argparse
 import logging
 import time
+import os
 
 import config
 from gui import GUI, FontRegistry
@@ -30,7 +31,7 @@ from label import Label
 from textarea import TextArea
 
 
-def run(fullscreen, width, height, workspace_filename):
+def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
     try:
         logging.info('App start.')
 
@@ -58,11 +59,18 @@ def run(fullscreen, width, height, workspace_filename):
         session: Session = Session()
         session.start()
 
+        # Can we enable voice in? @todo DRY
+        ASSEMBLYAI_API_KEY = os.getenv("ASSEMBLYAI_API_KEY")
+
+        if enable_voice_in and not ASSEMBLYAI_API_KEY:
+            logging.error("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
+            raise Exception("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
+
         gui = GUI(renderer, 
                   font_descriptor, 
                   workspace_filename=workspace_filename, 
                   client_session=session,
-                  enable_voice_in=False,
+                  enable_voice_in=enable_voice_in,
                   enable_voice_out=False)
         
         # @hack
@@ -151,8 +159,12 @@ if __name__ == "__main__":
     parser.add_argument('--fullscreen', action='store_true', help='run in fullscreen mode')
     parser.add_argument('--width', type=int, default=1400, help='window width (default: 1450)')
     parser.add_argument('--height', type=int, default=800, help='window height (default: 800)')
-
+    parser.add_argument('--voice-in', action='store_true', help='Enable voice input.')
     parser.add_argument('--workspace', default='aish_workspace.json', help='workspace file (default: aish_workspace.json)')
     args = parser.parse_args()
 
-    run(args.fullscreen, args.width, args.height, args.workspace)
+    run(fullscreen=args.fullscreen, 
+        width=args.width, 
+        height=args.height, 
+        workspace_filename=args.workspace, 
+        enable_voice_in=args.voice_in)

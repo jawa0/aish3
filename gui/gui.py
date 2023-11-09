@@ -124,6 +124,13 @@ class GUI:
 
         self.command_listener = None
 
+        # Do we have access to an LLM? Need to know for voice commands. Uses LLM to interpret transcribed text.
+        if not os.getenv("OPENAI_API_KEY"):
+            logging.warning("OPENAI_API_KEY is not set. Cannot enable voice commands. Can still do voice wakeup, and transcribe speech to text.")
+            self.llm_available = False
+        else:
+            self.llm_available = True
+
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -140,6 +147,7 @@ class GUI:
     def _start_listening_wakeword(self):
         if not self.voice_in_enabled:
             return
+        
         assert(self._voice_wakeup is None)
 
         self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
@@ -156,6 +164,7 @@ class GUI:
             return
         
         assert(self._voice_wakeup is not None)
+
         self._voice_wakeup.stop()
         self._voice_wakeup = None
 
@@ -217,7 +226,9 @@ class GUI:
                 not self._voice_in.is_recording():
 
                 self._voice_in.start_recording()
-                self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+
+                if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
 
             # If we were waiting for the wakeup phrase, then go back to doing that
             elif len(self._next_texts_to_say) == 0 and \
@@ -236,7 +247,9 @@ class GUI:
 
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
-        self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+
+        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
 
 
     def _on_voice_command(self, command: str) -> None:
@@ -460,26 +473,33 @@ class GUI:
                 logging.info('Command: toggle recording')
 
                 # Toggle active listening...
+                if not self.voice_in_enabled:
+                    logging.warning('Voice input is not enabled. Type python aish3.py --help to see how. Ignoring command.')
+                    return True
+                else:
 
-                if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-                    logging.debug('GUI is idle or listening for wakeword.')
+                    if self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                        logging.debug('GUI is idle or listening for wakeword.')
 
-                    if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
-                        logging.debug('GUI is listening for wakeword. Stopping voice wakeup.')
-                        self._stop_listening_wakeword()
+                        if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD:
+                            logging.debug('GUI is listening for wakeword. Stopping voice wakeup.')
+                            self._stop_listening_wakeword()
 
-                    logging.info(f'Starting active listening.')
-                    self._voice_in.start_recording()
-                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
-                    self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
+                        logging.info(f'Starting active listening.')
+                        self._voice_in.start_recording()
 
-                elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-                    logging.info(f'GUI is listening for speech. Stopping active listening.')
-                    self._voice_in.stop_recording()
-                    self.command_listener = None
-                    self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+                        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
 
-                    self._start_listening_wakeword()
+                    elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+                        logging.info(f'GUI is listening for speech. Stopping active listening.')
+                        self._voice_in.stop_recording()
+                        self.command_listener = None
+                        self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+
+                        self._start_listening_wakeword()
+
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
@@ -517,6 +537,8 @@ class GUI:
                 else:
                     if focusRing.focus_next():
                         return True  # event was handled
+                    
+        return False
 
 
     def update(self, dt):
@@ -798,10 +820,3 @@ class GUI:
 
         logging.debug("Controls coordinates fixed.")
         return True
-
-
-    def voice_input_available(self):
-        """Is speech input available?"""
-        return os.getenv("ASSEMBLYAI_API_KEY") is not None
-
-
