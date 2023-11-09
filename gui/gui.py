@@ -19,7 +19,7 @@ import json
 import logging
 import pytz
 import sdl2
-from typing import Union
+from typing import Optional, Union
 from tzlocal import get_localzone
 import weakref
 import os
@@ -98,7 +98,7 @@ class GUI:
         self._strokes = {}
         self._drag_control = None
 
-        self._viewport_pos = (0, 0)
+        self.set_view_pos(0, 0)
         self._viewport_bookmarks = {}
 
         self.workspace_filename = workspace_filename
@@ -172,8 +172,13 @@ class GUI:
             self.listening_indicator.set_text("")
 
 
+    def get_view_pos(self) -> "tuple[int, int]":
+        """Returns the viewport position in world (workspace) coordinates."""
+        return self._viewport_pos
+    
+
     def set_view_pos(self, wx: int, wy: int) -> None:
-        """Expects world (workspace) coordinates."""
+        """Expects world (workspace) coordinates of the viewport position."""
         
         # logging.debug(f'GUI.set_view_pos({x}, {y})')
         self._viewport_pos = (wx, wy)
@@ -352,12 +357,31 @@ class GUI:
         return handled
     
 
-    def cmd_new_text_area(self, x: int, y: int) -> None:
-        logging.info('Command: create new text area')
-        wr = self.content().get_world_rect()
+    def cmd_new_text_area(self, wx: Optional[int], wy: Optional[int]) -> None:
+        """Expects wx, and wy to be world (workspace) coordinates."""
 
-        # self.content().sizeToChildren()
-        textArea = self.create_control("TextArea", w=240, h=100, x=x - wr.x, y=y - wr.y)
+        logging.info('Command: create new text area')
+        print(f'wx, wy = {wx}, {wy}')
+        if wx is None or wy is None:
+            # Put it's top-left corner in the center of the viewport
+            # @todo need screen dimensions. GUI should really have these
+
+            # Get window client area dimensions
+            window_w = ctypes.c_int()
+            window_h = ctypes.c_int()
+            sdl2.SDL_GetWindowSize(self.renderer.window, ctypes.byref(window_w), ctypes.byref(window_h))
+            window_w = window_w.value
+            window_h = window_h.value
+            print(f'window_w, window_h = {window_w}, {window_h}')
+
+            vx = window_w // 2
+            vy = window_h // 2
+            print(f'vx, vy = {vx}, {vy}')
+
+            wx, wy = self.view_to_world(vx, vy)
+            print(f'wx, wy = {wx}, {wy}')
+
+        textArea = self.create_control("TextArea", w=240, h=100, x=wx, y=wy)
         self.content().add_child(textArea)
         self.set_focus(textArea)
 
@@ -636,20 +660,24 @@ class GUI:
 
 
     def draw(self):
+        # print(f'*************** GUI.draw() ***************')
+        # print(f'Viewport pos: {self._viewport_pos}')
+        # print(f'content rect: {self.content().bounding_rect}')
+        
         if self._content:
             self._content.draw()
 
-        # # @debug Draw strokes
-        # for stroke in self._strokes:
-        #     points = self._strokes[stroke]
+        # @debug Draw strokes
+        for stroke in self._strokes:
+            points = self._strokes[stroke]
             
-        #     # Convert the list of points to a ctypes array of SDL_Point structures
-        #     point_array = (sdl2.SDL_Point * len(points))(*points)
+            # Convert the list of points to a ctypes array of SDL_Point structures
+            point_array = (sdl2.SDL_Point * len(points))(*points)
 
-        #     if len(points) > 1:
-        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
-        #         sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
-        #         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+            if len(points) > 1:
+                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
+                sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
+                sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
 
 
     def push_focus_ring(self, focusRing):
@@ -708,6 +736,11 @@ class GUI:
         """Convert viewport (screen) coordinates to world (workspace) coordinates."""
         return vx + self._viewport_pos[0], vy + self._viewport_pos[1]
 
+
+    def world_to_view(self, wx: int, wy: int) -> "tuple[int, int]":
+        """Convert world (workspace) coordinates to viewport (screen) coordinates."""
+        return wx - self._viewport_pos[0], wy - self._viewport_pos[1]
+    
 
     def check_hit(self, world_x: int, world_y: int) -> "Union[GUIControl, None]":
         """Expects world (workspace) coordinates, not viewport (screen) coordinates.
@@ -798,8 +831,6 @@ class GUI:
             return False
 
         # self._content.sizeToChildren()
-        
-        # self._viewport_pos = self.content().bounding_rect.x, self.content().bounding_rect.y
 
         logging.info("GUI loaded.")
 
