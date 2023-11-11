@@ -34,6 +34,39 @@ class TextArea(GUIControl):
 
 
     def __init__(self, row_spacing=18, text_buffer=None, **kwargs):
+        """
+        Initializes a TextArea instance, which is a GUI control for displaying and editing text.
+
+        Inherits from GUIControl and accepts all its keyword arguments, along with some additional specific to TextArea.
+
+        Args:
+            row_spacing (int): The vertical spacing between rows of text. Default is 18.
+            text_buffer (TextEditBuffer, optional): The text buffer to be used by the TextArea. 
+                If None, a new TextEditBuffer is created. Default is None.
+
+        Keyword Args:
+            text (str): Initial text for the TextArea. Default is an empty string.
+            can_focus (bool): Indicates if the control can gain focus. Inherited from GUIControl. Default is True.
+            x (int): The x-coordinate of the control's position. Inherited from GUIControl. Relative to parent 
+                control. If no parent, then in world coordinates. Default is 0.
+            y (int): The y-coordinate of the control's position. Inherited from GUIControl. Relative to parent 
+                control. If no parent, then in world coordinates.  Default is 0.
+            w (int): The width of the control. Inherited from GUIControl. Default is 20.
+            h (int): The height of the control. Inherited from GUIControl. Default is 20.
+            saveable (bool): Indicates if the control's state is saveable. Inherited from GUIControl. Default is True.
+            gui (Object): Reference to the GUI object. Inherited from GUIControl. Default is None.
+            renderer (Object): Reference to the renderer object. Inherited from GUIControl. 
+                Default is gui.renderer if gui is not None, else None.
+            font_manager (Object): Reference to the font manager object. Inherited from GUIControl. 
+                Default is gui.font_manager if gui is not None, else None.
+            draw_bounds (bool): Indicates if bounds should be drawn. Inherited from GUIControl. Default is False.
+            draggable (bool): Indicates if the control is draggable. Inherited from GUIControl. Default is False.
+            visible (bool): Indicates if the control is visible. Inherited from GUIControl. Default is True.
+            screen_relative (bool): Indicates if the control's position is relative to the screen. 
+                Inherited from GUIControl. Default is False.
+
+        Calls the superclass initializer and sets up the TextArea specific attributes.
+        """
         # print(f'TextArea.__init__() called')
         super().__init__(**kwargs)
         text = kwargs.get('text', '')
@@ -327,8 +360,8 @@ class TextArea(GUIControl):
         else:
             vr = self.get_view_rect()
 
-        x = vr.x - self.x_scroll
-        y = vr.y - self.y_scroll
+        vx = vr.x - self.x_scroll
+        vy = vr.y - self.y_scroll
 
         # Determine start and end of selection
         selected = self.text_buffer.get_selection()
@@ -367,13 +400,13 @@ class TextArea(GUIControl):
 
                         draw_text(self.renderer, self.font_descriptor, 
                                 line, 
-                                x, y, bounding_rect=vr,
+                                vx, vy, bounding_rect=vr,
                                 dst_surface=surf, 
                                 selection_start=c_start, selection_end=c_end)
                     else:
-                        draw_text(self.renderer, self.font_descriptor, line, x, y, bounding_rect=vr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_descriptor, line, vx, vy, bounding_rect=vr, dst_surface=surf)
 
-                y += self.row_spacing
+                vy += self.row_spacing
 
             self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
             sdl2.SDL_FreeSurface(surf)

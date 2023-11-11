@@ -25,7 +25,7 @@ macos:
 
 tests:
 	@echo "Running tests..."
-	python test/test_$(APPNAME).py
+	python -m unittest discover -s test
 
 clean:
 	@echo "Cleaning up..."
