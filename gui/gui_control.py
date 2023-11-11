@@ -91,8 +91,8 @@ class GUIControl:
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
-        saveable = True if "saveable" not in json else json["saveable"]
-        kwargs["saveable"] = saveable
+        kwargs["saveable"] = json.get("saveable", True)
+        kwargs["name"] = json.get("name", "")
 
         if "bounding_rect" in json:
             x, y, w, h = json["bounding_rect"]
@@ -159,6 +159,8 @@ class GUIControl:
     def local_to_world(self, lx: int, ly: int) -> "tuple[int, int]":
         """
         Convert local coordinates of this control to world coordinates.
+        The local coordinates are relative to the control's content area, which is
+        offset by self._inset from the control's bounding rect.
         
         Args:
             lx (int): The local x-coordinate.
@@ -178,7 +180,9 @@ class GUIControl:
 
     def world_to_local(self, wx: int, wy: int) -> "tuple[int, int]":
         """
-        Convert world coordinates to local coordinates of this control.
+        Convert world coordinates to local coordinates of this control. The local coordinates
+        are relative to the control's content area, which is offset by self._inset from the
+        control's bounding rect.
         
         Args:
             wx (int): The world x-coordinate.
@@ -189,11 +193,11 @@ class GUIControl:
         """
         lx, ly = wx, wy
         for a in self.gui.get_ancestor_chain(self):
-            lx -= a.bounding_rect.x + a._inset[0]
-            ly -= a.bounding_rect.y + a._inset[1]
+            lx -= (a.bounding_rect.x + a._inset[0])
+            ly -= (a.bounding_rect.y + a._inset[1])
 
-        lx -= self.bounding_rect.x + self._inset[0]
-        ly -= self.bounding_rect.y + self._inset[1]
+        lx -= (self.bounding_rect.x + self._inset[0])
+        ly -= (self.bounding_rect.y + self._inset[1])
 
         return lx, ly
 
@@ -201,7 +205,7 @@ class GUIControl:
     def get_world_rect(self):
         """Get our bounding rect in 'world' coordinates. I.e. relative to the overall workspace."""
 
-        wx, wy = self.local_to_world(0, 0)
+        wx, wy = self.local_to_world(-self._inset[0], -self._inset[1])
         wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
         return wr
     

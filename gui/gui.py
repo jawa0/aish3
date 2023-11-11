@@ -105,9 +105,6 @@ class GUI:
         if self.workspace_filename is not None:
             self.load()
 
-        # @hack. GUI content root should never have insets, regardless of what was loaded.
-        self._content._inset = (0, 0)
-
         if enable_voice_out:
             self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
         else:
@@ -133,6 +130,10 @@ class GUI:
             self.llm_available = False
         else:
             self.llm_available = True
+
+        # @hack @debug @test
+        self._content._inset = (0, 0)
+        # self._content.draw_bounds = True
 
         self.content().sizeToChildren()
 

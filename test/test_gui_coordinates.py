@@ -313,5 +313,54 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         self.assertEquals((wr1.x, wr1.y), (wx1, wy1))
 
 
+    def test_local_to_world_inset_0(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        parent = g.content()
+        parent._inset = (40, 10)
+
+        lx, ly = 5, 7  # Local to my content area 
+        wx, wy = parent.local_to_world(lx, ly)
+        self.assertEqual((wx, wy), (45, 17))
+
+        c0 = GUIControl(gui=g, x=lx, y=ly, w=200, h=30, inset=(0, 0))
+        parent.add_child(c0)
+
+        wr0 = c0.get_world_rect()
+        self.assertEqual((wr0.x, wr0.y), (wx, wy))
+
+
+
+    def test_insets_0(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        parent = g.content()
+        parent._inset = (40, 10)
+        parent._inset = (0, 0)
+
+        print(f"parent: name='{parent._name}' br={parent.bounding_rect} inset={parent._inset}")
+
+        vx, vy = 11, 13
+        wx, wy = g.view_to_world(vx, vy)
+        self.assertEqual((wx, wy), (11, 13))
+
+        x, y = parent.world_to_local(wx, wy)
+        self.assertEqual(x, wx - parent.bounding_rect.x - parent._inset[0])
+        self.assertEqual(y, wy - parent.bounding_rect.y - parent._inset[1])
+
+        print(f"x={x} y={y}")
+
+        c0 = GUIControl(gui=g, x=x, y=y, w=200, h=30, inset=(0, 0))
+        parent.add_child(c0)
+
+        wr0 = c0.get_world_rect()
+        self.assertEqual((wr0.x, wr0.y), (wx, wy))
+
+        vr0 = c0.get_view_rect()
+        self.assertEqual((vr0.x, vr0.y), (vx, vy))
+
+
 if __name__ == '__main__':
     unittest.main()
