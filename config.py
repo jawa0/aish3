@@ -30,6 +30,8 @@ app_name = "aish3"
 app_config_path = Path().home() / f".{app_name}"
 app_config_path.mkdir(exist_ok=True, mode=0o700)  # rwx------ permissions
 
+GUI_INSET_X = 1
+GUI_INSET_Y = 1
 
 def setup_logging():
     formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")

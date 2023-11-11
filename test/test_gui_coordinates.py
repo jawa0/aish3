@@ -9,144 +9,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from gui import GUI, GUIContainer, GUIControl
 from session import Session
-from text_edit_buffer import TextEditBuffer
 
 
-class TestTextEditBuffer(unittest.TestCase):
-    def test_initial_point(self):
-        obj = TextEditBuffer()
-        self.assertEqual(obj.get_point(), 0)
-
-    def test_construct_with_text(self):
-        obj = TextEditBuffer("hello")
-        self.assertEqual(obj.get_point(), 0)
-
-    def test_insert_text(self):
-        text = "some text"
-        obj = TextEditBuffer()
-        obj.insert(text)
-        self.assertEqual(obj.get_point(), len(text))
-
-    def test_set_point_valid_range(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        valid_point = len(text) // 2
-        obj.set_point(valid_point)
-        self.assertEqual(obj.get_point(), valid_point)
-
-    def test_set_point_too_small(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        too_small_point = -1
-        obj.set_point(too_small_point)
-        self.assertEqual(obj.get_point(), 0)
-
-    def test_set_point_too_large(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        too_large_point = len(text) + 1
-        obj.set_point(too_large_point)
-        self.assertEqual(obj.get_point(), len(text))
-
-    def test_move_point_left_middle(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        middle_point = len(text) // 2
-        obj.set_point(middle_point)
-        obj.move_point_left()
-        self.assertEqual(obj.get_point(), middle_point - 1)
-
-    def test_move_point_left_start(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        obj.set_point(0)
-        obj.move_point_left()
-        self.assertEqual(obj.get_point(), 0)
-
-    def test_move_point_right_middle(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        middle_point = len(text) // 2
-        obj.set_point(middle_point)
-        obj.move_point_right()
-        self.assertEqual(obj.get_point(), middle_point + 1)
-
-    def test_move_point_right_end(self):
-        text = "some text"
-        obj = TextEditBuffer(text)
-        obj.set_point(len(text))
-        obj.move_point_right()
-        self.assertEqual(obj.get_point(), len(text))
-        
-    def test_get_row_col_valid_point(self):
-        text = "some\ntext"
-        obj = TextEditBuffer(text)
-        point = 6
-        expected_row, expected_col = 1, 1
-        row, col = obj.get_row_col(point)
-        self.assertEqual((row, col), (expected_row, expected_col))
-
-    def test_get_row_col_point_beginning(self):
-        text = "some\ntext"
-        obj = TextEditBuffer(text)
-
-        point = 0
-        expected_row, expected_col = 0, 0
-        row, col = obj.get_row_col(point)
-        self.assertEqual((row, col), (expected_row, expected_col))
-
-    def test_get_row_col_eol(self):
-        text = "some\ntext"
-        obj = TextEditBuffer(text)
-
-        point = 4
-        expected_row, expected_col = 0, 4
-        row, col = obj.get_row_col(point)
-        self.assertEqual((row, col), (expected_row, expected_col))
-
-    def test_get_row_col_bol(self):
-        text = "some\ntext"
-        obj = TextEditBuffer(text)
-
-        point = 5
-        expected_row, expected_col = 1, 0
-        row, col = obj.get_row_col(point)
-        self.assertEqual((row, col), (expected_row, expected_col))
-
-    def test_get_row_col_point_end(self):
-        text = "some\ntext"
-        obj = TextEditBuffer(text)
-
-        point = len(text)
-        expected_row, expected_col = 1, 4
-        row, col = obj.get_row_col(point)
-        self.assertEqual((row, col), (expected_row, expected_col))
-
-    # def test_get_row_col_point_after_end(self):
-    #     text = "some\ntext"
-    #     obj = TextEditBuffer(text)
-
-    #     point = len(text) + 1
-    #     row, col = obj.get_row_col(point)
-    #     self.assertEqual((row, col), (None, None))
-
-    # def test_get_row_col_point_before_beginning(self):
-    #     text = "some\ntext"
-    #     obj = TextEditBuffer(text)
-
-    #     point = -1
-    #     row, col = obj.get_row_col(point)
-    #     self.assertEqual((row, col), (None, None))
-
-    def test_delete_char(self):
-        obj = TextEditBuffer()
-        obj.insert('hello world')
-        obj.set_point(6)
-        obj.delete_char()
-        self.assertEqual(obj.get_text(), "helloworld")
-        self.assertEqual(obj.get_point(), 5)
-
-
+class TestGUICoordinateTransforms(unittest.TestCase):
     def test_content_init_world_rect(self):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
@@ -385,6 +250,67 @@ class TestTextEditBuffer(unittest.TestCase):
         g.set_view_pos(-5, -7)
         wx, wy = g.view_to_world(-5, -7)
         self.assertEqual((wx, wy), (-10, -14))
+
+
+    def test_view_to_world_and_back(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        c = GUIControl(gui=g, x=5, y=7, w=200, h=30)
+        g.content().add_child(c)
+
+        vx0, vy0 = 150, 160
+        wx, wy = g.view_to_world(vx0, vy0)
+        vx1, vy1 = g.world_to_view(wx, wy)
+
+        self.assertEqual((vx0, vy0), (vx1, vy1))
+
+
+    def test_coordinates(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        parent = g.content()
+
+        c0 = GUIControl(gui=g, x=5, y=7, w=200, h=30)
+        parent.add_child(c0)
+        wr0 = c0.get_world_rect()
+        lr0 = c0.bounding_rect
+
+        # We've added c0 to the GUI.content(), so we expect that its local coordinates
+        # relative to its parent (5, 7) are the same as its world coordinates.
+
+        self.assertEquals((wr0.x, wr0.y), (5, 7))
+
+        # Since we haven't moved the viewport, we expect its view coordinates to
+        # be the same as its world coordinates.
+
+        vr0 = c0.get_view_rect()
+        self.assertEquals(vr0, wr0)
+
+        # Now, let's add another control. This will cause a call to sizeToChildren(),
+        # which will update the parent's bounding_rect. Make sure all updates are valid.
+
+        # First, check again that since we haven't moved the viewport, we expect its
+        # view coordinates to bet the same as its world coordinates.
+
+        vx1, vy1 = 11, 13
+        wx1, wy1 = g.view_to_world(vx1, vy1)
+        self.assertEqual((wx1, wy1), (vx1, vy1))
+
+        # Now, let's add it to the content.
+        x1, y1 = parent.world_to_local(wx1, wy1)
+        self.assertEqual((x1, y1), (6, 6))  # (11, 13) - (5, 7)
+
+        c1 = GUIControl(gui=g, x=x1, y=y1, w=200, h=30)
+        print(f'*** c1 coordinates, before adding to parent: {c1.bounding_rect}')
+        parent.add_child(c1)
+        print(f'*** c1 coordinates, after adding to parent: {c1.bounding_rect}')
+
+        # Verify that c1's world position is where we wanted it.
+        
+        wr1 = c1.get_world_rect()
+        self.assertEquals((wr1.x, wr1.y), (wx1, wy1))
 
 
 if __name__ == '__main__':

@@ -19,8 +19,14 @@ import sdl2
 class GUIControl:
     def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, saveable=True, **kwargs):
         """
-        Initializer method (constructor0 for the class.
-        
+        Initializer method for the class.
+
+        can_focus (bool): Indicates if the control can gain focus. Default is True.
+        x (int): The x-coordinate of the control's position. Relative to parent 
+            control. If no parent, then in world coordinates. Default is 0.
+        y (int): The y-coordinate of the control's position. Relative to parent 
+            control. If no parent, then in world coordinates.  Default is 0.
+                
         Keyword arguments are used to fetch 'gui', 'renderer', 'font_manager', 'draw_bounds', 
         'draggable', 'visible', 'screen_relative', and 'saveable' values.
 
@@ -66,6 +72,9 @@ class GUIControl:
     
 
     def set_bounds(self, x, y, w, h):
+        """Set the bounding rect for the control. This is relative to its parent, not necessarily
+        in world coordinates."""
+
         if hasattr(self, "bounding_rect"):
             self.bounding_rect.x = x
             self.bounding_rect.y = y
@@ -142,20 +151,54 @@ class GUIControl:
         # print(f'GUIControl.updateLayout(): self={self}')
         pass
 
-    
+
+    def local_to_world(self, lx: int, ly: int) -> "tuple[int, int]":
+        """
+        Convert local coordinates of this control to world coordinates.
+        
+        Args:
+            lx (int): The local x-coordinate.
+            ly (int): The local y-coordinate.
+
+        Returns:
+            A tuple containing the x and y coordinates in world space.
+        """
+        wx = lx + self.bounding_rect.x
+        wy = ly + self.bounding_rect.y
+
+        for a in self.gui.get_ancestor_chain(self):
+            wx += a.bounding_rect.x
+            wy += a.bounding_rect.y
+        return wx, wy
+
+
+    def world_to_local(self, wx: int, wy: int) -> "tuple[int, int]":
+        """
+        Convert world coordinates to local coordinates of this control.
+        
+        Args:
+            wx (int): The world x-coordinate.
+            wy (int): The world y-coordinate.
+
+        Returns:
+            A tuple containing the x and y coordinates in local space of this control.
+        """
+        lx, ly = wx, wy
+        for a in self.gui.get_ancestor_chain(self):
+            lx -= a.bounding_rect.x
+            ly -= a.bounding_rect.y
+
+        lx -= self.bounding_rect.x
+        ly -= self.bounding_rect.y
+        
+        return lx, ly
+
+
     def get_world_rect(self):
         """Get our bounding rect in 'world' coordinates. I.e. relative to the overall workspace."""
-        if self.parent:
-            # Our rect is relative to parent, so add parent's offset.
-            parent_rect = self.parent.get_world_rect()
-            wr = sdl2.SDL_Rect(parent_rect.x + self.bounding_rect.x,
-                                 parent_rect.y + self.bounding_rect.y,
-                                 self.bounding_rect.w,
-                                 self.bounding_rect.h)
-        else:
-            # Our rect is relative to scene, so it should just be unmodified.
-            wr = self.bounding_rect
 
+        wx, wy = self.local_to_world(0, 0)
+        wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
         return wr
     
     

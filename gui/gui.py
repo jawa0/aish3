@@ -131,6 +131,8 @@ class GUI:
         else:
             self.llm_available = True
 
+        self.content().sizeToChildren()
+
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -265,21 +267,26 @@ class GUI:
         command = command.replace('"', "")
         command = command.replace("'", "")
 
+        vx, vy = self.get_mouse_position()
+
         if command == "stop_listening":
             logging.info('Command: stop listening')
             self._should_stop_voice_in = True
 
         elif command == "create_new_chat_with_llm":
-            x, y = self.get_mouse_position()
-            self.cmd_new_llm_chat(x, y)
+            self.cmd_new_llm_chat(vx, vy)
 
-        elif command == "create_new_text_area":
-            x, y = self.get_mouse_position()
-            self.cmd_new_text_area(x, y)
+        elif command == "create_new_text_area":            
+            print(f'vx, vy = {vx}, {vy}')            
+            print(f'GUI.viewport_pos = {self._viewport_pos}')
+            print(f'GUI.contents().bounding_rect = {self.content().bounding_rect}')
+            
+            wx, wy = self.view_to_world(vx, vy)
+            print(f'wx, wy = {wx}, {wy}')
+
+            self.cmd_new_text_area(wx, wy)
 
         elif command.startswith("create_new_label"):
-            x, y = self.get_mouse_position()
-
             # Get the optional text
             text = None
             if command.startswith("create_new_label("):
@@ -287,7 +294,7 @@ class GUI:
                 i_end = command.find(")")
                 if i_end > i_start:
                     text = command[i_start:i_end]
-            self.cmd_new_label(x, y, text=text)
+            self.cmd_new_label(vx, vy, text=text)
 
 
 
@@ -357,32 +364,39 @@ class GUI:
         return handled
     
 
+
     def cmd_new_text_area(self, wx: Optional[int], wy: Optional[int]) -> None:
         """Expects wx, and wy to be world (workspace) coordinates."""
 
         logging.info('Command: create new text area')
         print(f'wx, wy = {wx}, {wy}')
-        if wx is None or wy is None:
-            # Put it's top-left corner in the center of the viewport
-            # @todo need screen dimensions. GUI should really have these
 
-            # Get window client area dimensions
-            window_w = ctypes.c_int()
-            window_h = ctypes.c_int()
-            sdl2.SDL_GetWindowSize(self.renderer.window, ctypes.byref(window_w), ctypes.byref(window_h))
-            window_w = window_w.value
-            window_h = window_h.value
-            print(f'window_w, window_h = {window_w}, {window_h}')
+        assert(wx is not None and wy is not None)
 
-            vx = window_w // 2
-            vy = window_h // 2
-            print(f'vx, vy = {vx}, {vy}')
+        # if wx is None or wy is None:
+        #     # Put it's top-left corner in the center of the viewport
+        #     # @todo need screen dimensions. GUI should really have these
 
-            wx, wy = self.view_to_world(vx, vy)
-            print(f'wx, wy = {wx}, {wy}')
+        #     # Get window client area dimensions
+        #     window_w = ctypes.c_int()
+        #     window_h = ctypes.c_int()
+        #     sdl2.SDL_GetWindowSize(self.renderer.window, ctypes.byref(window_w), ctypes.byref(window_h))
+        #     window_w = window_w.value
+        #     window_h = window_h.value
+        #     print(f'window_w, window_h = {window_w}, {window_h}')
 
-        textArea = self.create_control("TextArea", w=240, h=100, x=wx, y=wy)
-        self.content().add_child(textArea)
+        #     vx = window_w // 2
+        #     vy = window_h // 2
+        #     print(f'vx, vy = {vx}, {vy}')
+
+        #     wx, wy = self.view_to_world(vx, vy)
+        #     print(f'wx, wy = {wx}, {wy}')
+
+        parent = self.content()
+        x, y = parent.world_to_local(wx, wy)
+        print(f'x, y = {x}, {y}')
+        textArea = self.create_control("TextArea", w=240, h=100, x=x, y=y)
+        parent.add_child(textArea)
         self.set_focus(textArea)
 
 
@@ -390,10 +404,21 @@ class GUI:
         logging.info('Command: create new LLM chat')
         wr = self.content().get_world_rect()
 
-        # self.content().sizeToChildren()
+        print('****************')
+        # @debug: print gui.content() bounding rect
+        print(f'gui.content().bounding_rect = {self.content().bounding_rect}')
+
+        # print gui world rect
+        print(f'gui.content().get_world_rect() = {wr}')
 
         argx = x-wr.x
         argy = y-wr.y
+        print(f'argx, argy = {argx}, {argy}')
+
+        print('****************')
+
+
+        # self.content().sizeToChildren()
 
         logging.debug(f"Creating new LLMChatContainer at {argx}, {argy}")
         chat = self.create_control("LLMChatContainer", x=argx, y=argy)
@@ -451,7 +476,14 @@ class GUI:
         # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
         if cmdPressed:
-            x, y = self.get_mouse_position()
+            vx, vy = self.get_mouse_position()
+            print('******** handle_keydown() ********')
+            print(f'gui.viewport_pos = {self._viewport_pos}')
+            print(f'gui.content().bounding_rect: {self.content().bounding_rect}')
+            print(f'gui.content().get_world_rect(): {self.content().get_world_rect()}')
+            print(f'Mouse position (view coordinate) vx, vy = {vx}, {vy}')    
+            print(f'Mouse position (world coordinate) wx, wy = {self.view_to_world(vx, vy)}')        
+            print('**********************************')
 
             # Shift+Cmd+[1-9] sets viewport bookmark
             if shiftPressed and not altPressed and not ctrlPressed and \
@@ -483,7 +515,7 @@ class GUI:
             
             # Cmd+B creates a new Label
             if keySym == sdl2.SDLK_b:
-                self.cmd_new_label(x, y)
+                self.cmd_new_label(vx, vy)
                 return True
             
             # Cmd+S saves GUI
@@ -497,7 +529,7 @@ class GUI:
             
             # Cmd+N add new LLM chat
             if keySym == sdl2.SDLK_n:
-                self.cmd_new_llm_chat(x, y)
+                self.cmd_new_llm_chat(vx, vy)
                 return True  # event was handled
 
             # Cmd+R say something
@@ -509,8 +541,11 @@ class GUI:
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea
-            if keySym == sdl2.SDLK_t:
-                self.cmd_new_text_area(x, y)
+            if keySym == sdl2.SDLK_t:                
+                wx, wy = self.view_to_world(vx, vy)
+                print(f'wx, wy = {wx}, {wy}')
+                
+                self.cmd_new_text_area(wx, wy)
                 return True
 
             if keySym == sdl2.SDLK_RETURN:
@@ -740,6 +775,40 @@ class GUI:
     def world_to_view(self, wx: int, wy: int) -> "tuple[int, int]":
         """Convert world (workspace) coordinates to viewport (screen) coordinates."""
         return wx - self._viewport_pos[0], wy - self._viewport_pos[1]
+
+
+    def get_ancestor_chain(self, control):
+        chain = []
+        while control is not None:
+            chain.append(control)
+            control = control.parent
+        chain.reverse()
+        chain.pop()  # Don't want the control, itself
+        return chain
+    
+
+    def local_to_local(src_control, dst_control, x_src_local: int, y_src_local: int) -> "tuple[int, int]":
+        """
+        Convert coordinates local to one control (src_control) into coordinates local to another control (dst_control).
+
+        Args:
+            src_control: The control to which the source coordinates are local.
+            dst_control: The control to which you want to convert the coordinates.
+            x_src_local (int): The x-coordinate local to the src_control.
+            y_src_local (int): The y-coordinate local to the src_control.
+
+        Returns:
+            A tuple containing the x and y coordinates local to the dst_control.
+        """
+
+        # First, convert src_control local coordinates to world coordinates
+        x_world, y_world = src_control.local_to_world(x_src_local, y_src_local)
+
+        # Then, convert the world coordinates to dst_control local coordinates
+        x_dst_local, y_dst_local = dst_control.world_to_local(x_world, y_world)
+
+        return x_dst_local, y_dst_local
+
     
 
     def check_hit(self, world_x: int, world_y: int) -> "Union[GUIControl, None]":
@@ -759,16 +828,6 @@ class GUI:
                     q.extend(child.children)
             # print(len(q))
         return None
-    
-
-    def get_ancestor_chain(self, control):
-        chain = []
-        while control is not None:
-            chain.append(control)
-            control = control.parent
-        chain.reverse()
-        chain.pop()  # Don't want the control, itself
-        return chain
     
 
     def save(self):        
