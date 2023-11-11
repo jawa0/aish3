@@ -15,7 +15,7 @@
 
 import sdl2
 import weakref
-from config import GUI_INSET_X, GUI_INSET_Y
+
 
 class GUILayout:
     def __init__(self, container=None):
@@ -41,9 +41,9 @@ class ColumnLayout(GUILayout):
         
         children = container.get_children()
         is_first = True
-        y = GUI_INSET_Y
+        y = 0
         for child in children:
-            child.set_position(GUI_INSET_X, y)
+            child.set_position(0, y)
             y += child.bounding_rect.h
 
 
@@ -58,9 +58,9 @@ class RowLayout(GUILayout):
         
         children = container.get_children()
         is_first = True
-        x = GUI_INSET_X
+        x = 0
         for child in children:
-            child.set_position(x, GUI_INSET_Y)
+            child.set_position(x, 0)
             x += child.bounding_rect.w
 
 

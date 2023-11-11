@@ -22,13 +22,14 @@ from .gui_control import GUIControl
 import gui
 import math
 
-from config import GUI_INSET_X, GUI_INSET_Y
-
 
 class GUIContainer(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+
+        # kwargs["inset"] = json
+
         instance = super().from_json(json, **kwargs)
         for child_json in json["children"]:
             # print(f'child_json: {child_json}')
@@ -85,7 +86,8 @@ class GUIContainer(GUIControl):
 
         json["class"] = self.__class__.__name__
         json["layout"] =  self.layout.__class__.__name__ if self.layout else None
-
+        json["name"] = self._name
+        json["inset"] = self._inset
 
         json["children"] = []
         for child in self.children:
@@ -114,6 +116,8 @@ class GUIContainer(GUIControl):
         if not self._visible:
             return
         
+        vr = self.get_view_rect()
+
         # Draw own bounding rect
         if self.draw_bounds and self.bounding_rect is not None:
             # Save the current color
@@ -123,11 +127,17 @@ class GUIContainer(GUIControl):
 
             # Set the new color
             r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
+            # r, g, b = (0, 255, 0)
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
 
             # Draw the bounding rectangle
-            vr = self.get_view_rect()
             sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+
+            # # Draw insets
+            # r, g, b = (255, 0, 0)
+            # sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+            # inset_rect = sdl2.SDL_Rect(vr.x + self._inset[0], vr.y + self._inset[1], vr.w - 2 * self._inset[0], vr.h - 2 * self._inset[1])
+            # sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, inset_rect)
 
             # Reset to the old color
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
@@ -179,20 +189,18 @@ class GUIContainer(GUIControl):
         if not self.children:
             return
         else:
-            # container_x_wrt_parent = self.bounding_rect.x
-            # container_y_wrt_parent = self.bounding_rect.y
-            container_x_wrt_parent, container_y_wrt_parent = self.gui.local_to_local(self, self.parent, 0, 0)
+            my_content_x_wrt_parent_content, my_content_y_wrt_parent_content = self.gui.local_to_local(self, self.parent, 0, 0)
 
-            print(f'GUIContainer.sizeToChildren(): container_x_wrt_parent={container_x_wrt_parent}, container_y_wrt_parent={container_y_wrt_parent}')
+            print(f'GUIContainer.sizeToChildren(): my_content_x_wrt_parent_content={my_content_x_wrt_parent_content}, my_content_y_wrt_parent_content={my_content_y_wrt_parent_content}')
 
             # Child coordinates are always relative to us. Make sure to handle the case where some of
             # them are negative. Also, maybe we deleted our leftmost or topmost. So in these cases,
             # our position will also change.
 
-            children_x_min_wrt_me = math.inf
-            children_x_max_wrt_me = -math.inf
-            children_y_min_wrt_me = math.inf
-            children_y_max_wrt_me = -math.inf
+            children_x_min_wrt_my_content_area = math.inf
+            children_x_max_wrt_my_content_area = -math.inf
+            children_y_min_wrt_my_content_area = math.inf
+            children_y_max_wrt_my_content_area = -math.inf
 
             count_non_screen_locked_children = 0
             for c in self.children:
@@ -201,27 +209,30 @@ class GUIContainer(GUIControl):
                     continue
                 count_non_screen_locked_children += 1
 
-                children_x_min_wrt_me = min(children_x_min_wrt_me, c.bounding_rect.x)
-                children_x_max_wrt_me = max(children_x_max_wrt_me, c.bounding_rect.x + c.bounding_rect.w)
-                children_y_min_wrt_me = min(children_y_min_wrt_me, c.bounding_rect.y)
-                children_y_max_wrt_me = max(children_y_max_wrt_me, c.bounding_rect.y + c.bounding_rect.h)
+                children_x_min_wrt_my_content_area = min(children_x_min_wrt_my_content_area, c.bounding_rect.x)
+                children_x_max_wrt_my_content_area = max(children_x_max_wrt_my_content_area, c.bounding_rect.x + c.bounding_rect.w)
+                children_y_min_wrt_my_content_area = min(children_y_min_wrt_my_content_area, c.bounding_rect.y)
+                children_y_max_wrt_my_content_area = max(children_y_max_wrt_my_content_area, c.bounding_rect.y + c.bounding_rect.h)
 
             if count_non_screen_locked_children == 0:
-                children_x_min_wrt_me = 0
-                children_x_max_wrt_me = 0
-                children_y_min_wrt_me = 0
-                children_y_max_wrt_me = 0
+                children_x_min_wrt_my_content_area = 0
+                children_x_max_wrt_my_content_area = 0
+                children_y_min_wrt_my_content_area = 0
+                children_y_max_wrt_my_content_area = 0
 
-            # children_x_min_wrt_me -= self._inset[0]
-            # children_x_max_wrt_me += self._inset[0]
+            # children_x_min_wrt_my_content_area -= self._inset[0]
+            # children_x_max_wrt_my_content_area += self._inset[0]
             # children_y_min_wrt_me -= self._inset[1]
             # children_y_max_wrt_me += self._inset[1]
             
-            # We want to move ourselves so our (0, 0) world coordinates correspond to 
-            # (children_x_min_wrt_me, children_y_min_wrt_me)'s world coordinates.
+            # We want to move ourselves so that AFTER, (0, 0) relative to our content area corresponsds to
+            # the world coordinates of (children_x_min_wrt_my_content_area, children_y_min_wrt_my_content_area) BEFORE.
 
-            my_x_shift = children_x_min_wrt_me
-            my_y_shift = children_y_min_wrt_me
+            my_content_area_wx_before, my_content_area_wy_before = self.local_to_world(0, 0)
+            my_content_area_wx_after, my_content_area_wy_after = self.local_to_world(children_x_min_wrt_my_content_area, children_y_min_wrt_my_content_area)
+
+            my_x_shift = my_content_area_wx_after - my_content_area_wx_before
+            my_y_shift = my_content_area_wy_after - my_content_area_wy_before
 
             print(f'GUIContainer.sizeToChildren(): my_x_shift={my_x_shift}, my_y_shift={my_y_shift}')
         
@@ -237,10 +248,11 @@ class GUIContainer(GUIControl):
 
                 c.set_position(c.bounding_rect.x + child_x_shift, c.bounding_rect.y + child_y_shift)
 
-            self.set_position(container_x_wrt_parent + my_x_shift, container_y_wrt_parent + my_y_shift)
+            # self.set_position(my_content_x_wrt_parent_content + my_x_shift, my_content_y_wrt_parent_content + my_y_shift)
+            self.set_position(self.bounding_rect.x + my_x_shift, self.bounding_rect.y + my_y_shift)
 
-            new_width_local = children_x_max_wrt_me - children_x_min_wrt_me + 2 * self._inset[0]
-            new_height_local = children_y_max_wrt_me - children_y_min_wrt_me + 2 * self._inset[1]
+            new_width_local = children_x_max_wrt_my_content_area - children_x_min_wrt_my_content_area + 2 * self._inset[0]
+            new_height_local = children_y_max_wrt_my_content_area - children_y_min_wrt_my_content_area + 2 * self._inset[1]
 
             print(f'GUIContainer.sizeToChildren(): new_width_local={new_width_local}, new_height_local={new_height_local}')
 
