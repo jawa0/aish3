@@ -289,7 +289,9 @@ class GUI:
                 i_end = command.find(")")
                 if i_end > i_start:
                     text = command[i_start:i_end]
-            self.cmd_new_label(vx, vy, text=text)
+
+            wx, wy = self.view_to_world(vx, vy)
+            self.cmd_new_label(wx, wy, text=text)
 
 
 
@@ -386,18 +388,18 @@ class GUI:
 
         parent = self.content()
         x, y = parent.world_to_local(wx, wy)
-        print(f'x, y = {x}, {y}')
         chat = self.create_control("LLMChatContainer", x=x, y=y)
         self.content().add_child(chat)
 
 
-    def cmd_new_label(self, x: int, y: int, text: str="New Label") -> None:
-        logging.info('Command: create new Label')
-        wr = self.content().get_world_rect()
+    def cmd_new_label(self, wx: int, wy: int, text: str="New Label") -> None:
+        """Expects wx, and wy to be world (workspace) coordinates."""
 
-        # self.content().sizeToChildren()
-        label = self.create_control("Label", text=text, font_descriptor="large-label", w=200, h=30, x=x-wr.x, y=y-wr.y)
-        self.content().add_child(label)
+        logging.info('Command: create new Label')
+        parent = self.content()
+        x, y = parent.world_to_local(wx, wy)
+        label = self.create_control("Label", text=text, font_descriptor="large-label", w=200, h=30, x=x, y=y)
+        parent.add_child(label)
         self.set_focus(label)
 
 
@@ -481,7 +483,8 @@ class GUI:
             
             # Cmd+B creates a new Label
             if keySym == sdl2.SDLK_b:
-                self.cmd_new_label(vx, vy)
+                wx, wy = self.view_to_world(vx, vy)
+                self.cmd_new_label(wx, wy)
                 return True
             
             # Cmd+S saves GUI
