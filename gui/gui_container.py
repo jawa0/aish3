@@ -150,13 +150,6 @@ class GUIContainer(GUIControl):
 
         self.updateLayout()
 
-        # Redundant. sizeToChildren() already does this. Was called from updateLayout().
-        # child_rect_wrt_my_parent = sdl2.SDL_Rect(child.bounding_rect.x + self.bounding_rect.x,
-        #                                          child.bounding_rect.y + self.bounding_rect.y,
-        #                                          child.bounding_rect.w,
-        #                                          child.bounding_rect.h)
-        # self.bounding_rect = rect_union(self.bounding_rect, child_rect_wrt_my_parent)
-        
         if add_to_focus_ring:
             self.focusRing.add(child)
             self.focusRing.focus(child)
@@ -179,14 +172,16 @@ class GUIContainer(GUIControl):
             self.parent.updateLayout()
 
 
-    def sizeToChildren(self, inset_x=GUI_INSET_X, inset_y=GUI_INSET_Y):
-        print("************* GUIContainer.sizeToChildren() *************")
+    def sizeToChildren(self):
+        print(f"************* GUIContainer.sizeToChildren() name='{self._name}' *************")
+        print(f"  self.bounding_rect={self.bounding_rect}, self._inset={self._inset}")
         # print(f'GUIContainer.sizeToChildren(): self={self}')
         if not self.children:
             return
         else:
-            container_x_wrt_parent = self.bounding_rect.x
-            container_y_wrt_parent = self.bounding_rect.y
+            # container_x_wrt_parent = self.bounding_rect.x
+            # container_y_wrt_parent = self.bounding_rect.y
+            container_x_wrt_parent, container_y_wrt_parent = self.gui.local_to_local(self, self.parent, 0, 0)
 
             print(f'GUIContainer.sizeToChildren(): container_x_wrt_parent={container_x_wrt_parent}, container_y_wrt_parent={container_y_wrt_parent}')
 
@@ -217,6 +212,11 @@ class GUIContainer(GUIControl):
                 children_y_min_wrt_me = 0
                 children_y_max_wrt_me = 0
 
+            # children_x_min_wrt_me -= self._inset[0]
+            # children_x_max_wrt_me += self._inset[0]
+            # children_y_min_wrt_me -= self._inset[1]
+            # children_y_max_wrt_me += self._inset[1]
+            
             # We want to move ourselves so our (0, 0) world coordinates correspond to 
             # (children_x_min_wrt_me, children_y_min_wrt_me)'s world coordinates.
 
@@ -239,8 +239,8 @@ class GUIContainer(GUIControl):
 
             self.set_position(container_x_wrt_parent + my_x_shift, container_y_wrt_parent + my_y_shift)
 
-            new_width_local = children_x_max_wrt_me - children_x_min_wrt_me + 2 * inset_x
-            new_height_local = children_y_max_wrt_me - children_y_min_wrt_me + 2 * inset_y
+            new_width_local = children_x_max_wrt_me - children_x_min_wrt_me + 2 * self._inset[0]
+            new_height_local = children_y_max_wrt_me - children_y_min_wrt_me + 2 * self._inset[1]
 
             print(f'GUIContainer.sizeToChildren(): new_width_local={new_width_local}, new_height_local={new_height_local}')
 

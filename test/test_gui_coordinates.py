@@ -25,7 +25,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
 
-        c = GUIControl(gui=g)
+        c = GUIControl(gui=g, inset=(0, 0))
         c.set_position(5, 7)
 
         r = c.bounding_rect
@@ -45,7 +45,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
 
-        c = GUIControl(gui=g)
+        c = GUIControl(gui=g, inset=(0, 0))
         c.set_position(-5, -7)
 
         r = c.bounding_rect
@@ -67,13 +67,13 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
 
         # print('create GUIContainer c0')
-        c0 = GUIContainer(gui=g)
+        c0 = GUIContainer(gui=g, inset=(0, 0))
         # print('add c0 to g.content()')
         g.content().add_child(c0)
         c0.set_position(5, 7)
 
         # print('create GUIControl c')
-        c = GUIControl(gui=g)
+        c = GUIControl(gui=g, inset=(0, 0))
         # print('add c to c0')
         c0.add_child(c)
         c.set_position(5, 7)
@@ -95,11 +95,11 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
 
-        c0 = GUIContainer(gui=g)
+        c0 = GUIContainer(gui=g, inset=(0, 0))
         g.content().add_child(c0)
         c0.set_position(-2, -3)
 
-        c = GUIControl(gui=g)
+        c = GUIControl(gui=g, inset=(0, 0))
         c0.add_child(c)
         c.set_position(-1, -2)
 
@@ -120,10 +120,10 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         s = Session()
         g = GUI(renderer=None, font_descriptor=None, client_session=s)
 
-        cont = GUIContainer(gui=g)
+        cont = GUIContainer(gui=g, inset=(0, 0))
         g.content().add_child(cont)
 
-        c0 = GUIControl(gui=g)
+        c0 = GUIControl(gui=g, inset=(0, 0))
         cont.add_child(c0)
         c0.set_position(5, 7)
         c0.set_size(10, 20, updateLayout=False)
@@ -132,7 +132,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         self.assertEqual(r_c0.x, 5)
         self.assertEqual(r_c0.y, 7)
 
-        c1 = GUIControl(gui=g)
+        c1 = GUIControl(gui=g, inset=(0, 0))
         cont.add_child(c1)
         c1.set_position(31, 37)
         c1.set_size(10, 20, updateLayout=False)
@@ -145,7 +145,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         self.assertEqual(cont.bounding_rect.y, 0)
 
         # !!!!
-        cont.sizeToChildren(inset_x=0, inset_y=0)
+        cont.sizeToChildren()
         r_cont = cont.bounding_rect
 
         self.assertEqual(r_cont.x, r_c0.x)
@@ -272,7 +272,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
 
         parent = g.content()
 
-        c0 = GUIControl(gui=g, x=5, y=7, w=200, h=30)
+        c0 = GUIControl(gui=g, x=5, y=7, w=200, h=30, inset=(0, 0))
         parent.add_child(c0)
         wr0 = c0.get_world_rect()
         lr0 = c0.bounding_rect
@@ -302,7 +302,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         x1, y1 = parent.world_to_local(wx1, wy1)
         self.assertEqual((x1, y1), (6, 6))  # (11, 13) - (5, 7)
 
-        c1 = GUIControl(gui=g, x=x1, y=y1, w=200, h=30)
+        c1 = GUIControl(gui=g, x=x1, y=y1, w=200, h=30, inset=(0, 0))
         print(f'*** c1 coordinates, before adding to parent: {c1.bounding_rect}')
         parent.add_child(c1)
         print(f'*** c1 coordinates, after adding to parent: {c1.bounding_rect}')

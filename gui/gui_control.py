@@ -14,6 +14,7 @@
 
 
 import sdl2
+from config import GUI_INSET_X, GUI_INSET_Y
 
 
 class GUIControl:
@@ -23,9 +24,9 @@ class GUIControl:
 
         can_focus (bool): Indicates if the control can gain focus. Default is True.
         x (int): The x-coordinate of the control's position. Relative to parent 
-            control. If no parent, then in world coordinates. Default is 0.
+            control's content area (offset by parent's _inset[0]). If no parent, then in world coordinates. Default is 0.
         y (int): The y-coordinate of the control's position. Relative to parent 
-            control. If no parent, then in world coordinates.  Default is 0.
+            control's content area (offset by parent's _inset[1]). If no parent, then in world coordinates.  Default is 0.
                 
         Keyword arguments are used to fetch 'gui', 'renderer', 'font_manager', 'draw_bounds', 
         'draggable', 'visible', 'screen_relative', and 'saveable' values.
@@ -43,6 +44,7 @@ class GUIControl:
             visible (bool): whether it's visible, default is True
             screen_relative (bool): whether it's screen relative, default is False
             saveable (bool): whether it's saveable, default is True
+            name (str): name of the control, default is "".
         """
         self.gui = kwargs.get('gui')
         self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
@@ -52,6 +54,8 @@ class GUIControl:
         self._visible = kwargs.get('visible', True)
         self._screen_relative = kwargs.get('screen_relative', False)
         self._saveable = saveable
+        self._inset = kwargs.get('inset', (GUI_INSET_X, GUI_INSET_Y))
+        self._name = kwargs.get('name', "")
 
         # print(f'GUIControl.__init__(): self.font_descriptor={self.font_descriptor}')
 
@@ -163,12 +167,12 @@ class GUIControl:
         Returns:
             A tuple containing the x and y coordinates in world space.
         """
-        wx = lx + self.bounding_rect.x
-        wy = ly + self.bounding_rect.y
+        wx = lx + self._inset[0] + self.bounding_rect.x
+        wy = ly + self._inset[1] + self.bounding_rect.y
 
         for a in self.gui.get_ancestor_chain(self):
-            wx += a.bounding_rect.x
-            wy += a.bounding_rect.y
+            wx += a.bounding_rect.x + a._inset[0]
+            wy += a.bounding_rect.y + a._inset[1]
         return wx, wy
 
 
@@ -185,12 +189,12 @@ class GUIControl:
         """
         lx, ly = wx, wy
         for a in self.gui.get_ancestor_chain(self):
-            lx -= a.bounding_rect.x
-            ly -= a.bounding_rect.y
+            lx -= a.bounding_rect.x + a._inset[0]
+            ly -= a.bounding_rect.y + a._inset[1]
 
-        lx -= self.bounding_rect.x
-        ly -= self.bounding_rect.y
-        
+        lx -= self.bounding_rect.x + self._inset[0]
+        ly -= self.bounding_rect.y + self._inset[1]
+
         return lx, ly
 
 

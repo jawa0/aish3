@@ -35,10 +35,6 @@ class ColumnLayout(GUILayout):
         super().__init__(**kwargs)
 
     def update(self):
-        # @todo DRY
-        GUI_INSET_X = 1
-        GUI_INSET_Y = 1
-
         container = self.get_container()
         if not container:
             return
@@ -56,10 +52,6 @@ class RowLayout(GUILayout):
         super().__init__(**kwargs)
 
     def update(self):
-        # @todo DRY
-        GUI_INSET_X = 1
-        GUI_INSET_Y = 1
-
         container = self.get_container()
         if not container:
             return
