@@ -274,16 +274,11 @@ class GUI:
             self._should_stop_voice_in = True
 
         elif command == "create_new_chat_with_llm":
-            self.cmd_new_llm_chat(vx, vy)
-
-        elif command == "create_new_text_area":            
-            print(f'vx, vy = {vx}, {vy}')            
-            print(f'GUI.viewport_pos = {self._viewport_pos}')
-            print(f'GUI.contents().bounding_rect = {self.content().bounding_rect}')
-            
             wx, wy = self.view_to_world(vx, vy)
-            print(f'wx, wy = {wx}, {wy}')
+            self.cmd_new_llm_chat(wx, wy)
 
+        elif command == "create_new_text_area":                        
+            wx, wy = self.view_to_world(vx, vy)
             self.cmd_new_text_area(wx, wy)
 
         elif command.startswith("create_new_label"):
@@ -373,25 +368,6 @@ class GUI:
 
         assert(wx is not None and wy is not None)
 
-        # if wx is None or wy is None:
-        #     # Put it's top-left corner in the center of the viewport
-        #     # @todo need screen dimensions. GUI should really have these
-
-        #     # Get window client area dimensions
-        #     window_w = ctypes.c_int()
-        #     window_h = ctypes.c_int()
-        #     sdl2.SDL_GetWindowSize(self.renderer.window, ctypes.byref(window_w), ctypes.byref(window_h))
-        #     window_w = window_w.value
-        #     window_h = window_h.value
-        #     print(f'window_w, window_h = {window_w}, {window_h}')
-
-        #     vx = window_w // 2
-        #     vy = window_h // 2
-        #     print(f'vx, vy = {vx}, {vy}')
-
-        #     wx, wy = self.view_to_world(vx, vy)
-        #     print(f'wx, wy = {wx}, {wy}')
-
         parent = self.content()
         x, y = parent.world_to_local(wx, wy)
         print(f'x, y = {x}, {y}')
@@ -400,28 +376,18 @@ class GUI:
         self.set_focus(textArea)
 
 
-    def cmd_new_llm_chat(self, x: int, y: int) -> None:
+    def cmd_new_llm_chat(self, wx: int, wy: int) -> None:
+        """Expects wx, and wy to be world (workspace) coordinates."""
+        
         logging.info('Command: create new LLM chat')
-        wr = self.content().get_world_rect()
+        print(f'wx, wy = {wx}, {wy}')
+        
+        assert(wx is not None and wy is not None)
 
-        print('****************')
-        # @debug: print gui.content() bounding rect
-        print(f'gui.content().bounding_rect = {self.content().bounding_rect}')
-
-        # print gui world rect
-        print(f'gui.content().get_world_rect() = {wr}')
-
-        argx = x-wr.x
-        argy = y-wr.y
-        print(f'argx, argy = {argx}, {argy}')
-
-        print('****************')
-
-
-        # self.content().sizeToChildren()
-
-        logging.debug(f"Creating new LLMChatContainer at {argx}, {argy}")
-        chat = self.create_control("LLMChatContainer", x=argx, y=argy)
+        parent = self.content()
+        x, y = parent.world_to_local(wx, wy)
+        print(f'x, y = {x}, {y}')
+        chat = self.create_control("LLMChatContainer", x=x, y=y)
         self.content().add_child(chat)
 
 
@@ -529,7 +495,8 @@ class GUI:
             
             # Cmd+N add new LLM chat
             if keySym == sdl2.SDLK_n:
-                self.cmd_new_llm_chat(vx, vy)
+                wx, wy = self.view_to_world(vx, vy)
+                self.cmd_new_llm_chat(wx, wy)
                 return True  # event was handled
 
             # Cmd+R say something
