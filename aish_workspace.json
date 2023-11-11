@@ -1,38 +1,28 @@
 {
-  "saved_at_utc": "2023-11-08T22:20:16.847566+00:00",
-  "saved_at_local": "2023-11-08T17:20:16.847566-05:00",
+  "saved_at_utc": "2023-11-11T19:16:39.684711+00:00",
+  "saved_at_local": "2023-11-11T14:16:39.684711-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
-        10,
-        10,
-        1402,
-        797
+        22,
+        23,
+        200,
+        30
       ],
       "layout": null,
       "children": [
         {
           "class": "Label",
           "bounding_rect": [
-            12,
-            13,
+            0,
+            0,
             200,
             30
           ],
           "text": "New Label",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "bounding_rect": [
-            24,
-            90,
-            240,
-            100
-          ],
-          "text": "This is an editable text area"
         }
       ]
     }

@@ -87,7 +87,7 @@ class GUI:
         # assert(self.renderer)
         # assert(self.font_descriptor)
 
-        self._content = GUIContainer(gui=self)
+        self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root")
         assert(self._content.focusRing is not None)
         self.focus_stack = []
         self.push_focus_ring(self._content.focusRing)
@@ -104,6 +104,9 @@ class GUI:
         self.workspace_filename = workspace_filename
         if self.workspace_filename is not None:
             self.load()
+
+        # @hack. GUI content root should never have insets, regardless of what was loaded.
+        self._content._inset = (0, 0)
 
         if enable_voice_out:
             self._voice_out = VoiceOut(on_speech_done=[self._on_speech_done])
@@ -445,13 +448,13 @@ class GUI:
 
         if cmdPressed:
             vx, vy = self.get_mouse_position()
-            print('******** handle_keydown() ********')
-            print(f'gui.viewport_pos = {self._viewport_pos}')
-            print(f'gui.content().bounding_rect: {self.content().bounding_rect}')
-            print(f'gui.content().get_world_rect(): {self.content().get_world_rect()}')
-            print(f'Mouse position (view coordinate) vx, vy = {vx}, {vy}')    
-            print(f'Mouse position (world coordinate) wx, wy = {self.view_to_world(vx, vy)}')        
-            print('**********************************')
+            # print('******** handle_keydown() ********')
+            # print(f'gui.viewport_pos = {self._viewport_pos}')
+            # print(f'gui.content().bounding_rect: {self.content().bounding_rect}')
+            # print(f'gui.content().get_world_rect(): {self.content().get_world_rect()}')
+            # print(f'Mouse position (view coordinate) vx, vy = {vx}, {vy}')    
+            # print(f'Mouse position (world coordinate) wx, wy = {self.view_to_world(vx, vy)}')        
+            # print('**********************************')
 
             # Shift+Cmd+[1-9] sets viewport bookmark
             if shiftPressed and not altPressed and not ctrlPressed and \
@@ -511,7 +514,7 @@ class GUI:
                 return True  # event was handled
             
             # Cmd+T creaes a new TextArea
-            if keySym == sdl2.SDLK_t:                
+            if keySym == sdl2.SDLK_t:
                 wx, wy = self.view_to_world(vx, vy)
                 print(f'wx, wy = {wx}, {wy}')
                 
@@ -757,9 +760,11 @@ class GUI:
         return chain
     
 
-    def local_to_local(src_control, dst_control, x_src_local: int, y_src_local: int) -> "tuple[int, int]":
+    def local_to_local(self, src_control, dst_control, x_src_local: int, y_src_local: int) -> "tuple[int, int]":
         """
-        Convert coordinates local to one control (src_control) into coordinates local to another control (dst_control).
+        Convert coordinates local to content area of one control (src_control) into coordinates local to 
+        content area of another control (dst_control). If dst_control is None, then the coordinates are
+        converted to world (workspace) coordinates.
 
         Args:
             src_control: The control to which the source coordinates are local.
@@ -773,6 +778,9 @@ class GUI:
 
         # First, convert src_control local coordinates to world coordinates
         x_world, y_world = src_control.local_to_world(x_src_local, y_src_local)
+
+        if dst_control is None:
+            return x_world, y_world
 
         # Then, convert the world coordinates to dst_control local coordinates
         x_dst_local, y_dst_local = dst_control.world_to_local(x_world, y_world)

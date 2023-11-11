@@ -47,10 +47,8 @@ class TextArea(GUIControl):
         Keyword Args:
             text (str): Initial text for the TextArea. Default is an empty string.
             can_focus (bool): Indicates if the control can gain focus. Inherited from GUIControl. Default is True.
-            x (int): The x-coordinate of the control's position. Inherited from GUIControl. Relative to parent 
-                control. If no parent, then in world coordinates. Default is 0.
-            y (int): The y-coordinate of the control's position. Inherited from GUIControl. Relative to parent 
-                control. If no parent, then in world coordinates.  Default is 0.
+            x (int): Inherited from GUIControl (see GUIControl.__init__()). Default is 0.
+            y (int):  Inherited from GUIControl (see GUIControl.__init__()). Default is 0.
             w (int): The width of the control. Inherited from GUIControl. Default is 20.
             h (int): The height of the control. Inherited from GUIControl. Default is 20.
             saveable (bool): Indicates if the control's state is saveable. Inherited from GUIControl. Default is True.
