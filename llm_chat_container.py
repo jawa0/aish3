@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import openai
+from typing import Optional
 from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
@@ -231,7 +232,7 @@ class LLMChatContainer(GUIContainer):
         self.accumulated_response_text = ""
 
 
-    def on_llm_response_chunk(self, chunk_text: str | None) -> None:
+    def on_llm_response_chunk(self, chunk_text: Optional[str]) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
         assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
