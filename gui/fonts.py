@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Union, Tuple, Optional
+from typing import Dict, Union, Tuple, Optional
 
 from sdl2.ext import Color, FontManager
 
@@ -40,7 +40,7 @@ def font_descriptor_from_json_str(json_string: str) -> FontDescriptor:
 
 class FontRegistry:
     _instance = None
-    _registry: dict[FontDescriptor, FontManager]
+    _registry: Dict[FontDescriptor, FontManager]
     _default_path = './res/fonts'
 
 
