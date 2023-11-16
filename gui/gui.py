@@ -881,31 +881,5 @@ class GUI:
                     depth_first_traversal(child, f)
             f(c)
 
-        def hack_fix_fucked_coordinates(c_root: "GUIControl") -> None:
-            from math import fabs
-            from random import randint
-
-            COORD_SIZE_THRESHOLD = 1200
-            RECT_ATTR_NAME = "bounding_rect"
-            is_fucked = False
-
-            to_check = []
-            depth_first_traversal(c_root, lambda c: hasattr(c, RECT_ATTR_NAME) and to_check.append(c))
-            
-            # Because of depth-first traversal, all ancestors of a control appear after it in the list
-            # So, we only need to fix individual fucked controls. Not their whole subtree.
-            
-            for c in to_check:
-                x = c.bounding_rect.x
-                y = c.bounding_rect.y
-
-                is_fucked = fabs(x) > COORD_SIZE_THRESHOLD or fabs(y) > COORD_SIZE_THRESHOLD
-                # print(f'(x, y) = {x, y} is_fucked = {is_fucked}')
-                if is_fucked:
-                    print(f'(x, y) = {x, y} is_fucked = {is_fucked}')
-                    c.set_position(randint(0, 500), randint(0, 500))
-
-        # hack_fix_fucked_coordinates(self.content())
-
         logging.debug("Controls coordinates fixed.")
         return True
