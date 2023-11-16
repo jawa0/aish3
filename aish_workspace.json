@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-11-11T21:53:39.256512+00:00",
-  "saved_at_local": "2023-11-11T16:53:39.256512-05:00",
+  "saved_at_utc": "2023-11-12T05:04:04.679047+00:00",
+  "saved_at_local": "2023-11-12T00:04:04.679047-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -42,8 +42,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            308,
-            24,
+            272,
+            55,
             608,
             312
           ],
@@ -146,8 +146,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            958,
-            401,
+            900,
+            55,
             608,
             312
           ],
@@ -250,9 +250,22 @@
       ]
     }
   },
-  "viewport_bookmarks": {},
+  "viewport_bookmarks": {
+    "1": [
+      23,
+      6
+    ],
+    "2": [
+      320,
+      26
+    ],
+    "9": [
+      960,
+      399
+    ]
+  },
   "viewport_pos": [
-    0,
-    0
+    23,
+    6
   ]
 }

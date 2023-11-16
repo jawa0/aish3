@@ -251,6 +251,7 @@ class TextEditBuffer(object):
 
             new_point = self.POINT - col + from_line_length + 1 + to_col  # +1 is for the newline char
             self.set_point(new_point)
+            
             return True   
 
         return False
