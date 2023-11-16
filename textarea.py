@@ -74,7 +74,7 @@ class TextArea(GUIControl):
         self.y_scroll = 0
         self.x_scroll = 0
         self.combined_text_texture = None
-        self.is_user_scrolling = False
+        self._was_last_event_mousewheel = False
         self.input_q = None
 
 
@@ -131,14 +131,14 @@ class TextArea(GUIControl):
 
 
     def handle_event(self, event):
+        current_was_last_event_mousewheel = self._was_last_event_mousewheel
+        self._was_last_event_mousewheel = False
 
         if event.type == sdl2.SDL_MOUSEWHEEL:
             # Here, we handle the vertical scrolling (event.wheel.y) 
             
-            self.is_user_scrolling = True
-            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
-            self.is_user_scrolling = False
-
+            self._was_last_event_mousewheel = True
+            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)            
             return True
         
         elif event.type == sdl2.SDL_KEYDOWN:
@@ -243,10 +243,7 @@ class TextArea(GUIControl):
                             self.text_buffer.set_mark()
                     else:
                         self.text_buffer.clear_mark()
-                    if self.text_buffer.move_point_down():  
-                        # @todo encapsulate in a controller
-                        # self.scroll_cursor_into_view()
-                        pass
+                    self.text_buffer.move_point_down()
 
                 self.set_needs_redraw()        
                 return True
@@ -330,6 +327,9 @@ class TextArea(GUIControl):
             self.set_needs_redraw()
             return True
     
+        # We reached the end of our events, so don't clear _was_last_event_mousewheel
+        self._was_last_event_mousewheel = current_was_last_event_mousewheel
+
         return self.parent_handle_event(event)
     
 
@@ -337,7 +337,7 @@ class TextArea(GUIControl):
         if self.combined_text_texture is not None:
             sdl2.SDL_DestroyTexture(self.combined_text_texture)
             self.combined_text_texture = None
-            if not self.is_user_scrolling:
+            if not self._was_last_event_mousewheel:
                 self.scroll_cursor_into_view()
 
 
@@ -450,7 +450,7 @@ class TextArea(GUIControl):
                                          self.row_spacing, 
                                          wr.x, wr.y, wr, 
                                          self.x_scroll, self.y_scroll,
-                                         dont_draw_just_calculate=True)  # !!!
+                                         dont_draw_just_calculate=True)  # !!! @todo wtf? @hack
         
         
         cursor_bottom_y = y_cursor + self.row_spacing
@@ -466,7 +466,7 @@ class TextArea(GUIControl):
             # print(f'y_correction: {y_correction}')
             self.scroll_by(dy=y_correction)
 
-        x_pad = 20  # Arbitrary
+        x_pad = 20  # Arbitrary @note this is really an input sensitivy setting
         if x_cursor > wr.x + wr.w - x_pad:
             x_correction = x_cursor - (wr.x + wr.w - x_pad)
             self.scroll_by(dx=x_correction)
