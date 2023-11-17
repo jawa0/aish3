@@ -16,6 +16,7 @@
 import sdl2
 import json
 import logging
+import matplotlib
 import os
 import openai
 from typing import Optional
@@ -122,6 +123,9 @@ class LLMChatContainer(GUIContainer):
         self.accumulated_response_text = None
         # self.focusRing.focus(self.system.text_area)
 
+        self.busy_colormap = matplotlib.colormaps['spring']
+        self._t_busy = 0.0
+
 
     @classmethod
     def from_json(cls, json, **kwargs):
@@ -212,6 +216,9 @@ class LLMChatContainer(GUIContainer):
                                         chunk_handler=self.on_llm_response_chunk,
                                         done_handler=self.on_llm_response_done)
 
+        self.pulse_busy = True
+        self._t_busy = 0.0
+
         model = 'gpt-4-1106-preview'
         # model = 'gpt-4'
         self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
@@ -246,7 +253,9 @@ class LLMChatContainer(GUIContainer):
 
 
     def on_llm_response_done(self) -> None:
-        pass
+        self.pulse_busy = False
+        self._t_busy = 0.0
+
         # self.gui.say(self.accumulated_response_text)
 
 
@@ -256,6 +265,57 @@ class LLMChatContainer(GUIContainer):
             "version": 1,
             "system_text": self.system.text_area.text_buffer.get_text(),
         }
+
+    
+    def on_update(self, dt):
+        self._t_busy += dt
+    
+
+    def _draw_bounds(self, vr):
+        # Draw the bounding rectangle after all text has been drawn
+        # Save the current color
+        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+        old_color = (r.value, g.value, b.value, a.value)
+
+        # Set the new color
+        if self.pulse_busy:
+            PERIOD_SECONDS = 1.0
+            # triangle wave
+            t = self._t_busy % PERIOD_SECONDS / PERIOD_SECONDS
+            if t < PERIOD_SECONDS / 2:            
+                fr, fg, fb, fa = self.busy_colormap(t)
+            else:
+                fr, fg, fb, fa = self.busy_colormap(1 - t)
+
+            r = int(fr * 255)
+            g = int(fg * 255)
+            b = int(fb * 255)
+
+        elif self.has_focus():
+            r, g, b = (0, 127, 255)
+        else:
+            r, g, b = (100, 100, 100)
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+        # Draw the bounding rectangle
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+
+        # Reset to the old color
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+
+    def draw(self):
+        super().draw()
+
+        # @todo should each specialized control need to implement this?
+        if self._screen_relative:
+            vr = self.bounding_rect
+        else:
+            vr = self.get_view_rect()
+
+        if self.pulse_busy:
+            self._draw_bounds(vr)
 
 
 GUI.register_control_type("LLMChatContainer", LLMChatContainer)

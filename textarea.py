@@ -349,6 +349,29 @@ class TextArea(GUIControl):
         self.set_needs_redraw()
 
 
+    def _draw_bounds(self, vr):
+        # Draw the bounding rectangle after all text has been drawn
+        # Save the current color
+        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+        old_color = (r.value, g.value, b.value, a.value)
+
+        # Set the new color
+        if self.pulse_busy:
+            r, g, b = (255, 0, 0)
+        elif self.has_focus():
+            r, g, b = (0, 127, 255)
+        else:
+            r, g, b = (100, 100, 100)
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+        # Draw the bounding rectangle
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+
+        # Reset to the old color
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+
     def draw(self):
         lines = self.text_buffer.get_lines()
         
@@ -412,21 +435,7 @@ class TextArea(GUIControl):
         assert(self.combined_text_texture is not None)
         sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, vr)
 
-        # Draw the bounding rectangle after all text has been drawn
-        # Save the current color
-        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
-        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
-        old_color = (r.value, g.value, b.value, a.value)
-
-        # Set the new color
-        r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
-        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
-
-        # Draw the bounding rectangle
-        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
-
-        # Reset to the old color
-        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+        self._draw_bounds(vr)
 
         # Draw cursor
         if self.has_focus():
