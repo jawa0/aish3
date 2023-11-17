@@ -69,6 +69,7 @@ class GUIControl:
         self.parent = None
         self.set_bounds(x, y, w, h)
         self.containing_focus_ring = None
+        self.pulse_busy = False
 
 
     def has_focus(self):
