@@ -222,9 +222,9 @@ class GUIControl:
         return vr        
         
 
-    def _set_focus(self, has_focus):
+    def _set_focus(self, getting_focus):
         if self.can_focus:
-            if self.has_focus() and self.parent and has_focus == False:
+            if self.has_focus() and self.parent and getting_focus == False:
                 self.parent.focused_child = None  # @todo still need this? GUI should handle this @todo
             return True
         else:

@@ -15,12 +15,14 @@
 
 from json import JSONDecodeError, loads
 import logging
+from typing import Optional
 
 import sdl2
 from gui.fonts import json_str_from_font_descriptor
 from draw import draw_text
 from gui import GUI, GUIControl
 from gui.fonts import FontDescriptor, font_descriptor_from_json_str
+from textarea import TextArea
 
 
 class Label(GUIControl):
@@ -105,22 +107,68 @@ class Label(GUIControl):
     def on_double_click(self, vx, vy):
         logging.debug("Label.on_double_click")
         if not self.editor:
-            self.editor = self.gui.create_control("TextArea", 
-                                                  text=self._text, 
-                                                  saveable=False,
-                                                  draggable=False,
-                                                  font_descriptor=self.font_descriptor, 
-                                                  x=self.bounding_rect.x, 
-                                                  y=self.bounding_rect.y, 
-                                                  w=self.bounding_rect.w, 
-                                                  h=self.bounding_rect.h)
-            self.parent.add_child(self.editor)
-            self.editor.text_buffer.move_point_to_end()
-            self._draggable = False
+            self._start_editing()
 
-            # @todo need some way to pre-snoop editor's events or better yet
-            # dynamically add event handlers. Like if user hits Esc or Enter,
-            # close the editor.
 
+    def _start_editing(self):
+        assert(not self.editor)
+        self.editor = self.gui.create_control("LabelEditor", 
+                                        label=self, 
+                                        saveable=False,
+                                        draggable=False,
+                                        font_descriptor=self.font_descriptor, 
+                                        x=self.bounding_rect.x, 
+                                        y=self.bounding_rect.y, 
+                                        w=self.bounding_rect.w, 
+                                        h=self.bounding_rect.h)
+        self.parent.add_child(self.editor)
         
+
+class LabelEditor(TextArea):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.edit_target: Label = kwargs['label']
+        self.edit_target._draggable = False
+        self.text_buffer.set_text(self.edit_target.get_text())
+        self.text_buffer.move_point_to_end()
+
+
+    def _stop_editing(self):
+        assert(self.edit_target)
+        self.edit_target._draggable = True
+        self.edit_target.set_text(self.text_buffer.get_text())
+        self.parent.remove_child(self)
+        self.edit_target.editor = None
+        self.edit_target = None
+
+
+    def _set_focus(self, getting_focus):
+        # Losing focus cancels editing
+        if self.has_focus() and not getting_focus:
+            self._stop_editing()
+            return True
+
+        return super()._set_focus(getting_focus)
+
+
+    def handle_event(self, event):
+        if event.type == sdl2.SDL_KEYDOWN:
+            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            keySymbol = event.key.keysym.sym
+
+            if cmdPressed:
+                # Cmd+Delete to delete Label we're editing
+                if keySymbol == sdl2.SDLK_BACKSPACE:
+                    self.edit_target.parent.remove_child(self.edit_target)
+                    self._stop_editing()
+                    return True
+            else:
+                if keySymbol == sdl2.SDLK_ESCAPE or keySymbol == sdl2.SDLK_RETURN:
+                    self._stop_editing()
+                    return True
+
+        return super().handle_event(event)
+
+
 GUI.register_control_type("Label", Label)
+GUI.register_control_type("LabelEditor", LabelEditor)
