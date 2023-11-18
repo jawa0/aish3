@@ -13,12 +13,14 @@
 # limitations under the License.
 
 
+from collections import deque
 import ctypes
 import datetime
 import json
 import logging
 import pytz
 import sdl2
+import time
 from typing import Optional, Union
 from tzlocal import get_localzone
 import weakref
@@ -131,11 +133,20 @@ class GUI:
         else:
             self.llm_available = True
 
+        self._clickstream = deque(maxlen=2)
+
         # @hack @debug @test
         self._content._inset = (0, 0)
         # self._content.draw_bounds = True
 
         self.content().sizeToChildren()
+
+
+    class ClickContext:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+            self.t = time.time()
 
 
     class JSONEncoder(json.JSONEncoder):
@@ -300,6 +311,29 @@ class GUI:
 
 
     def handle_event(self, event):
+        is_double_click = False
+        if event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+            self._clickstream.append(GUI.ClickContext(event.button.x, event.button.y))
+
+            if len(self._clickstream) > 1:
+                click0 = self._clickstream[0]
+                click1 = self._clickstream[1]
+
+                DOUBLE_CLICK_TIMEOUT = 0.4  # seconds. @todo: should read system settings?
+                DOUBLE_CLICK_RADIUS = 10  # pixels.
+
+                # Check if the elapsed time between click0 and click1 is less than DOUBLE_CLICK_TIMEOUT
+                if click1.t - click0.t < DOUBLE_CLICK_TIMEOUT:
+                    # Check if the distance between click0 and click1 is less than 10 pixels
+                    dx = click1.x - click0.x
+                    dy = click1.y - click0.y
+                    d = dx * dx + dy * dy
+                    if d < DOUBLE_CLICK_RADIUS * DOUBLE_CLICK_RADIUS:
+                        # It's a double click!
+                        is_double_click = True
+                        logging.debug(f"** Double click at {click1.x}, {click1.y} dt={click1.t - click0.t}!")
+
+
         handled = False
         if self._focused_control:
             handled = self._focused_control.handle_event(event)
@@ -319,10 +353,13 @@ class GUI:
                     # If it's the left mouse button, then check for a hit on a control.
                     if event.button.button == sdl2.SDL_BUTTON_LEFT:
                         wx, wy = self.view_to_world(event.button.x, event.button.y)
-                        hit_control = self.check_hit(wx, wy)
+                        hit_control = self.check_hit(wx, wy, only_draggable=True)
                         if hit_control:
                             self._drag_control = hit_control
                             self.set_focus(hit_control)
+
+                            if is_double_click and hasattr(hit_control, "on_double_click"):
+                                hit_control.on_double_click(event.button.x, event.button.y)
                     return True
 
             elif event.type == sdl2.SDL_MOUSEBUTTONUP:
@@ -790,7 +827,7 @@ class GUI:
 
     
 
-    def check_hit(self, world_x: int, world_y: int) -> "Union[GUIControl, None]":
+    def check_hit(self, world_x: int, world_y: int, only_draggable:bool=False) -> "Union[GUIControl, None]":
         """Expects world (workspace) coordinates, not viewport (screen) coordinates.
         Returns the control that was hit, or None if no control was hit.
         See also: GUI.view_to_world()"""
@@ -800,7 +837,8 @@ class GUI:
         q = list(self.content())
         while len(q) > 0:
             child = q.pop()
-            if sdl2.SDL_PointInRect(p, child.get_world_rect()):
+            skip_it = only_draggable and not child._draggable
+            if not skip_it and sdl2.SDL_PointInRect(p, child.get_world_rect()):
                 return child
             else:
                 if hasattr(child, "children"):

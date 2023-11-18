@@ -15,8 +15,11 @@
 
 import ctypes
 import sdl2
+from sdl2.ext.ttf import FontTTF
+from sdl2.sdlttf import TTF_FontHeight
 from draw import draw_cursor, draw_text
 from gui import GUI, GUIControl
+from gui.fonts import FontRegistry
 from text_edit_buffer import TextEditBuffer
 import queue
 
@@ -76,6 +79,17 @@ class TextArea(GUIControl):
         self.combined_text_texture = None
         self._was_last_event_mousewheel = False
         self.input_q = None
+
+        # @hack @todo FontManager is deprecated. Should use sdl2.ext.ttf.FontTTF
+        fm = FontRegistry().get_fontmanager(self.font_descriptor)
+        font_size_px = fm.size
+
+        font = FontTTF("./res/fonts/FiraCode-Regular.ttf", font_size_px, (255, 255, 255))
+        ttf_font = font.get_ttf_font()
+        line_height_px = TTF_FontHeight(ttf_font)
+        self.row_spacing = line_height_px
+        del ttf_font
+        font.close()
 
 
     def __json__(self):

@@ -14,6 +14,7 @@
 
 
 from json import JSONDecodeError, loads
+import logging
 
 import sdl2
 from gui.fonts import json_str_from_font_descriptor
@@ -101,4 +102,25 @@ class Label(GUIControl):
         sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, r)
 
 
+    def on_double_click(self, vx, vy):
+        logging.debug("Label.on_double_click")
+        if not self.editor:
+            self.editor = self.gui.create_control("TextArea", 
+                                                  text=self._text, 
+                                                  saveable=False,
+                                                  draggable=False,
+                                                  font_descriptor=self.font_descriptor, 
+                                                  x=self.bounding_rect.x, 
+                                                  y=self.bounding_rect.y, 
+                                                  w=self.bounding_rect.w, 
+                                                  h=self.bounding_rect.h)
+            self.parent.add_child(self.editor)
+            self.editor.text_buffer.move_point_to_end()
+            self._draggable = False
+
+            # @todo need some way to pre-snoop editor's events or better yet
+            # dynamically add event handlers. Like if user hits Esc or Enter,
+            # close the editor.
+
+        
 GUI.register_control_type("Label", Label)
