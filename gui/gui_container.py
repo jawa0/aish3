@@ -166,8 +166,12 @@ class GUIContainer(GUIControl):
 
 
     def remove_child(self, child):
-        child.parent = None
+        self.focusRing.remove(child)
         self.children.remove(child)
+        if self.gui._focused_control == child:
+            self.gui._focused_control = None
+            
+        child.parent = None
         self.updateLayout()
 
 
@@ -257,8 +261,4 @@ class GUIContainer(GUIControl):
             print(f'GUIContainer.sizeToChildren(): new_width_local={new_width_local}, new_height_local={new_height_local}')
 
             self.set_size(new_width_local, new_height_local, updateLayout=False)
-
-
-    def handle_event(self, event):
-        return self.parent_handle_event(event)
     

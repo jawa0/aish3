@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-11-12T05:04:04.679047+00:00",
-  "saved_at_local": "2023-11-12T00:04:04.679047-05:00",
+  "saved_at_utc": "2023-11-18T18:48:25.378357+00:00",
+  "saved_at_local": "2023-11-18T13:48:25.378357-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
         34,
-        35,
-        1566,
-        713
+        50,
+        1484,
+        578
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -19,21 +19,10 @@
       ],
       "children": [
         {
-          "class": "Label",
-          "bounding_rect": [
-            0,
-            0,
-            200,
-            30
-          ],
-          "text": "New Label",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
           "class": "TextArea",
           "bounding_rect": [
-            11,
-            67,
+            2,
+            156,
             240,
             100
           ],
@@ -42,8 +31,112 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            272,
-            55,
+            255,
+            266,
+            608,
+            312
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                164,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "Give me a list of 20 animals."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            876,
+            265,
             608,
             312
           ],
@@ -144,108 +237,59 @@
           ]
         },
         {
-          "class": "LLMChatContainer",
+          "class": "Label",
           "bounding_rect": [
-            900,
-            55,
-            608,
-            312
+            0,
+            1,
+            200,
+            30
           ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
+          "text": "New Label",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            186,
+            0,
+            200,
+            30
           ],
-          "children": [
-            {
-              "class": "Label",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                0,
-                164,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            }
-          ]
+          "text": "Double-click to set label text",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            188,
+            42,
+            200,
+            30
+          ],
+          "text": "Cmd+Del while editing a label deletes it",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            258,
+            218,
+            200,
+            30
+          ],
+          "text": "An LLM Chat",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            877,
+            220,
+            200,
+            30
+          ],
+          "text": "Another chat",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         }
       ]
     }

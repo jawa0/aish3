@@ -180,7 +180,7 @@ class TextArea(GUIControl):
                 self.set_needs_redraw()
                 return True
             
-            # Cmd+Backspace/Delete delete the TextArea, but only if
+            # Cmd+Backspace/Delete delete the focused control, but only if
             # it is at the top-level of the GUI, not part of some other
             # container.
 
