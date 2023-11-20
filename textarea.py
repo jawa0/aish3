@@ -82,6 +82,7 @@ class TextArea(GUIControl):
 
         # @hack @todo FontManager is deprecated. Should use sdl2.ext.ttf.FontTTF
         fm = FontRegistry().get_fontmanager(self.font_descriptor)
+        assert(fm is not None)
         font_size_px = fm.size
 
         font = FontTTF("./res/fonts/FiraCode-Regular.ttf", font_size_px, (255, 255, 255))
