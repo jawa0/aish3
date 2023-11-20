@@ -5,7 +5,11 @@ from typing import Dict, Union, Tuple, Optional
 from sdl2.ext import Color, FontManager
 
 
-FontDescriptor = Union[str, Tuple[str, int, Tuple[int, int, int]]]
+# Either a name, or a tuple of (filename, size, color)
+FontColorRGB = Tuple[int, int, int]
+FontFilename = str
+FontSizePixels = int
+FontDescriptor = Union[str, Tuple[FontFilename, FontSizePixels, FontColorRGB]]
 
 
 # Function to convert a FontDescriptor to a string for saving to JSON.
@@ -20,6 +24,7 @@ def json_str_from_font_descriptor(font_descriptor: FontDescriptor) -> str:
 
 # Function to convert a JSON stringto a FontDescriptor
 def font_descriptor_from_json_str(json_string: str) -> FontDescriptor:
+    print(f'font_descriptor_from_json_str(): json_string={json_string}')
     try:
         data = json.loads(json_string)
         # print('Got valid JSON')
@@ -63,6 +68,5 @@ class FontRegistry:
         return key
 
 
-    def get_fontmanager(self, string_key: Optional[str] = None, filename: Optional[str] = None, size: Optional[int] = None, color: Tuple[int,int,int] = (255, 255, 255)) -> Optional[FontManager]:
-        key: FontDescriptor = string_key if string_key else (filename, size, color)
-        return self._instance._registry.get(key)
+    def get_fontmanager(self, font_descriptor: FontDescriptor) -> Optional[FontManager]:
+        return self._instance._registry.get(font_descriptor)

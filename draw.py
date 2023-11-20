@@ -13,18 +13,24 @@
 # limitations under the License.
 
 
-from gui.fonts import FontRegistry
+from typing import Dict, Optional, Tuple
+
 import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
 
+from gui.fonts import FontDescriptor, FontRegistry
+from text_edit_buffer import TextEditBuffer
 
-_char_width_cache = {}
+# Key: (font_name, font_size, char)
+_char_width_cache: Dict[Tuple[str, int, str], int] = {}
 
-def get_char_width(font_descriptor, char):
+
+def get_char_width(font_descriptor: FontDescriptor, char: str) -> int:
     global _char_width_cache
 
     font_manager = FontRegistry().get_fontmanager(font_descriptor)
+    assert(font_manager is not None)
     font_name = font_manager.default_font
     font_size = font_manager.size
     key = (font_name, font_size, char)
@@ -46,6 +52,7 @@ def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_sur
     
     # print(f'draw_text: font_descriptor={font_descriptor}')
     font_manager = FontRegistry().get_fontmanager(font_descriptor)
+    assert(font_manager is not None)
     # print(f'draw_text: font_manager={font_manager}')
 
     # Keep track of initial x, and y since we will be updating x, y for each character.
@@ -135,14 +142,51 @@ def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_sur
         sdl2.SDL_FreeSurface(text_surface)
 
 
-def draw_cursor(renderer, font_descriptor, 
-                text_buffer, 
-                row_spacing, 
-                x, y, 
-                bounding_rect=None, 
-                x_scroll=0, y_scroll=0,
-                dont_draw_just_calculate=False): 
-    
+def draw_cursor(renderer: 'sdl2.ext.Renderer', 
+                font_descriptor: FontDescriptor, 
+                text_buffer: TextEditBuffer, 
+                row_spacing: int, 
+                x: int, 
+                y: int, 
+                bounding_rect: 'Optional[sdl2.SDL_Rect]' = None, 
+                x_scroll: int = 0, 
+                y_scroll: int = 0,
+                dont_draw_just_calculate: bool = False) -> Tuple[int, int]: 
+    """
+    Draws or calculates the position of the cursor within a text buffer.
+
+    This function determines the cursor's x and y position within a given text
+    buffer, optionally drawing it using the provided renderer. Calculation of
+    the cursor's position accounts for tab expansion and scrolling offsets.
+
+    Args:
+        renderer: The rendering context onto which the cursor may be drawn.
+        font_descriptor: Data describing the font, used to calculate character widths.
+        text_buffer: The text buffer which contains the text and cursor position.
+        row_spacing: The vertical distance from the start of one row of text, to the next, in pixels.
+        x: The x coordinate of the top-left corner of the text area.
+        y: The y coordinate of the top-left corner of the text area.
+        bounding_rect (optional): A rectangle that defines the clipping area for drawing.
+        x_scroll (optional): The horizontal scroll offset.
+        y_scroll (optional): The vertical scroll offset.
+        dont_draw_just_calculate (optional): If set to True, the function will not
+                                              draw the cursor but only calculate
+                                              its position.
+
+    Returns:
+        A tuple (x_cursor, y_cursor) representing the cursor's coordinates. If the
+        cursor is drawn, these coordinates indicate where the cursor was drawn.
+        If drawing is skipped, they indicate where the cursor would have been
+        drawn.
+
+    Note:
+        If `bounding_rect` is provided, the cursor will be drawn clipped to this
+        rectangle. The cursor will not be drawn outside this area.
+
+        If `dont_draw_just_calculate` is True, no drawing operations will occur,
+        and the function serves to return the cursor's computed position.
+    """
+
     row, col_unexpanded = text_buffer.get_row_col(text_buffer.get_point())
     line_unexpanded = text_buffer.get_line(row, expand_tabs=False)
 

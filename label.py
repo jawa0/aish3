@@ -19,7 +19,7 @@ from typing import Optional
 
 import sdl2
 from gui.fonts import json_str_from_font_descriptor
-from draw import draw_text
+from draw import draw_text, get_char_width
 from gui import GUI, GUIControl
 from gui.fonts import FontDescriptor, font_descriptor_from_json_str
 from textarea import TextArea
@@ -135,8 +135,13 @@ class LabelEditor(TextArea):
 
     def _stop_editing(self):
         assert(self.edit_target)
-        self.edit_target._draggable = True
         self.edit_target.set_text(self.text_buffer.get_text())
+        text_width_px = get_char_width(self.edit_target.font_descriptor, "W") * len(self.text_buffer.get_text())
+
+        r = self.edit_target.bounding_rect
+        self.edit_target.set_bounds(r.x, r.y, text_width_px, r.h)
+
+        self.edit_target._draggable = True
         self.parent.remove_child(self)
         self.edit_target.editor = None
         self.edit_target = None
