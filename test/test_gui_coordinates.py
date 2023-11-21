@@ -362,5 +362,31 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         self.assertEqual((vr0.x, vr0.y), (vx, vy))
 
 
+    def test_ancestor_chain(self):
+        s = Session()
+        g = GUI(renderer=None, font_descriptor=None, client_session=s)
+
+        cnt0 = GUIContainer(gui=g)
+        g.content().add_child(cnt0)
+
+        cnt1 = GUIContainer(gui=g)
+        cnt0.add_child(cnt1)
+
+        cnt2 = GUIContainer(gui=g)
+        cnt1.add_child(cnt2)
+
+        c = GUIControl(gui=g)
+        cnt2.add_child(c)
+
+        chain = g.get_ancestor_chain(c)
+        self.assertEqual(len(chain), 4)
+
+        # self.assertEqual(chain[0], cnt2)
+        # self.assertEqual(chain[-1], g.content())
+
+        self.assertEqual(chain[0], g.content())
+        self.assertEqual(chain[-1], cnt2)
+
+
 if __name__ == '__main__':
     unittest.main()
