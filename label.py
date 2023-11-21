@@ -86,11 +86,7 @@ class Label(GUIControl):
 
 
     def draw(self):
-        # @todo should each specialized control need to implement this?
-        if self._screen_relative:
-            r = self.bounding_rect
-        else:
-            r = self.get_view_rect()
+        r = self.get_view_rect()
 
         if self.combined_text_texture is None:
             surf = sdl2.SDL_CreateRGBSurface(0, self.bounding_rect.w, self.bounding_rect.h, 32, 0, 0, 0, 0)

@@ -396,11 +396,7 @@ class TextArea(GUIControl):
     def draw(self):
         lines = self.text_buffer.get_lines()
         
-        # @todo should each specialized control need to implement this?
-        if self._screen_relative:
-            vr = self.bounding_rect
-        else:
-            vr = self.get_view_rect()
+        vr = self.get_view_rect()
 
         vx = vr.x - self.x_scroll
         vy = vr.y - self.y_scroll

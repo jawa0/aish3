@@ -21,7 +21,7 @@ import logging
 import pytz
 import sdl2
 import time
-from typing import Optional, Union
+from typing import List, Optional, Union
 from tzlocal import get_localzone
 import weakref
 import os
@@ -341,6 +341,10 @@ class GUI:
         if event.type == sdl2.SDL_KEYDOWN:
             keySym = event.key.keysym.sym
             if keySym == sdl2.SDLK_BACKQUOTE:  # tilde key pressed
+                # print("\n********* Tilde key pressed. Toggling command console visibility.\n")
+                # print(f"self._viewport_pos = {self._viewport_pos}")
+                # print(f"self.command_console.bounding_rect = {self.command_console.bounding_rect}")
+
                 self.command_console._visible = not self.command_console._visible
 
                 # Gets focus which causes it to handle the upcoming SDL_TEXTINPUT and 
@@ -809,7 +813,24 @@ class GUI:
         return wx - self._viewport_pos[0], wy - self._viewport_pos[1]
 
 
-    def get_ancestor_chain(self, control):
+    def get_ancestor_chain(self, control: 'GUIControl') -> List['GUIControl']:
+        """
+        Constructs a list of ancestors for the given control in order from the root ancestor to the direct parent.
+
+        This method traverses the hierarchy of parent controls, starting from the given control and moving up the
+        lineage, collecting each parent in a list. The resulting list is ordered from the root container (highest
+        in the hierarchy) to the immediate parent of the provided control.
+
+        Note that the given control itself is not included in the chain, only its ancestors are.
+
+        Args:
+            control (GUIControl): The control for which to get the ancestor chain.
+
+        Returns:
+            list[GUIControl]: A list of ancestors, where the first element is the root ancestor (e.g., the content of
+                            the GUI), and the last element is the immediate parent control just above the given control.
+        """
+
         chain = []
         while control is not None:
             chain.append(control)

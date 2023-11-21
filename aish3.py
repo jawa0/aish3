@@ -84,12 +84,12 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
 
     gui.command_console = CommandConsole(saveable=False,
                                          screen_relative=True,
-                                        can_focus=False,
+                                        can_focus=True,
                                         visible=False,
                                         x=10,
-                                        y=100,
+                                        y=50,
                                         w=1000,
-                                        h=300,
+                                        h=500,
                                         gui=gui)
     gui.content().add_child(gui.command_console)
 

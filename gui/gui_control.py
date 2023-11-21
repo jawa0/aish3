@@ -216,14 +216,47 @@ class GUIControl:
         """Get our bounding rect in 'view' coordinates. I.e. relative to the viewport position.
         These are what need to be passed to our drawing routines."""
 
-        wr = self.get_world_rect()
-        vx, vy = self.gui.world_to_view(wr.x, wr.y)
-        vr = sdl2.SDL_Rect(vx, vy, wr.w, wr.h)
-        return vr        
+        if self.is_screen_relative():
+            return self.bounding_rect
+        else:
+            ancestors = self.gui.get_ancestor_chain(self)
+            most_senior_screen_relative_ancestor = None
+            for ancestor in ancestors:  # ordered from root on down to control's direct parent
+                if ancestor.is_screen_relative():
+                    most_senior_screen_relative_ancestor = ancestor
+                    break
+                
+            if most_senior_screen_relative_ancestor is not None:
+                x, y = self.gui.local_to_local(self.parent, 
+                                               most_senior_screen_relative_ancestor, 
+                                               self.bounding_rect.x, 
+                                               self.bounding_rect.y)
+                
+                avr = most_senior_screen_relative_ancestor.get_view_rect()
+                vr = sdl2.SDL_Rect(x + avr.x, y + avr.y, self.bounding_rect.w, self.bounding_rect.h)
+                return vr
+            else:
+                wr = self.get_world_rect()
+                vx, vy = self.gui.world_to_view(wr.x, wr.y)
+                vr = sdl2.SDL_Rect(vx, vy, wr.w, wr.h)
+                return vr        
         
 
+    def is_screen_relative(self):
+        # Check self first
+        if self._screen_relative:
+            return True
+
+        # # Now check ancestors
+        # for ancestor in self.gui.get_ancestor_chain(self):
+        #     if ancestor._screen_relative:
+        #         return True
+
+        return False
+
+
     def _set_focus(self, getting_focus):
-        if self.can_focus:
+        if self._visible and self.can_focus:
             if self.has_focus() and self.parent and getting_focus == False:
                 self.parent.focused_child = None  # @todo still need this? GUI should handle this @todo
             return True

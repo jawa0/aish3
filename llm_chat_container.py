@@ -308,11 +308,7 @@ class LLMChatContainer(GUIContainer):
     def draw(self):
         super().draw()
 
-        # @todo should each specialized control need to implement this?
-        if self._screen_relative:
-            vr = self.bounding_rect
-        else:
-            vr = self.get_view_rect()
+        vr = self.get_view_rect()
 
         if self.pulse_busy:
             self._draw_bounds(vr)

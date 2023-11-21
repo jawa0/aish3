@@ -170,7 +170,7 @@ class GUIContainer(GUIControl):
         self.children.remove(child)
         if self.gui._focused_control == child:
             self.gui._focused_control = None
-            
+
         child.parent = None
         self.updateLayout()
 
@@ -209,7 +209,7 @@ class GUIContainer(GUIControl):
             count_non_screen_locked_children = 0
             for c in self.children:
                 # If the child is screen-relative, it should not contribute to our size.
-                if c._screen_relative:
+                if c.is_screen_relative():
                     continue
                 count_non_screen_locked_children += 1
 
@@ -247,7 +247,7 @@ class GUIContainer(GUIControl):
 
             for c in self.children:
                 # If the child is screen-relative, don't move it.
-                if c._screen_relative:
+                if c.is_screen_relative():
                     continue
 
                 c.set_position(c.bounding_rect.x + child_x_shift, c.bounding_rect.y + child_y_shift)
