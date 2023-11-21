@@ -25,6 +25,7 @@ import config
 from gui import GUI, FontRegistry
 from llm_chat_container import LLMChatContainer
 from gui_layout import RowLayout
+from command_console import CommandConsole
 from draw import draw_text
 from session import Session
 from label import Label
@@ -81,6 +82,17 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
     gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
     gui.content().add_child(gui.voice_transcript)
 
+    gui.command_console = CommandConsole(saveable=False,
+                                         screen_relative=True,
+                                        can_focus=False,
+                                        visible=False,
+                                        x=10,
+                                        y=100,
+                                        w=1000,
+                                        h=300,
+                                        gui=gui)
+    gui.content().add_child(gui.command_console)
+
     running = True
     t_prev_update = time.time()
 
@@ -105,6 +117,8 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
                                                             new_height - voice_transcript_height - 5, 
                                                             new_width-5, 
                                                             voice_transcript_height)
+
+                            # gui.command_console.set_bounds(10, 10, new_width-10, 200)
 
                         width = new_width
                         height = new_height

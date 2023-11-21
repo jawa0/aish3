@@ -17,11 +17,14 @@ import datetime
 from dotenv import load_dotenv
 import logging
 import openai
+import os
 import os.path
 from pathlib import Path
 
-
 load_dotenv()   # Load the .env file
+
+# Set the application path to the current working directory when config is loaded
+app_path = os.getcwd()
 
 # Ensure app user config dir exists
 app_name = "aish3"
@@ -67,9 +70,8 @@ def setup_logging():
     for handler in handlers:
         root_logger.addHandler(handler)
 
-
     # Increase OpenAI log level
     logging.getLogger("openai").setLevel(logging.DEBUG)
 
-
 setup_logging()
+
