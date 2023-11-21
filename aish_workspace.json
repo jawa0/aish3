@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-11-18T18:48:25.378357+00:00",
-  "saved_at_local": "2023-11-18T13:48:25.378357-05:00",
+  "saved_at_utc": "2023-11-21T02:08:01.808079+00:00",
+  "saved_at_local": "2023-11-20T21:08:01.808079-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
-        34,
-        50,
+        39,
+        346,
         1484,
-        578
+        695
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -21,8 +21,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            2,
-            156,
+            0,
+            117,
             240,
             100
           ],
@@ -32,7 +32,7 @@
           "class": "LLMChatContainer",
           "bounding_rect": [
             255,
-            266,
+            383,
             608,
             312
           ],
@@ -136,7 +136,7 @@
           "class": "LLMChatContainer",
           "bounding_rect": [
             876,
-            265,
+            382,
             608,
             312
           ],
@@ -239,8 +239,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            0,
-            1,
+            3,
+            64,
             200,
             30
           ],
@@ -250,9 +250,9 @@
         {
           "class": "Label",
           "bounding_rect": [
-            186,
+            282,
             0,
-            200,
+            450,
             30
           ],
           "text": "Double-click to set label text",
@@ -261,9 +261,9 @@
         {
           "class": "Label",
           "bounding_rect": [
-            188,
-            42,
-            200,
+            280,
+            54,
+            600,
             30
           ],
           "text": "Cmd+Del while editing a label deletes it",
@@ -309,7 +309,7 @@
     ]
   },
   "viewport_pos": [
-    23,
-    6
+    21,
+    289
   ]
 }

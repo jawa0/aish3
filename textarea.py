@@ -336,6 +336,12 @@ class TextArea(GUIControl):
         elif event.type == sdl2.SDL_TEXTINPUT:
             # event.text.text is a bytes object representing a string in UTF-8 encoding
             text = event.text.text.decode('utf-8')
+            
+            # @hack to get command console to stop inserting its wakeup key ~ into
+            # the textbuffer
+            if text == '~' or text == "`":
+                return True
+            
             if self.text_buffer.get_selection() is not None:
                 self.text_buffer.delete_selection()
             self.text_buffer.insert(text)
