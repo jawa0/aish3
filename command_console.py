@@ -25,13 +25,18 @@ from textarea import TextArea
 
 class CommandConsole(GUIContainer):
     def __init__(self, **kwargs):
+        PANEL_WIDTH = 1000
+        
         super().__init__(layout=ColumnLayout(), **kwargs)
+        self.draw_bounds = True
+        self._inset = (GUI_INSET_X, GUI_INSET_Y)
+
         self.console_label = Label(text="Command Console", 
-                                   x=0, y=0, w=self.bounding_rect.w, h=20,  # Adjust dimensions as needed
+                                   w=PANEL_WIDTH, 
                                    gui=self.gui)
         self.add_child(self.console_label, add_to_focus_ring=False)
 
-        self.console_area = TextArea(w=self.bounding_rect.w - GUI_INSET_X, h=60, gui=self.gui)
+        self.console_area = TextArea(w=PANEL_WIDTH, h=60, gui=self.gui)
         self.add_child(self.console_area)
 
 
