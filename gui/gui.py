@@ -55,7 +55,7 @@ class GUI:
     
 
     def create_control(self, class_name, **kwargs):
-        print(f'GUI.create_control({class_name}): kwargs = {kwargs}')
+        # print(f'GUI.create_control({class_name}): kwargs = {kwargs}')
         cls = self.__class__
         control_class = cls.control_class(class_name)
         if control_class:

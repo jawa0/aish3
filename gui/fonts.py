@@ -24,7 +24,7 @@ def json_str_from_font_descriptor(font_descriptor: FontDescriptor) -> str:
 
 # Function to convert a JSON stringto a FontDescriptor
 def font_descriptor_from_json_str(json_string: str) -> FontDescriptor:
-    print(f'font_descriptor_from_json_str(): json_string={json_string}')
+    # print(f'font_descriptor_from_json_str(): json_string={json_string}')
     try:
         data = json.loads(json_string)
         # print('Got valid JSON')
