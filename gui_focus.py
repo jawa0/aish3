@@ -31,6 +31,18 @@ class FocusRing():
         return self._focused_control
 
 
+    # @todo change name to set_focus?
+    # Handle None case, or do we need clear_focus?
+    def focus(self, control):
+        if control not in self._controls:
+            raise Exception("Control not in focus ring")
+        
+        success = self.gui.set_focus(control, True)
+        if success:
+            self._focused_control = control
+        return success
+
+
     # Add a control to the FocusRing
     def add(self, control, set_focus=False):
         if control in self._controls:
@@ -38,7 +50,7 @@ class FocusRing():
         
         self._controls.append(control)
         control.containing_focus_ring = weakref.ref(self)
-        if self._focused_control is None or set_focus:
+        if self.get_focus() is None or set_focus:
             self.focus(control)
 
 
@@ -49,18 +61,8 @@ class FocusRing():
         
         self._controls.remove(control)
         control.containing_focus_ring = None
-        if self._focused_control == control:
+        if self.get_focus() == control:
             self._focused_control = None
-
-
-    def focus(self, control):
-        if control not in self._controls:
-            raise Exception("Control not in focus ring")
-        
-        success = self.gui.set_focus(control, True)
-        if success:
-            self._focused_control = control
-        return success
 
 
     def focus_first(self):

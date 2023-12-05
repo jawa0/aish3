@@ -360,8 +360,9 @@ class GUI:
 
 
         handled = False
-        if self._focused_control:
-            handled = self._focused_control.handle_event(event)
+        focused_control = self.get_focus()
+        if focused_control:
+            handled = focused_control.handle_event(event)
 
         if not handled:    
             if event.type == sdl2.SDL_KEYDOWN:
@@ -385,6 +386,13 @@ class GUI:
 
                             if is_double_click and hasattr(hit_control, "on_double_click"):
                                 hit_control.on_double_click(event.button.x, event.button.y)
+
+                        else:  
+                            # No control was hit                            
+                            # Clear focus when clicking on nothing
+                            if focused_control is not None:
+                                self.set_focus(focused_control, False)
+
                     return True
 
             elif event.type == sdl2.SDL_MOUSEBUTTONUP:
@@ -619,7 +627,7 @@ class GUI:
                 
         if keySym == sdl2.SDLK_RETURN:
             # Focus down into FocusRing of currently focused control...
-            focused = self._focused_control
+            focused = self.get_focus()
             if focused:
                 if hasattr(focused, "focusRing"):
                     self.push_focus_ring(focused.focusRing)
@@ -771,6 +779,8 @@ class GUI:
     
     
     def set_focus(self, control: "GUIControl", focus_it=True):
+        assert(control is not None)
+        
         if focus_it:
             # Can't focus on a control that can't be focused.
             # @note @todo shouldn't this happen automatically?
@@ -919,7 +929,7 @@ class GUI:
 
     def load(self):
         bak_content = self._content
-        bak_focused_control = self._focused_control
+        bak_focused_control = self.get_focus()
         self.focus_stack = []
 
         logging.info("Loading GUI...")
@@ -935,7 +945,7 @@ class GUI:
                 assert(focusRing is not None)
                 focusRing.focus_first()
 
-                print(gui_json["viewport_bookmarks"])
+                # print(gui_json["viewport_bookmarks"])
                 self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
                 
                 vx, vy = gui_json.get("viewport_pos", (0, 0))
@@ -944,8 +954,11 @@ class GUI:
 
         except Exception as e:
             logging.error("Error loading GUI. Exception: ", str(e))
-            self._content = bak_content
-            self._focused_control = bak_focused_control
+            if bak_content:
+                self._content = bak_content
+
+            if bak_focused_control:
+                self.set_focus(bak_focused_control)
             return False
 
         # self._content.sizeToChildren()
