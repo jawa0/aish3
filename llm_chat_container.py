@@ -108,8 +108,13 @@ class LLMChatContainer(GUIContainer):
         self.utterances = []
 
         if default_setup:
-            self.add_child(Label(text="LLM Chat [gpt-4]", w=PANEL_WIDTH, h=20, **kwargs),
-                           add_to_focus_ring=False)
+            self.title = Label(text="LLM Chat [gpt-4]", 
+                               w=PANEL_WIDTH, h=20, 
+                               draggable=False,
+                               editable=False,
+                               **kwargs)
+            
+            self.add_child(self.title, add_to_focus_ring=False)
 
             text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
             self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
@@ -123,7 +128,7 @@ class LLMChatContainer(GUIContainer):
         self.accumulated_response_text = None
         # self.focusRing.focus(self.system.text_area)
 
-        self.busy_colormap = matplotlib.colormaps['spring']
+        self.busy_colormap = matplotlib.colormaps['summer']
         self._t_busy = 0.0
 
 
@@ -146,6 +151,24 @@ class LLMChatContainer(GUIContainer):
             if child_class_name == "ChatMessageUI":
                 instance.utterances.append(child)
                 instance.focusRing.add(child.text_area)
+
+        # @note Override settings on legacy saved components...
+        for child in instance.children:
+            if isinstance(child, Label) and child.get_text().startswith("LLM Chat"):
+                instance.title = child
+                break
+
+        instance.title._draggable = False
+        instance.title._editable = False
+        for utterance in instance.utterances:
+            utterance._draggable = False
+            utterance._editable = False
+
+            utterance.text_area._draggable = False
+            utterance.label._draggable = False
+            utterance.label._editable = False
+
+
         return instance
 
 

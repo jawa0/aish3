@@ -379,9 +379,11 @@ class GUI:
                     # If it's the left mouse button, then check for a hit on a control.
                     if event.button.button == sdl2.SDL_BUTTON_LEFT:
                         wx, wy = self.view_to_world(event.button.x, event.button.y)
-                        hit_control = self.check_hit(wx, wy, only_draggable=True)
+                        hit_control = self.check_hit(wx, wy, only_draggable=False)
                         if hit_control:
-                            self._drag_control = hit_control
+                            if hit_control._draggable:
+                                self._drag_control = hit_control
+
                             self.set_focus(hit_control)
 
                             if is_double_click and hasattr(hit_control, "on_double_click"):
@@ -884,18 +886,20 @@ class GUI:
         Returns the control that was hit, or None if no control was hit.
         See also: GUI.view_to_world()"""
 
-        p = sdl2.SDL_Point(world_x, world_y)
-        
+        pt = sdl2.SDL_Point(world_x, world_y)
+
+        # Breadth-first traversal of hierarchy
         q = list(self.content())
         while len(q) > 0:
-            child = q.pop()
-            skip_it = only_draggable and not child._draggable
-            if not skip_it and sdl2.SDL_PointInRect(p, child.get_world_rect()):
-                return child
-            else:
-                if hasattr(child, "children"):
-                    q.extend(child.children)
-            # print(len(q))
+            node = q.pop(0)
+            if hasattr(node, "children"):
+                q = node.children + q
+                continue
+
+            skip_it = only_draggable and not node._draggable
+            if not skip_it and sdl2.SDL_PointInRect(pt, node.get_world_rect()):
+                return node
+
         return None
     
 
