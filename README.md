@@ -1,6 +1,8 @@
 AISH(3) -- AI Shell 
 ==
 
+![Screenshot showing a black screen with blue-bordered text areas, white labels, and LLM chat controls](./res/img/aish3-screenshot.png)
+
 This is a Python GUI (SDL) application. The goal is to have a portable hands-free AI assistant and playground.
 
 _Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire, light, or flame" in English._
