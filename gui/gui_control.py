@@ -50,6 +50,7 @@ class GUIControl:
         self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
         self.font_descriptor = kwargs.get('font_descriptor', self.gui.font_descriptor if self.gui else "default")
         self.draw_bounds = kwargs.get('draw_bounds', False)
+        self._editable = kwargs.get('editable', True)
         self._draggable = kwargs.get('draggable', True)
         self._visible = kwargs.get('visible', True)
         self._screen_relative = kwargs.get('screen_relative', False)

@@ -102,7 +102,7 @@ class Label(GUIControl):
 
     def on_double_click(self, vx, vy):
         logging.debug("Label.on_double_click")
-        if not self.editor:
+        if self._editable and not self.editor:
             self._start_editing()
 
 
@@ -124,6 +124,7 @@ class LabelEditor(TextArea):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.edit_target: Label = kwargs['label']
+        self._was_target_draggable = self.edit_target._draggable
         self.edit_target._draggable = False
         self.text_buffer.set_text(self.edit_target.get_text())
         self.text_buffer.move_point_to_end()
@@ -137,7 +138,7 @@ class LabelEditor(TextArea):
         r = self.edit_target.bounding_rect
         self.edit_target.set_bounds(r.x, r.y, text_width_px, r.h)
 
-        self.edit_target._draggable = True
+        self.edit_target._draggable = self._was_target_draggable
         self.parent.remove_child(self)
         self.edit_target.editor = None
         self.edit_target = None
