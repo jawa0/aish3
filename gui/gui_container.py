@@ -125,12 +125,14 @@ class GUIContainer(GUIControl):
             sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
             old_color = (r.value, g.value, b.value, a.value)
 
-            # Set the new color
-            r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
-            # r, g, b = (0, 255, 0)
-            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+            # Draw background
+            background_color = (0, 0, 0)
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, *background_color, 255)
+            sdl2.SDL_RenderFillRect(self.renderer.sdlrenderer, vr)
 
-            # Draw the bounding rectangle
+            # Draw border
+            border_color = (0, 127, 255) if self.has_focus() else (100, 100, 100)
+            sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, *border_color, 255)
             sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
 
             # # Draw insets
