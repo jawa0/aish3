@@ -170,8 +170,8 @@ class GUIContainer(GUIControl):
     def remove_child(self, child):
         self.focusRing.remove(child)
         self.children.remove(child)
-        if self.gui._focused_control == child:
-            self.gui._focused_control = None
+        if self.gui.get_focus() == child:
+            self.gui.set_focus(child, False)
 
         child.parent = None
         self.updateLayout()
