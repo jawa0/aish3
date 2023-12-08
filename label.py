@@ -70,6 +70,12 @@ class Label(GUIControl):
         return json
 
 
+    def __str__(self):
+        default_str = super(Label, self).__str__()
+        text_summary = self.get_text()[:12]
+        return f"{default_str}, text: {text_summary}"
+    
+
     def get_text(self):
         return self._text
     

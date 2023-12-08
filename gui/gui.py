@@ -345,18 +345,18 @@ class GUI:
                 # print(f"self._viewport_pos = {self._viewport_pos}")
                 # print(f"self.command_console.bounding_rect = {self.command_console.bounding_rect}")
 
-                self.command_console._visible = not self.command_console._visible
+                # self.command_console._visible = not self.command_console._visible
 
                 # Gets focus which causes it to handle the upcoming SDL_TEXTINPUT and 
                 # also insert the ~ character into the text buffer. @bug @note
-                self.set_focus(self.command_console.console_area, self.command_console._visible)
+                # self.set_focus(self.command_console.console_area, self.command_console._visible)
                 return True
 
-            elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
-                # Hide the command console if Esc is pressed
-                self.command_console._visible = False
-                self.set_focus(self.command_console.console_area, False)
-                return True
+            # elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
+            #     # Hide the command console if Esc is pressed
+            #     # self.command_console._visible = False
+            #     # self.set_focus(self.command_console.console_area, False)
+            #     return True
 
 
         handled = False
@@ -380,6 +380,7 @@ class GUI:
                     if event.button.button == sdl2.SDL_BUTTON_LEFT:
                         wx, wy = self.view_to_world(event.button.x, event.button.y)
                         hit_control = self.check_hit(wx, wy, only_draggable=False)
+                        logging.debug(f'GUI.check_hit({wx}, {wy}) returned {hit_control}')
                         if hit_control:
                             if hit_control._draggable:
                                 self._drag_control = hit_control
@@ -883,23 +884,39 @@ class GUI:
 
     def check_hit(self, world_x: int, world_y: int, only_draggable:bool=False) -> "Union[GUIControl, None]":
         """Expects world (workspace) coordinates, not viewport (screen) coordinates.
-        Returns the control that was hit, or None if no control was hit.
+        Returns the control that was hit, or None if no control was hit. Will not return controls
+        that have can_focus=False, unless they are draggable. If only_draggable is True, then will only return controls that
+        have draggable=True.
         See also: GUI.view_to_world()"""
 
+        logging.debug(f'GUI.check_hit({world_x}, {world_y})')
         pt = sdl2.SDL_Point(world_x, world_y)
 
-        # Breadth-first traversal of hierarchy
-        q = list(self.content())
-        while len(q) > 0:
-            node = q.pop(0)
+        # Build up queue of controls to check, in depth-first order so that children are
+        # tested before parents. But, we *do* want to hit check parents if no children were 
+        # hit, so build up queue first, and then do hit checks once queue if fully built.
+
+        depth_q = [self.content()]
+        hit_check_q = []
+        while len(depth_q) > 0:
+            node = depth_q.pop(0)
             if hasattr(node, "children"):
-                q = node.children + q
-                continue
+                depth_q = node.children + depth_q
 
-            skip_it = only_draggable and not node._draggable
-            if not skip_it and sdl2.SDL_PointInRect(pt, node.get_world_rect()):
+            skip_it = (not node._visible) or \
+                      (not (node.can_focus or node._draggable)) \
+                      or (node == self.content()) or \
+                      (only_draggable and not node._draggable)            
+            
+            if not skip_it:
+                hit_check_q = [node] + hit_check_q
+
+        # Now do hit checks
+        while len(hit_check_q) > 0:
+            node = hit_check_q.pop(0)
+            if sdl2.SDL_PointInRect(pt, node.get_world_rect()):
                 return node
-
+            
         return None
     
 

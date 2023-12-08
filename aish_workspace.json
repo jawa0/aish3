@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-11-21T02:08:01.808079+00:00",
-  "saved_at_local": "2023-11-20T21:08:01.808079-05:00",
+  "saved_at_utc": "2023-12-08T17:12:51.528266+00:00",
+  "saved_at_local": "2023-12-08T12:12:51.528266-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
         39,
-        346,
-        1484,
-        695
+        463,
+        1489,
+        585
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -22,7 +22,7 @@
           "class": "TextArea",
           "bounding_rect": [
             0,
-            117,
+            0,
             240,
             100
           ],
@@ -31,10 +31,10 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            255,
-            383,
+            249,
+            249,
             608,
-            312
+            336
           ],
           "layout": "ColumnLayout",
           "name": "",
@@ -60,7 +60,7 @@
                 0,
                 20,
                 604,
-                144
+                84
               ],
               "layout": "ColumnLayout",
               "name": "",
@@ -86,7 +86,7 @@
                     0,
                     20,
                     600,
-                    120
+                    60
                   ],
                   "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
                 }
@@ -96,9 +96,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 0,
-                164,
+                104,
                 604,
-                144
+                84
               ],
               "layout": "ColumnLayout",
               "name": "",
@@ -124,9 +124,47 @@
                     0,
                     20,
                     600,
+                    60
+                  ],
+                  "text": "How do I add an image in Mardown? I want to add a screen-shot to my README.md file.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
                     120
                   ],
-                  "text": "Give me a list of 20 animals."
+                  "text": "In Markdown, you can add an image using the following syntax:\n\n```markdown\n![Alt text](URL_or_path_to_image \"Optional title\")\n```\n\n- `Alt text` is the alternative text that describes the image if it cannot be displayed.\n- `URL_or_path_to_image` is the web address or the relative file path to your image.\n- `Optional title` is a title for the image that will appear as a tooltip. This part is optional.\n\nSince you're adding a screenshot to your `README.md`, make sure the image is placed in your repository or hosted online. Here is an example:\n\n```markdown\n![Screenshot of my application](images/screenshot.png \"Application Screenshot\")\n```\n\nIn this case, it's assumed that the `images` folder is in the same directory as your `README.md` file, and `screenshot.png` is the image you want to display. If the image is hosted online, replace `images/screenshot.png` with the actual URL of the image."
                 }
               ]
             }
@@ -135,10 +173,10 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            876,
-            382,
+            881,
+            248,
             608,
-            312
+            336
           ],
           "layout": "ColumnLayout",
           "name": "",
@@ -164,7 +202,7 @@
                 0,
                 20,
                 604,
-                144
+                84
               ],
               "layout": "ColumnLayout",
               "name": "",
@@ -190,7 +228,7 @@
                     0,
                     20,
                     600,
-                    120
+                    60
                   ],
                   "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
                 }
@@ -200,9 +238,9 @@
               "class": "ChatMessageUI",
               "bounding_rect": [
                 0,
-                164,
+                104,
                 604,
-                144
+                84
               ],
               "layout": "ColumnLayout",
               "name": "",
@@ -228,9 +266,47 @@
                     0,
                     20,
                     600,
+                    60
+                  ],
+                  "text": "I want to display custom information when printing an instance of one of my own\nclasses. It should print the same info as the default print, but additionally it\nshould print the first 12 chars of the text property if the object has a text \nproperty."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
                     120
                   ],
-                  "text": ""
+                  "text": "To achieve this functionality, you can override the `__str__` method in your class definition. This method is called when you use the `print` function on an instance of your class. Here's an example of how you might implement this:\n\n```python\nclass YourClass:\n    def __init__(self, text_property=None, *args, **kwargs):\n        self.text_property = text_property\n        # Initialize other properties here\n\n    def __str__(self):\n        default_str = super(YourClass, self).__str__()\n        if hasattr(self, 'text_property') and self.text_property:\n            text_summary = self.text_property[:12]\n            return f\"{default_str}, text: {text_summary}\"\n        else:\n            return default_str\n\n# Example usage:\ninstance = YourClass(text_property=\"Hello, World! This is an example text.\")\nprint(instance)\n```\n\nIn this implementation, the `__str__` method first calls the parent class's `__str__` implementation to get the default string representation. Then it checks if the `text_property` attribute exists and is not empty. If so, it slices the first 12 characters and appends it to the default string. If the object does not have a `text_property`, it simply returns the default string representation."
                 }
               ]
             }
@@ -239,8 +315,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            3,
-            64,
+            1,
+            108,
             200,
             30
           ],
@@ -272,8 +348,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            258,
-            218,
+            252,
+            211,
             200,
             30
           ],
@@ -283,8 +359,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            877,
-            220,
+            885,
+            210,
             200,
             30
           ],
@@ -309,7 +385,7 @@
     ]
   },
   "viewport_pos": [
-    21,
-    289
+    179,
+    402
   ]
 }

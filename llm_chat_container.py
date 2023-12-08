@@ -60,6 +60,8 @@ class LLMChatContainer(GUIContainer):
                 elif child_class_name == "TextArea":
                     instance.text_area = child
                     instance.text_area._draggable = False
+            
+            instance.can_focus = False
             return instance
 
 
@@ -77,6 +79,7 @@ class LLMChatContainer(GUIContainer):
 
                 self.label._draggable = False
                 self.text_area._draggable = False
+                self.can_focus = False
 
 
         def get_role(self):
