@@ -380,7 +380,7 @@ class GUI:
                     if event.button.button == sdl2.SDL_BUTTON_LEFT:
                         wx, wy = self.view_to_world(event.button.x, event.button.y)
                         hit_control = self.check_hit(wx, wy, only_draggable=False)
-                        logging.debug(f'GUI.check_hit({wx}, {wy}) returned {hit_control}')
+                        # logging.debug(f'GUI.check_hit({wx}, {wy}) returned {hit_control}')
                         if hit_control:
                             if hit_control._draggable:
                                 self._drag_control = hit_control
@@ -889,7 +889,7 @@ class GUI:
         have draggable=True.
         See also: GUI.view_to_world()"""
 
-        logging.debug(f'GUI.check_hit({world_x}, {world_y})')
+        # logging.debug(f'GUI.check_hit({world_x}, {world_y})')
         pt = sdl2.SDL_Point(world_x, world_y)
 
         # Build up queue of controls to check, in depth-first order so that children are
