@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-12-08T17:12:51.528266+00:00",
-  "saved_at_local": "2023-12-08T12:12:51.528266-05:00",
+  "saved_at_utc": "2023-12-12T23:12:55.936231+00:00",
+  "saved_at_local": "2023-12-12T18:12:55.936231-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
-        39,
-        463,
-        1489,
-        585
+        445,
+        369,
+        2528,
+        949
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -22,17 +22,17 @@
           "class": "TextArea",
           "bounding_rect": [
             0,
-            0,
+            26,
             240,
             100
           ],
-          "text": "This is an editable TextArea"
+          "text": "This is an editable TextAreaCreate a new llm chat.\n"
         },
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            249,
-            249,
+            1288,
+            277,
             608,
             336
           ],
@@ -173,8 +173,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            881,
-            248,
+            1920,
+            276,
             608,
             336
           ],
@@ -315,18 +315,7 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1,
-            108,
-            200,
-            30
-          ],
-          "text": "New Label",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "Label",
-          "bounding_rect": [
-            282,
+            1425,
             0,
             450,
             30
@@ -337,8 +326,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            280,
-            54,
+            1424,
+            28,
             600,
             30
           ],
@@ -348,8 +337,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            252,
-            211,
+            1291,
+            213,
             200,
             30
           ],
@@ -359,13 +348,578 @@
         {
           "class": "Label",
           "bounding_rect": [
-            885,
-            210,
+            1924,
+            212,
             200,
             30
           ],
           "text": "Another chat",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            648,
+            417,
+            608,
+            336
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                104,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "How can I distinguish between mac os and raspberry pi in Python 3? I want a code \nsnippet that executes at runtime and allows me to take separate branches if I'm on\nMac vs. if I'm running on Rasperry Pi."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "To distinguish between macOS and Raspberry Pi OS at runtime in Python 3, you can use \nthe `platform` module, which allows you to access underlying platform\u2019s data, such \nas its identifier, OS name, and version. Since Raspberry Pi OS is a Debian-based \nsystem, you can look for identifiers that are unique to it and macOS.\n\nHere is an example of how you might use the `platform` module to determine the \noperating system and take separate branches accordingly:\n\n```python\nimport platform\nimport os\n\ndef running_on_raspberry_pi():\n    # Raspberry Pi OS can return 'armv7l' or 'armv6l' on `platform.machine()`\n    # for Raspberry Pi 2/3/4, and 'aarch64' on a 64-bit OS variations for Pi 3/4.\n    # Adjust as necessary for your specific context.\n    return platform.machine().startswith(\"arm\") and \"raspbian\" in platform.uname().system.lower()\n\nif running_on_raspberry_pi():\n    # We're running on Raspberry Pi, take the Pi-related branch.\n    print(\"This is a Raspberry Pi.\")\n    # Raspberry Pi specific code goes here\nelse:\n    # We're not running on Raspberry Pi, check if it's macOS or something else.\n    if platform.system() == \"Darwin\":\n        # We're running on macOS, take the macOS-related branch.\n        print(\"This is macOS.\")\n        # macOS specific code goes here\n    else:\n        # We're running on a different system, handle that case accordingly.\n        print(\"This is an unsupported platform.\")\n        # Code for other platforms or a generic handler goes here\n```\n\nThe `running_on_raspberry_pi()` function uses `platform.machine()` to get the architecture and to check if it's an ARM CPU typically used by Raspberry Pi devices. The extra check with `platform.uname().system` is very simplistic and intended to account for Raspbian/Raspberry Pi OS systems, but keep in mind this is not foolproof; the robustness of this check would need to be enhanced for a production environment, possibly with additional checks depending on the variety of Raspberry Pi OS distributions you expect to encounter.\n\nRemember to modify and enhance these checks as needed based on the specific requirements and operating system configurations you are working with."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            0,
+            109,
+            608,
+            840
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                104,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I want a textual unique identifier that I can use to identify Python objects. Do they\nhave an id field? I remember something about the native pointer being used? In any\ncase, a numeric id is fine, as long as I can convert it to text."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "In Python, every object has a built-in identifier which is unique to the object \nduring its lifetime. This identifier is the address of the object in memory, and it \ncan be obtained using the `id()` function. The `id()` function returns a numeric \nvalue which is guaranteed to be unique for different objects (between their creation \ntime until they are destroyed).\n\nIf you need a textual representation of this identifier, you can convert the result \nof the `id()` function to a string using the `str()` function or format it as a \nhexadecimal string using the `hex()` function. Here are some examples:\n\n```python\n# Using the id() function to get the unique identifier of an object\nsome_object = object()\nobject_id = id(some_object)\n\n# Converting the numeric ID to a string\ntextual_id = str(object_id)\n\n# Alternatively, converting the numeric ID to a hexadecimal string\nhex_id = hex(object_id)\n\n# Now, both `textual_id` and `hex_id` are textual representations of the object's ID\n```\n\nDo note that the `id()` function provides a unique identifier only during the \nobject's lifetime. After an object is destroyed, its `id()` may be reused for another \nobject. This is typically not an issue unless you're storing and comparing IDs across \nthe lifecycle of your program where objects may be created and destroyed."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                272,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "When I refer to \"that\" object, or \"this\" object -- what is that part of speech called\ngrammatically?\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                356,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "In the context of grammar, \"that\" and \"this\" are referred to as demonstrative \npronouns. Demonstrative pronouns are used to point to specific things in a discourse \ncontext. \"This\" is used for singular or uncountable items that are physically or \nconceptually near to the speaker, while \"that\" is used for pointing to singular or \nuncountable items that are physically or conceptually more distant. They can also be \nused as demonstrative adjectives when they modify nouns instead of replacing them."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                440,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I have an LLM-based GUI application. There's a hierarchy of GUIControl objects.\nA GUIContainer is a GUIControl that has a list of children GUIControl objects. The\noverall gui is managed by a GUI object that has a content() GUIContainer.\n\nI want to be able to give the LLM information about the scene. Essentially make it\naware of its own GUI layout. One reason to do this would be to support user commands\nlike \"move that TextArea we just created over to the right\". Or \"select the chat \ncontrol on the left\""
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                524,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "To make an LLM aware of the GUI layout, you would need to represent the hierarchy and \nproperties of GUIControl objects in a format that the LLM can understand and process. \nHere's a high-level overview of how you might approach this:\n\n1. **Serialization of GUI Layout**: Develop a system to serialize the hierarchy and \nattributes of all `GUIControl` objects into a structured, queryable format. This \ncould be a nested dictionary, JSON, XML, or any other structured data format that can \nbe easily read and interpreted.\n\n2. **Scene Description Protocol**: Define a protocol or schema that includes all the \nnecessary information to describe the GUI controls, their properties, locations, \nrelationships, and any other attributes relevant to the tasks you will be asking the \nLLM to support.\n\n3. **Interpretation Engine**: Build an engine between the LLM and your application \nthat can interpret commands, access the structured layout information, and identify \nthe corresponding `GUIControl` elements based on the given criteria (e.g., \"the \nTextArea we just created,\" \"the chat control on the left\").\n\n4. **Unique Identifiers**: Assign unique identifiers to each GUI control that can be \nused to reference them in conversation with the LLM. This can be their `id()` \nconverted to a string, or you can generate a custom ID that might carry more semantic \nmeaning within the context of your GUI.\n\n5. **State Synchronization**: Ensure that there is synchronization between the GUI's \nstate and the data that the LLM has. This means updating the structured layout \ninformation whenever a change occurs in the GUI so that the LLM's data is always \nup-to-date.\n\n6. **Command Parsing and Execution**: Implement a system to parse the commands from \nthe LLM, map them to the actions that need to be taken on the GUI, and then execute \nthe corresponding methods or functions on the relevant GUI objects.\n\nHere's a conceptual example of how you might serialize a simple layout:\n\n```json\n{\n  \"controls\": {\n    \"gui_1\": {\n      \"type\": \"GUIContainer\",\n      \"properties\": {\n        \"orientation\": \"vertical\",\n        \"position\": {\"x\": 0, \"y\": 0}\n      },\n      \"children\": {\n        \"textarea_1\": {\n          \"type\": \"TextArea\",\n          \"properties\": {\n            \"text\": \"Sample text\",\n            \"position\": {\"x\": 10, \"y\": 20},\n            \"size\": {\"width\": 100, \"height\": 200},\n            \"created\": \"2023-03-20T14:20:00Z\"\n          }\n        },\n        \"chatcontrol_1\": {\n          \"type\": \"ChatControl\",\n          \"properties\": {\n            \"position\": {\"x\": 10, \"y\": 230},\n            \"size\": {\"width\": 100, \"height\": 300},\n            \"side\": \"left\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\nWith this structure in place, when you receive a command like \"move that TextArea we \njust created over to the right,\" the Interpretation Engine would:\n\n1. Parse the command and determine it's referring to a `TextArea` control.\n2. Look up the most recently created `TextArea` using a timestamp or creation order.\n3. Change its `position` property as required (e.g., increase the `x` value).\n4. Reflect that change in the actual GUI.\n\nFor a command like \"select the chat control on the left,\" the engine would:\n\n1. Parse the command and identify that it's referring to a `ChatControl` control with \na property indicating it's on the \"left.\"\n2. Find the relevant `ChatControl` in the serialized representation.\n3. Trigger the selection action on that control in the GUI."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                608,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I'm glad you mentioned timestamps for object creation. But that got me thinking -- do\nI want both this and also some kind of record of gui events. Both by the app and by\nthe user. Talk to me more about clickstreams, and what I've described."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                692,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "Certainly, the concept you are alluding to is related to event logging and \nclickstream data collection. In the context of GUI applications, a clickstream would \nbe a record of all GUI events triggered by the user, such as mouse movements, clicks, \nselections, and keyboard inputs. Additionally, events generated by the application \nitself, such as updates to the layout, addition or removal of controls, or feedback \nmessages displayed to the user, are also valuable data points.\n\nHere's how you might think about integrating both object creation timestamps and event logging within your application:\n\n1. **Object Creation Timestamps**:\n   - Assign a timestamp at the moment of each GUIControl's instantiation.\n   - Use these timestamps to query the most recently created objects or to establish \nan order of creation which is useful for contextual commands.\n\n2. **GUI Event Logging (Clickstreams)**:\n   - Implement event listeners for all interactive GUIControls to capture and store user interactions, like button clicks, text entry, menu selections, and more.\n   - Create a standardized format for logging these interactions, which could include the timestamp of the event, the type of the event, the ID of the GUIControl involved, and any relevant parameters or properties.\n\n3. **Application Events**: \n   - Similarly, log events initiated by the application, such as the creation of new controls, changes in layout, pop-up dialogs, error messages, and so on.\n   - Ensure that each log entry has enough contextual information to reconstruct what actions took place and the GUI's state changes over time.\n\n4. **Event Stream Analysis**:\n   - Use the collected event log data to analyze user behavior, troubleshoot issues, and inform design improvements for the GUI.\n   - Set up mechanisms to query this data effectively, enabling the LLM or other analytic tools to extract meaningful insights or respond to user commands with context-aware actions.\n\n5. **Log Storage and Management**:\n   - Design a log storage solution that can handle the volume of data generated, with options for filtering, search, and retrieval.\n   - Decide on a retention policy based on your application's needs and possible privacy or regulatory requirements.\n\n6. **Privacy Considerations**:\n   - Keep in mind the privacy implications of logging user interactions. Notify users if their actions are being logged, and ensure compliance with privacy laws and best practices.\n\nBy integrating object creation timestamps with a comprehensive event logging system, you can provide a rich dataset that captures both the static structure of the GUI at any moment in time (through the serialization of the GUI hierarchy and object attributes) and the dynamic interactions that occur within it.\n\nSuch an integrated approach would allow for complex queries like, \"Undo the last action in the text area I was working on,\" using timestamped object data to find the correct text area, and the event log to determine the last action taken on that object and how to reverse it."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            0,
+            66,
+            570,
+            30
+          ],
+          "text": "Scene-graph reflection / introspection",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            644,
+            13,
+            285,
+            30
+          ],
+          "text": "Selection vs. Focus",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            646,
+            52,
+            240,
+            100
+          ],
+          "text": "- Need to distinguish between the\ntwo for e.g. multi-select"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            1028,
+            12,
+            285,
+            30
+          ],
+          "text": "Coordinate Problems",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1029,
+            51,
+            240,
+            100
+          ],
+          "text": "- Save/load and some controls have \nshifted\n- revisit why container \nsizeToChildren needs to change\ncontainer position. So many BUGS\n- Go to full translate + zoom + ? rotation ? transform hierarchy"
         }
       ]
     }
@@ -385,7 +939,7 @@
     ]
   },
   "viewport_pos": [
-    179,
-    402
+    585,
+    335
   ]
 }
