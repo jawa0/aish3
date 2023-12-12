@@ -56,6 +56,10 @@ stop_listening
 create_new_chat_with_llm
 create_new_text_area
 create_new_label(label_text)
+pan_screen_left(number_of_pixels)
+pan_screen_right(number_of_pixels)
+pan_screen_down(number_of_pixels)
+pan_screen_up(number_of_pixels)
 
 EXAMPLES:
 "stop_listening" -> stop_listening
@@ -64,7 +68,10 @@ EXAMPLES:
 "create a new chat" -> create_new_chat_with_llm
 "create a new label" -> create_new_label("New Label")
 "create a new label with text Hello World" -> create_new_label("Hello World")
-
+"pan screen left 650 pixels" -> pan_screen_left(650)
+"pan screen right 40 pixels" -> pan_screen_right(40)
+"pan screen down 300 pixels" -> pan_screen_down(300)
+"pan screen up 120" -> pan_screen_up(120)
 """
                     # Get last K transcribed texts, for context. Includes partials.
                     K = 3
