@@ -35,7 +35,7 @@ class PhraseListener:
         PhraseListener._audio_q = None
 
         keyword_paths = {"macOS": "./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn",
-                "RaspberryPi": "./res/wake-phrases/Yarr-assistant_en_raspberry_pi_v3_0_0.ppn",
+                "RaspberryPi": "./res/wake-phrases/Yarr-Assistant_en_raspberry_pi_v3_0_0/Yarr-Assistant_en_raspberry_pi_v3_0_0.ppn",
         }
 
         if platform.system() == "Darwin":
