@@ -299,7 +299,7 @@ class GUI:
 
         elif command.startswith("create_new_label"):
             # Get the optional text
-            text = None
+            text = ""
             if command.startswith("create_new_label("):
                 i_start = len("create_new_label(")
                 i_end = command.find(")")
@@ -309,6 +309,49 @@ class GUI:
             wx, wy = self.view_to_world(vx, vy)
             self.cmd_new_label(wx, wy, text=text)
 
+        else:
+            pan_screen_prefix = "pan_screen_"
+            if command.startswith(pan_screen_prefix):
+                dx_pixels = 400
+                dy_pixels = 300
+
+                pan_screen_left = pan_screen_prefix + "left("
+                if command.startswith(pan_screen_left):
+                    dy_pixels = 0
+                    i_start = len(pan_screen_left)
+                    i_end = command.find(")")
+                    if i_end > i_start:
+                        dx_pixels = int(command[i_start:i_end])
+                    dx_pixels = -dx_pixels
+
+                pan_screen_right = pan_screen_prefix + "right("
+                if command.startswith(pan_screen_right):
+                    dy_pixels = 0
+                    i_start = len(pan_screen_right)
+                    i_end = command.find(")")
+                    if i_end > i_start:
+                        dx_pixels = int(command[i_start:i_end])
+
+                pan_screen_down = pan_screen_prefix + "down("
+                if command.startswith(pan_screen_down):
+                    dx_pixels = 0
+                    i_start = len(pan_screen_down)
+                    i_end = command.find(")")
+                    if i_end > i_start:
+                        dy_pixels = int(command[i_start:i_end])
+
+                pan_screen_up = pan_screen_prefix + "up("
+                if command.startswith(pan_screen_up):
+                    dx_pixels = 0
+                    i_start = len(pan_screen_up)
+                    i_end = command.find(")")
+                    if i_end > i_start:
+                        dy_pixels = int(command[i_start:i_end])
+                    dy_pixels = -dy_pixels
+
+
+                wx, wy = self.get_view_pos()
+                self.set_view_pos(wx + dx_pixels, wy + dy_pixels)
 
 
     def handle_event(self, event):
