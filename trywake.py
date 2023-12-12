@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import platform
 import pvporcupine
 import pyaudio
 from queue import Empty, Queue
@@ -17,6 +18,17 @@ def main():
     load_dotenv()    
     PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
 
+    keyword_paths = {"macOS": "./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn",
+           "RaspberryPi": "./res/wake-phrases/Yarr-assistant_en_raspberry_pi_v3_0_0.ppn",
+    }
+
+    if platform.system() == "Darwin":
+        KEYWORD_PATH = keyword_paths["macOS"]
+    elif platform.system() == "Linux" and platform.machine().startswith("armv"):
+        KEYWORD_PATH = keyword_paths["RaspberryPi"]
+    else:
+        raise NotImplementedError("Platform not supported.")
+    
     pv_handle = pvporcupine.create(
         access_key=PICOVOICE_ACCESS_KEY,
         # keyword_paths=["./res/wake-phrases/Yar-Robot-Oh_en_mac_v2_2_0/Yar-Robot-Oh_en_mac_v2_2_0.ppn"],
