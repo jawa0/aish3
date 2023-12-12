@@ -79,6 +79,7 @@ class LLMChatContainer(GUIContainer):
 
                 self.label._draggable = False
                 self.text_area._draggable = False
+                self._draggable = False
                 self.can_focus = False
 
 
@@ -94,11 +95,11 @@ class LLMChatContainer(GUIContainer):
         def set_text(self, text):
             self.text_area.text_buffer.set_text(text)
 
-        def _set_focus(self, has_focus):
-            if has_focus:
-                return self.gui.set_focus(self.text_area)
-            else:
-                super()._set_focus(has_focus)
+        # def _set_focus(self, has_focus):
+        #     if has_focus:
+        #         return self.gui.set_focus(self.text_area)
+        #     else:
+        #         super()._set_focus(has_focus)
 
 
     @classmethod
