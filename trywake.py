@@ -31,7 +31,7 @@ def main():
     
     pv_handle = pvporcupine.create(
         access_key=PICOVOICE_ACCESS_KEY,
-        keyword_paths=[keyword_paths["RaspberryPi"]],
+        keyword_paths=[KEYWORD_PATH],
     )
 
     print(f"PicoVoice expected sample rate (Hz): {pv_handle.sample_rate}")

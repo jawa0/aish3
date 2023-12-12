@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import pvporcupine
 import pyaudio
 from queue import Empty, Queue
@@ -31,9 +32,20 @@ class PhraseListener:
         # @todo @bug what about multiple instance?
         PhraseListener._audio_q = None
 
-        self._pv_handle = pvporcupine.create(
+        keyword_paths = {"macOS": "./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn",
+                "RaspberryPi": "./res/wake-phrases/Yarr-assistant_en_raspberry_pi_v3_0_0.ppn",
+        }
+
+        if platform.system() == "Darwin":
+            KEYWORD_PATH = keyword_paths["macOS"]
+        elif platform.system() == "Linux" and platform.machine().startswith("armv"):
+            KEYWORD_PATH = keyword_paths["RaspberryPi"]
+        else:
+            raise NotImplementedError("Platform not supported.")
+
+        pv_handle = pvporcupine.create(
             access_key=os.getenv("PICOVOICE_ACCESS_KEY"),
-            keyword_paths=["./res/wake-phrases/Yar-assistant_en_mac_v2_2_0/Yar-assistant_en_mac_v2_2_0.ppn"]
+            keyword_paths=[KEYWORD_PATH],
         )
 
         logging.debug(f"PicoVoice expected sample rate (Hz): {self._pv_handle.sample_rate}")
