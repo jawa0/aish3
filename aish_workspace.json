@@ -1,6 +1,6 @@
 {
-  "saved_at_utc": "2023-12-13T00:24:07.544244+00:00",
-  "saved_at_local": "2023-12-12T19:24:07.544244-05:00",
+  "saved_at_utc": "2023-12-13T17:32:11.563892+00:00",
+  "saved_at_local": "2023-12-13T12:32:11.563892-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -935,8 +935,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            719,
-            568,
+            653,
+            655,
             608,
             312
           ],
@@ -1055,6 +1055,57 @@
             100
           ],
           "text": "Every GUIContainer has a\nself.focusRing"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            929,
+            183,
+            330,
+            30
+          ],
+          "text": "Programming Assistants",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            927,
+            220,
+            240,
+            100
+          ],
+          "text": "AISH3\n"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            926,
+            325,
+            240,
+            100
+          ],
+          "text": "Mentat - AbanteAI\nBioBootloader"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            926,
+            431,
+            240,
+            100
+          ],
+          "text": "Cosine"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            925,
+            539,
+            240,
+            100
+          ],
+          "text": "Cody - SourceGraph\nSteve Yegge"
         }
       ]
     }
@@ -1074,7 +1125,7 @@
     ]
   },
   "viewport_pos": [
-    733,
-    329
+    753,
+    445
   ]
 }
