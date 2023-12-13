@@ -207,7 +207,7 @@ class LLMChatContainer(GUIContainer):
                     self.add_child(user, add_to_focus_ring=False)
                     self.utterances.append(user)
                     self.focus_ring.add(user.text_area)
-                    self.focus_ring.set_focus(user.text_area)
+                    self.gui.set_focus(user.text_area, True)
                     return True  # event was handled
                 
                 # Cmd+Backspace/Delete deletes the currently focused message

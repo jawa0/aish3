@@ -91,6 +91,8 @@ class GUI:
         # assert(self.font_descriptor)
 
         self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root")
+        self._content.can_focus = False
+        
         assert(self._content.focus_ring is not None)
         self.focus_stack = []
         self.push_focus_ring(self._content.focus_ring)
@@ -674,25 +676,40 @@ class GUI:
         if keySym == sdl2.SDLK_RETURN:
             # Focus down into focus_ring of currently focused control...
             focused = self.get_focus()
-            if focused:
-                if hasattr(focused, "focus_ring"):
-                    self.push_focus_ring(focused.focus_ring)
-                    focused.focus_ring.focus_first()
+
+            # @hack
+            # Breadth-first search for first focusable descendant. Should be using FocusRings
+            # but there's a tensions between these two appraoaches.
+
+            q = [focused]
+            while len(q) > 0:
+                control = q.pop(0)
+                if control.can_focus and control != focused:
+                    self.set_focus(control)
                     return True
 
-        elif keySym == sdl2.SDLK_ESCAPE:
-            # Focus up into previous focus_ring on stack
-            self.pop_focus_ring()
+                if isinstance(control, GUIContainer):
+                    q.extend(control.children)
 
-            oldfocus_ring = self.get_focus_ring()
-            assert(oldfocus_ring is not None)
-            oldfocus_ring.set_focus(oldfocus_ring.get_focus())
-            return True
+
+        elif keySym == sdl2.SDLK_ESCAPE:
+            # self.pop_focus_ring()
+
+            focused = self.get_focus()
+            if focused and focused != self.content():
+                lineage = self.get_ancestor_chain(focused)
+                for a in reversed(lineage):
+                    if a.can_focus:
+                        self.set_focus(a)
+                        return True
 
         elif keySym == sdl2.SDLK_TAB:
             # TAB focuses next control in focus ring
             # Shift+TAB focuses previous control
 
+            # top of focus ring stack will be *our* focus ring, which manages our children.
+            # So, we actually want the focus ring that is just below the top of the stack
+            self.pop_focus_ring()
             focus_ring = self.get_focus_ring()
             assert(focus_ring is not None)
 
@@ -811,9 +828,10 @@ class GUI:
 
 
     def pop_focus_ring(self):
-        if len(self.focus_stack) > 1:
+        # return self.focus_stack.pop()
+        if len(self.focus_stack) > 0:
             return self.focus_stack.pop()
-        return None
+        # return None
 
 
     def get_focus_ring(self):
@@ -842,8 +860,25 @@ class GUI:
                     self._focused_control._set_focus(False)
                     self._focused_control = None
 
-            self._focused_control = control
+            # Focus is switching -- we need to update the FocusRing stack. It's gnarlier, but also
+            # kind of prettier than I original thought. We can click on a controls that's neither
+            # our ancestor, nor a descendant. We need to handle this from a FocusRing perspective.
+            # pop up our ancestor chain, and then push down the destination control's ancestor chain.
+
+            if self._focused_control is not None:
+                src_ancestors = self.get_ancestor_chain(self._focused_control)
+                for a in reversed(src_ancestors):
+                    a.focus_out()
+
+            target_ancestors = self.get_ancestor_chain(control)
+            for a in target_ancestors:
+                a.focus_in()
+                if control == a:
+                    break
             
+            # Set focus on the control.
+            self._focused_control = control
+
             # containing_ring = control.containing_focus_ring()
             # if containing_ring is not None:
             #     currentfocus_ring = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
@@ -874,8 +909,8 @@ class GUI:
         Constructs a list of ancestors for the given control in order from the root ancestor to the direct parent.
 
         This method traverses the hierarchy of parent controls, starting from the given control and moving up the
-        lineage, collecting each parent in a list. The resulting list is ordered from the root container (highest
-        in the hierarchy) to the immediate parent of the provided control.
+        lineage, collecting each parent in a list. The list is then reversed. The resulting list is ordered from 
+        the root container (highest in the hierarchy) to the immediate parent of the provided control.
 
         Note that the given control itself is not included in the chain, only its ancestors are.
 
@@ -886,6 +921,8 @@ class GUI:
             list[GUIControl]: A list of ancestors, where the first element is the root ancestor (e.g., the content of
                             the GUI), and the last element is the immediate parent control just above the given control.
         """
+
+        assert(control is not None)
 
         chain = []
         while control is not None:
