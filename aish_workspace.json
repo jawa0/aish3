@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-12-13T20:10:27.376118+00:00",
-  "saved_at_local": "2023-12-13T15:10:27.376118-05:00",
+  "saved_at_utc": "2023-12-13T22:22:48.202354+00:00",
+  "saved_at_local": "2023-12-13T17:22:48.202354-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
-        445,
-        192,
-        2528,
-        1225
+        157,
+        -87,
+        2816,
+        1768
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -19,20 +19,10 @@
       ],
       "children": [
         {
-          "class": "TextArea",
-          "bounding_rect": [
-            0,
-            203,
-            240,
-            100
-          ],
-          "text": "This is an editable TextAreaCreate a new llm chat.\n"
-        },
-        {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            1288,
-            480,
+            1576,
+            962,
             608,
             336
           ],
@@ -173,8 +163,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            1920,
-            479,
+            2208,
+            961,
             608,
             336
           ],
@@ -315,8 +305,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1425,
-            203,
+            1713,
+            685,
             450,
             30
           ],
@@ -326,8 +316,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1424,
-            231,
+            1712,
+            713,
             600,
             30
           ],
@@ -337,8 +327,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1291,
-            416,
+            1579,
+            898,
             200,
             30
           ],
@@ -348,8 +338,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1924,
-            415,
+            2212,
+            897,
             200,
             30
           ],
@@ -359,8 +349,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            1302,
-            852,
+            1590,
+            1334,
             608,
             336
           ],
@@ -501,8 +491,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            0,
-            312,
+            275,
+            928,
             608,
             840
           ],
@@ -871,8 +861,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            0,
-            269,
+            273,
+            883,
             570,
             30
           ],
@@ -882,8 +872,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            644,
-            216,
+            932,
+            698,
             285,
             30
           ],
@@ -893,8 +883,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            646,
-            255,
+            934,
+            737,
             240,
             100
           ],
@@ -903,8 +893,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1028,
-            215,
+            1316,
+            697,
             285,
             30
           ],
@@ -914,8 +904,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1029,
-            254,
+            1317,
+            736,
             240,
             100
           ],
@@ -924,8 +914,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            648,
-            393,
+            936,
+            875,
             135,
             30
           ],
@@ -935,8 +925,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            644,
-            913,
+            932,
+            1395,
             608,
             312
           ],
@@ -1039,8 +1029,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            649,
-            533,
+            937,
+            1015,
             240,
             100
           ],
@@ -1049,8 +1039,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            650,
-            641,
+            938,
+            1123,
             240,
             100
           ],
@@ -1059,8 +1049,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            929,
-            386,
+            1217,
+            868,
             330,
             30
           ],
@@ -1070,8 +1060,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            927,
-            423,
+            1215,
+            905,
             240,
             100
           ],
@@ -1080,8 +1070,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            926,
-            528,
+            1214,
+            1010,
             240,
             100
           ],
@@ -1090,8 +1080,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            926,
-            634,
+            1214,
+            1116,
             240,
             100
           ],
@@ -1100,8 +1090,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            925,
-            742,
+            1213,
+            1224,
             240,
             100
           ],
@@ -1110,8 +1100,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            649,
-            749,
+            937,
+            1231,
             240,
             100
           ],
@@ -1120,8 +1110,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            649,
-            426,
+            937,
+            908,
             240,
             100
           ],
@@ -1130,8 +1120,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            651,
-            6,
+            939,
+            488,
             315,
             30
           ],
@@ -1141,8 +1131,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            651,
-            40,
+            939,
+            522,
             240,
             100
           ],
@@ -1151,8 +1141,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1054,
-            0,
+            1342,
+            482,
             135,
             30
           ],
@@ -1162,12 +1152,199 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1053,
-            34,
+            1341,
+            516,
             240,
             100
           ],
           "text": "When focusing TextArea, cursor\njumps to the end. There was some\nreason for this, to do with appending\neither LLM or transcribed text? \nbut most of the time now it's \nannoying. GitHub Issue #71"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            664,
+            349,
+            240,
+            100
+          ],
+          "text": "#72: Add ability to set and jump to bookmarks, with voice"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            662,
+            307,
+            135,
+            30
+          ],
+          "text": "Bookmarks",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            18,
+            303,
+            555,
+            30
+          ],
+          "text": "Make it easier for people to try AISH",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            17,
+            348,
+            240,
+            100
+          ],
+          "text": "Improve install docs and provide\nvideo walk-through"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            18,
+            459,
+            240,
+            100
+          ],
+          "text": "Pre-built binaries for PC, mac,\nLinux, RaspberryPi/Raspian"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            275,
+            349,
+            240,
+            100
+          ],
+          "text": "Docker container?\n- Can SDL work from container?"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            274,
+            459,
+            240,
+            100
+          ],
+          "text": "Web / Canvas version?"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            284,
+            613,
+            450,
+            30
+          ],
+          "text": "Re-enable / fix command window",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            284,
+            647,
+            240,
+            100
+          ],
+          "text": "- Show / hide\n- layout \n- modal"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            543,
+            648,
+            240,
+            100
+          ],
+          "text": "Should be able to type all \nsupported commands instead of\nvoice"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            406,
+            0,
+            420,
+            30
+          ],
+          "text": "Integrate with GitHub issues",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            408,
+            35,
+            240,
+            100
+          ],
+          "text": "- Generate Github issue from note\n- sync?"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            408,
+            147,
+            330,
+            30
+          ],
+          "text": "Open and Display Files",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            408,
+            184,
+            240,
+            100
+          ],
+          "text": "- text / source files\n- images\n- ability to confirm a command"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            2,
+            3,
+            255,
+            30
+          ],
+          "text": "Command Input Map",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            4,
+            40,
+            240,
+            100
+          ],
+          "text": "- Instead of event-handling if or\nswitch statements\n- declarative\n- push / pop\n- find conflicts"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            -20,
+            841,
+            90,
+            30
+          ],
+          "text": "Search",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            -22,
+            879,
+            240,
+            100
+          ],
+          "text": "- text search\n- go to the note with text \"...\"\n"
         }
       ]
     }
@@ -1187,7 +1364,7 @@
     ]
   },
   "viewport_pos": [
-    717,
-    114
+    -123,
+    626
   ]
 }
