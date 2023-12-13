@@ -62,7 +62,7 @@ class GUIContainer(GUIControl):
         self.children = children if children is not None else []
 
         self.set_layout(layout)
-        self.focusRing = FocusRing(gui=self.gui)
+        self.focus_ring = FocusRing(gui=self.gui)
 
 
     def __iter__(self):
@@ -163,12 +163,12 @@ class GUIContainer(GUIControl):
         self.updateLayout()
 
         if add_to_focus_ring:
-            self.focusRing.add(child)
-            self.focusRing.focus(child)
+            self.focus_ring.add(child)
+            self.focus_ring.set_focus(child)
 
 
     def remove_child(self, child):
-        self.focusRing.remove(child)
+        self.focus_ring.remove(child)  # @note It's possible child won't be in that focus ring
         self.children.remove(child)
         if self.gui.get_focus() == child:
             self.gui.set_focus(child, False)

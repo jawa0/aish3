@@ -1,15 +1,15 @@
 {
-  "saved_at_utc": "2023-12-12T23:12:55.936231+00:00",
-  "saved_at_local": "2023-12-12T18:12:55.936231-05:00",
+  "saved_at_utc": "2023-12-13T00:24:07.544244+00:00",
+  "saved_at_local": "2023-12-12T19:24:07.544244-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
         445,
-        369,
+        395,
         2528,
-        949
+        985
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -22,7 +22,7 @@
           "class": "TextArea",
           "bounding_rect": [
             0,
-            26,
+            0,
             240,
             100
           ],
@@ -359,8 +359,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            648,
-            417,
+            1302,
+            649,
             608,
             336
           ],
@@ -920,6 +920,141 @@
             100
           ],
           "text": "- Save/load and some controls have \nshifted\n- revisit why container \nsizeToChildren needs to change\ncontainer position. So many BUGS\n- Go to full translate + zoom + ? rotation ? transform hierarchy"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            648,
+            190,
+            135,
+            30
+          ],
+          "text": "FocusRing",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "LLMChatContainer",
+          "bounding_rect": [
+            719,
+            568,
+            608,
+            312
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "bounding_rect": [
+                0,
+                164,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "A FocusRing is meant to store a list of references to controls that the GUI can set\nfocus on.. The idea is that there is also a hierarchy of focus rings and focusing a\ncontrol that has child controls can push a new focus ring on the stack"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            648,
+            229,
+            240,
+            100
+          ],
+          "text": "A FocusRing is meant to store a \nlist of references to controls \nthat the GUI can set focus on.. \nThe idea is that there is also a \nhierarchy of focus rings and \nfocusing a control that has child \ncontrols can push a new focus ring \non the stack"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            650,
+            342,
+            240,
+            100
+          ],
+          "text": "Every GUIContainer has a\nself.focusRing"
         }
       ]
     }
@@ -939,7 +1074,7 @@
     ]
   },
   "viewport_pos": [
-    585,
-    335
+    733,
+    329
   ]
 }
