@@ -112,7 +112,7 @@ class LLMChatContainer(GUIContainer):
         self.draw_bounds = True
         
         self.set_layout(ColumnLayout())
-        assert(self.focusRing is not None)
+        assert(self.focus_ring is not None)
         self.system = None
         self.utterances = []
 
@@ -132,13 +132,22 @@ class LLMChatContainer(GUIContainer):
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
             for utterance in self.utterances:
                 self.add_child(utterance, add_to_focus_ring=False)
-                self.focusRing.add(utterance.text_area)
+
+                # @note FocusRing shenanigans
+                self.focus_ring.add(utterance.text_area)
 
         self.accumulated_response_text = None
-        # self.focusRing.focus(self.system.text_area)
+        # self.focus_ring.focus(self.system.text_area)
 
         self.busy_colormap = matplotlib.colormaps['summer']
         self._t_busy = 0.0
+
+
+    def remove_child(self, child):
+        super().remove_child(child)
+
+        # @note UNDO FocusRing shenanigans
+        self.focus_ring.remove(child.text_area)
 
 
     @classmethod
@@ -159,7 +168,7 @@ class LLMChatContainer(GUIContainer):
             instance.add_child(child, add_to_focus_ring=False)
             if child_class_name == "ChatMessageUI":
                 instance.utterances.append(child)
-                instance.focusRing.add(child.text_area)
+                instance.focus_ring.add(child.text_area)
 
         # @note Override settings on legacy saved components...
         for child in instance.children:
@@ -197,8 +206,8 @@ class LLMChatContainer(GUIContainer):
                     user = self.ChatMessageUI(role="User", gui=self.gui)
                     self.add_child(user, add_to_focus_ring=False)
                     self.utterances.append(user)
-                    self.focusRing.add(user.text_area)
-                    self.focusRing.focus(user.text_area)
+                    self.focus_ring.add(user.text_area)
+                    self.focus_ring.set_focus(user.text_area)
                     return True  # event was handled
                 
                 # Cmd+Backspace/Delete deletes the currently focused message
@@ -206,11 +215,7 @@ class LLMChatContainer(GUIContainer):
                 elif keySymbol == sdl2.SDLK_BACKSPACE:
                     focused_control = self.gui.get_focus()
                     if focused_control is self:
-                        if self.parent:
-                            if self.parent.focusRing:
-                                self.parent.focusRing.focus_next()
-                                self.parent.focusRing.remove(self)
-                            self.parent.remove_child(self)
+                        self.parent.remove_child(self)
                         return True
 
                     chat_message = focused_control.parent
@@ -221,8 +226,8 @@ class LLMChatContainer(GUIContainer):
                         # Can't delete first, System message
                         if len(self.utterances) > 1 and chat_message != self.utterances[0]:
                             # @todo wrap in a remove message method
-                            self.focusRing.focus_previous()
-                            self.focusRing.remove(chat_message.text_area)
+                            # self.focus_ring.focus_previous()
+                            # self.focus_ring.remove(chat_message.text_area)
                             self.utterances.remove(chat_message)
                             self.remove_child(chat_message)
                             return True
@@ -258,7 +263,7 @@ class LLMChatContainer(GUIContainer):
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
         self.add_child(answer, add_to_focus_ring=False)
-        self.focusRing.add(answer.text_area, set_focus=True)
+        self.focus_ring.add(answer.text_area, set_focus=True)
 
         # Shrink previous messages
         for u in self.utterances:

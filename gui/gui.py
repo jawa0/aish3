@@ -91,9 +91,9 @@ class GUI:
         # assert(self.font_descriptor)
 
         self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root")
-        assert(self._content.focusRing is not None)
+        assert(self._content.focus_ring is not None)
         self.focus_stack = []
-        self.push_focus_ring(self._content.focusRing)
+        self.push_focus_ring(self._content.focus_ring)
         
         # May be self.content or any depth of descendant of self.content
         self._focused_control = None
@@ -672,39 +672,39 @@ class GUI:
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
-            # Focus down into FocusRing of currently focused control...
+            # Focus down into focus_ring of currently focused control...
             focused = self.get_focus()
             if focused:
-                if hasattr(focused, "focusRing"):
-                    self.push_focus_ring(focused.focusRing)
-                    focused.focusRing.focus_first()
+                if hasattr(focused, "focus_ring"):
+                    self.push_focus_ring(focused.focus_ring)
+                    focused.focus_ring.focus_first()
                     return True
 
         elif keySym == sdl2.SDLK_ESCAPE:
-            # Focus up into previous FocusRing on stack
+            # Focus up into previous focus_ring on stack
             self.pop_focus_ring()
 
-            oldFocusRing = self.get_focus_ring()
-            assert(oldFocusRing is not None)
-            oldFocusRing.focus(oldFocusRing.get_focus())
+            oldfocus_ring = self.get_focus_ring()
+            assert(oldfocus_ring is not None)
+            oldfocus_ring.set_focus(oldfocus_ring.get_focus())
             return True
 
         elif keySym == sdl2.SDLK_TAB:
             # TAB focuses next control in focus ring
             # Shift+TAB focuses previous control
 
-            focusRing = self.get_focus_ring()
-            assert(focusRing is not None)
+            focus_ring = self.get_focus_ring()
+            assert(focus_ring is not None)
 
             if ctrlPressed:
                 # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
                 pass
             else:
                 if shiftPressed:  # if shift was also held
-                    if focusRing.focus_previous():
+                    if focus_ring.focus_previous():
                         return True  # event was handled
                 else:
-                    if focusRing.focus_next():
+                    if focus_ring.focus_next():
                         return True  # event was handled
                     
         return False
@@ -805,9 +805,9 @@ class GUI:
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
 
 
-    def push_focus_ring(self, focusRing):
-        assert(focusRing is not None)
-        self.focus_stack.append(focusRing)
+    def push_focus_ring(self, focus_ring):
+        assert(focus_ring is not None)
+        self.focus_stack.append(focus_ring)
 
 
     def pop_focus_ring(self):
@@ -846,9 +846,9 @@ class GUI:
             
             # containing_ring = control.containing_focus_ring()
             # if containing_ring is not None:
-            #     currentFocusRing = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
+            #     currentfocus_ring = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
 
-            #     if currentFocusRing != containing_ring:
+            #     if currentfocus_ring != containing_ring:
             #         self.focus_stack.append(containing_ring)
                     
             return self._focused_control._set_focus(True)
@@ -1003,11 +1003,11 @@ class GUI:
                 content_json = gui_json["gui"]["content"]
                 gui_class = GUI.control_class(content_json["class"])
                 self._content = gui_class.from_json(content_json, gui=self)
-                self.push_focus_ring(self._content.focusRing)
+                self.push_focus_ring(self._content.focus_ring)
 
-                focusRing = self.get_focus_ring()
-                assert(focusRing is not None)
-                focusRing.focus_first()
+                focus_ring = self.get_focus_ring()
+                assert(focus_ring is not None)
+                focus_ring.focus_first()
 
                 # print(gui_json["viewport_bookmarks"])
                 self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})

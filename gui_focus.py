@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import logging
 import weakref
 
 
@@ -24,7 +25,7 @@ class FocusRing():
         self._controls = list(controls)  # @note Copy it so our mods won't be propagaged outside this object
         self._focused_control = None
         if len(self._controls) > 0:
-            self.focus(self._controls[0])
+            self.set_focus(self._controls[0])
 
 
     def get_focus(self):
@@ -33,7 +34,7 @@ class FocusRing():
 
     # @todo change name to set_focus?
     # Handle None case, or do we need clear_focus?
-    def focus(self, control):
+    def set_focus(self, control):
         if control not in self._controls:
             raise Exception("Control not in focus ring")
         
@@ -51,13 +52,14 @@ class FocusRing():
         self._controls.append(control)
         control.containing_focus_ring = weakref.ref(self)
         if self.get_focus() is None or set_focus:
-            self.focus(control)
+            self.set_focus(control)
 
 
     # Remove a control from the FocusRing
-    def remove(self, control):
+    def remove(self, control: "GUIControl") -> None:
         if control not in self._controls:
-            raise Exception("Control not in focus ring")
+            logging.warn("Control not in focus ring")
+            return
         
         self._controls.remove(control)
         control.containing_focus_ring = None
@@ -67,7 +69,7 @@ class FocusRing():
 
     def focus_first(self):
         if len(self._controls) > 0:
-            return self.focus(self._controls[0])
+            return self.set_focus(self._controls[0])
         
 
     def focus_next(self, direction=1):
@@ -91,7 +93,7 @@ class FocusRing():
             if first_control_tried is None:
                 first_control_tried = control
 
-            result = self.focus(control)
+            result = self.set_focus(control)
             if result:
                 return True
             else:  # Try focusing the next one
