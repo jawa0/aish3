@@ -164,7 +164,7 @@ class GUIContainer(GUIControl):
 
         if add_to_focus_ring:
             self.focus_ring.add(child)
-            self.focus_ring.set_focus(child)
+            self.gui.set_focus(child, True)
 
 
     def remove_child(self, child):

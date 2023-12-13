@@ -23,25 +23,13 @@ class FocusRing():
         assert(self.gui is not None)
 
         self._controls = list(controls)  # @note Copy it so our mods won't be propagaged outside this object
-        self._focused_control = None
         if len(self._controls) > 0:
-            self.set_focus(self._controls[0])
+            # self.set_focus(self._controls[0])
+            self.gui.set_focus(self._controls[0], True)
 
 
     def get_focus(self):
-        return self._focused_control
-
-
-    # @todo change name to set_focus?
-    # Handle None case, or do we need clear_focus?
-    def set_focus(self, control):
-        if control not in self._controls:
-            raise Exception("Control not in focus ring")
-        
-        success = self.gui.set_focus(control, True)
-        if success:
-            self._focused_control = control
-        return success
+        return self.gui.get_focus()
 
 
     # Add a control to the FocusRing
@@ -52,7 +40,8 @@ class FocusRing():
         self._controls.append(control)
         control.containing_focus_ring = weakref.ref(self)
         if self.get_focus() is None or set_focus:
-            self.set_focus(control)
+            # self.set_focus(control)
+            self.gui.set_focus(control, True)
 
 
     # Remove a control from the FocusRing
@@ -64,12 +53,13 @@ class FocusRing():
         self._controls.remove(control)
         control.containing_focus_ring = None
         if self.get_focus() == control:
-            self._focused_control = None
+            self.gui.set_focus(control, True)
 
 
     def focus_first(self):
         if len(self._controls) > 0:
-            return self.set_focus(self._controls[0])
+            # return self.set_focus(self._controls[0])
+            return self.gui.set_focus(self._controls[0], True)
         
 
     def focus_next(self, direction=1):
@@ -80,20 +70,20 @@ class FocusRing():
         control = None
 
         # If there is no focused control, focus the first control.
-        if self._focused_control is None:
+        if self.gui.get_focus() is None:
             control = self._controls[0]
         else:
             # Otherwise, focus the next control.
-            control = self._next_control(self._focused_control, offset=direction)
+            control = self._next_control(self.gui.get_focus(), offset=direction)
 
-        assert(control is not None)
+        # assert(control is not None)
             
         first_control_tried = None
         while control != first_control_tried:   # Only go once around loop
             if first_control_tried is None:
                 first_control_tried = control
 
-            result = self.set_focus(control)
+            result = self.gui.set_focus(control, True)
             if result:
                 return True
             else:  # Try focusing the next one
@@ -108,5 +98,6 @@ class FocusRing():
 
 
     def _next_control(self, control, offset=1):
-        i = self._controls.index(control)
-        return self._controls[(i + offset) % len(self._controls)]
+        if control in self._controls:
+            i = self._controls.index(control)
+            return self._controls[(i + offset) % len(self._controls)]

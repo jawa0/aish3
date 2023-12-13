@@ -18,6 +18,36 @@ from config import GUI_INSET_X, GUI_INSET_Y
 
 
 class GUIControl:
+    @classmethod
+    def from_json(cls, json, **kwargs):
+        assert(json["class"] == cls.__name__)
+        kwargs["saveable"] = json.get("saveable", True)
+        kwargs["name"] = json.get("name", "")
+
+        if "bounding_rect" in json:
+            x, y, w, h = json["bounding_rect"]
+            kwargs["x"] = x
+            kwargs["y"] = y
+            kwargs["w"] = w
+            kwargs["h"] = h
+
+        if "draggable" in json and json["draggable"]:
+            kwargs["draggable"] = True
+            
+        instance = cls(**kwargs)
+        return instance
+
+
+    def __json__(self):
+        if not self._saveable:
+            return None
+            
+        json = {}
+        json["class"] = self.__class__.__name__
+        json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
+        return json
+
+
     def __init__(self, can_focus=True, x=0, y=0, w=20, h=20, saveable=True, **kwargs):
         """
         Initializer method for the class.
@@ -78,6 +108,19 @@ class GUIControl:
         return self.gui.get_focus() == self
     
 
+    def focus_in(self):
+        if hasattr(self, "focus_ring"):
+            self.gui.push_focus_ring(self.focus_ring)
+            # self.focus_ring.focus_first()  # @note: a FocusRing should (but doesn't) know when it gets pushed so this could be encapsulated
+
+
+    def focus_out(self):
+        # Focus up into previous focus_ring on stack
+        if hasattr(self, "focus_ring"):
+            assert(self.gui.get_focus_ring() == self.focus_ring)
+            self.gui.pop_focus_ring()
+
+
     def set_bounds(self, x, y, w, h):
         """Set the bounding rect for the control. This is relative to its parent, not necessarily
         in world coordinates."""
@@ -89,36 +132,6 @@ class GUIControl:
             self.bounding_rect.h = h
         else:
             self.bounding_rect = sdl2.SDL_Rect(x, y, w, h)
-
-
-    @classmethod
-    def from_json(cls, json, **kwargs):
-        assert(json["class"] == cls.__name__)
-        kwargs["saveable"] = json.get("saveable", True)
-        kwargs["name"] = json.get("name", "")
-
-        if "bounding_rect" in json:
-            x, y, w, h = json["bounding_rect"]
-            kwargs["x"] = x
-            kwargs["y"] = y
-            kwargs["w"] = w
-            kwargs["h"] = h
-
-        if "draggable" in json and json["draggable"]:
-            kwargs["draggable"] = True
-            
-        instance = cls(**kwargs)
-        return instance
-
-
-    def __json__(self):
-        if not self._saveable:
-            return None
-            
-        json = {}
-        json["class"] = self.__class__.__name__
-        json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
-        return json
 
 
     def _on_quit(self):
