@@ -1018,6 +1018,7 @@ class GUI:
             print(f'Viewport pos: {self._viewport_pos}')
 
             gui_json = {
+                "version": "0.2",
                 "saved_at_utc": utc_now.isoformat(),
                 "saved_at_local": local_now.isoformat(),
                 "gui": self.__json__(),

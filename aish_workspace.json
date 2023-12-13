@@ -1,15 +1,16 @@
 {
-  "saved_at_utc": "2023-12-13T22:22:48.202354+00:00",
-  "saved_at_local": "2023-12-13T17:22:48.202354-05:00",
+  "version": "0.2",
+  "saved_at_utc": "2023-12-13T23:35:05.744833+00:00",
+  "saved_at_local": "2023-12-13T18:35:05.744833-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "bounding_rect": [
-        157,
-        -87,
-        2816,
-        1768
+        1733,
+        875,
+        2858,
+        1850
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -21,8 +22,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            1576,
-            962,
+            0,
+            0,
             608,
             336
           ],
@@ -163,8 +164,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            2208,
-            961,
+            2250,
+            1043,
             608,
             336
           ],
@@ -305,8 +306,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1713,
-            685,
+            1755,
+            767,
             450,
             30
           ],
@@ -316,8 +317,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1712,
-            713,
+            1754,
+            795,
             600,
             30
           ],
@@ -327,8 +328,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1579,
-            898,
+            1621,
+            980,
             200,
             30
           ],
@@ -338,8 +339,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            2212,
-            897,
+            2254,
+            979,
             200,
             30
           ],
@@ -349,8 +350,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            1590,
-            1334,
+            1632,
+            1416,
             608,
             336
           ],
@@ -491,8 +492,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            275,
-            928,
+            317,
+            1010,
             608,
             840
           ],
@@ -861,8 +862,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            273,
-            883,
+            315,
+            965,
             570,
             30
           ],
@@ -872,8 +873,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            932,
-            698,
+            974,
+            780,
             285,
             30
           ],
@@ -883,8 +884,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            934,
-            737,
+            976,
+            819,
             240,
             100
           ],
@@ -893,8 +894,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1316,
-            697,
+            1228,
+            133,
             285,
             30
           ],
@@ -904,18 +905,18 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1317,
-            736,
+            1233,
+            170,
             240,
             100
           ],
-          "text": "- Save/load and some controls have \nshifted\n- revisit why container \nsizeToChildren needs to change\ncontainer position. So many BUGS\n- Go to full translate + zoom + ? rotation ? transform hierarchy"
+          "text": "- Save/load and some controls have \nshifted\n- GOAL save/load identical positions\n- revisit why container \nsizeToChildren needs to change\ncontainer position. So many BUGS\n- Go to full translate + zoom + ? rotation ? transform hierarchy"
         },
         {
           "class": "Label",
           "bounding_rect": [
-            936,
-            875,
+            978,
+            957,
             135,
             30
           ],
@@ -925,8 +926,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            932,
-            1395,
+            974,
+            1477,
             608,
             312
           ],
@@ -1029,8 +1030,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            937,
-            1015,
+            979,
+            1097,
             240,
             100
           ],
@@ -1039,8 +1040,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            938,
-            1123,
+            980,
+            1205,
             240,
             100
           ],
@@ -1049,8 +1050,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1217,
-            868,
+            1259,
+            950,
             330,
             30
           ],
@@ -1060,8 +1061,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1215,
-            905,
+            1257,
+            987,
             240,
             100
           ],
@@ -1070,8 +1071,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1214,
-            1010,
+            1256,
+            1092,
             240,
             100
           ],
@@ -1080,8 +1081,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1214,
-            1116,
+            1256,
+            1198,
             240,
             100
           ],
@@ -1090,8 +1091,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1213,
-            1224,
+            1255,
+            1306,
             240,
             100
           ],
@@ -1100,8 +1101,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            937,
-            1231,
+            979,
+            1313,
             240,
             100
           ],
@@ -1110,8 +1111,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            937,
-            908,
+            979,
+            990,
             240,
             100
           ],
@@ -1120,8 +1121,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            939,
-            488,
+            981,
+            570,
             315,
             30
           ],
@@ -1131,8 +1132,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            939,
-            522,
+            981,
+            604,
             240,
             100
           ],
@@ -1141,8 +1142,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1342,
-            482,
+            1384,
+            564,
             135,
             30
           ],
@@ -1152,8 +1153,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            1341,
-            516,
+            1383,
+            598,
             240,
             100
           ],
@@ -1162,8 +1163,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            664,
-            349,
+            963,
+            167,
             240,
             100
           ],
@@ -1172,8 +1173,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            662,
-            307,
+            967,
+            120,
             135,
             30
           ],
@@ -1183,8 +1184,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            18,
-            303,
+            60,
+            385,
             555,
             30
           ],
@@ -1194,8 +1195,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            17,
-            348,
+            59,
+            430,
             240,
             100
           ],
@@ -1204,8 +1205,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            18,
-            459,
+            60,
+            541,
             240,
             100
           ],
@@ -1214,8 +1215,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            275,
-            349,
+            317,
+            431,
             240,
             100
           ],
@@ -1224,8 +1225,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            274,
-            459,
+            316,
+            541,
             240,
             100
           ],
@@ -1234,19 +1235,19 @@
         {
           "class": "Label",
           "bounding_rect": [
-            284,
-            613,
+            1110,
+            322,
             450,
             30
           ],
-          "text": "Re-enable / fix command window",
+          "text": "Re-enable / fix CommandConsole",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
           "class": "TextArea",
           "bounding_rect": [
-            284,
-            647,
+            1114,
+            362,
             240,
             100
           ],
@@ -1255,8 +1256,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            543,
-            648,
+            1363,
+            361,
             240,
             100
           ],
@@ -1265,8 +1266,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            406,
-            0,
+            448,
+            82,
             420,
             30
           ],
@@ -1276,8 +1277,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            408,
-            35,
+            450,
+            117,
             240,
             100
           ],
@@ -1286,8 +1287,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            408,
-            147,
+            735,
+            323,
             330,
             30
           ],
@@ -1297,8 +1298,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            408,
-            184,
+            739,
+            362,
             240,
             100
           ],
@@ -1307,8 +1308,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            2,
-            3,
+            44,
+            85,
             255,
             30
           ],
@@ -1318,8 +1319,8 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            4,
-            40,
+            46,
+            122,
             240,
             100
           ],
@@ -1328,8 +1329,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            -20,
-            841,
+            22,
+            923,
             90,
             30
           ],
@@ -1339,12 +1340,43 @@
         {
           "class": "TextArea",
           "bounding_rect": [
-            -22,
-            879,
+            0,
+            961,
             240,
             100
           ],
           "text": "- text search\n- go to the note with text \"...\"\n"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            1541,
+            0,
+            90,
+            30
+          ],
+          "text": "Ingest",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1541,
+            38,
+            240,
+            100
+          ],
+          "text": "String Theory gets Competition: A New Attempt to Solve Physics' Biggest Mystery\nhttps://www.youtube.com/watch?v=-HHv3T4UHec&ab_channel=SabineHossenfelder\n"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1543,
+            146,
+            240,
+            100
+          ],
+          "text": "Black Hole Singularities \"Faith, not science!\" Prominent Physicist Claims\nhttps://www.youtube.com/watch?v=nz55jONtFAU&t=3s&ab_channel=SabineHossenfelder\n"
         }
       ]
     }
@@ -1364,7 +1396,7 @@
     ]
   },
   "viewport_pos": [
-    -123,
-    626
+    2254,
+    856
   ]
 }
