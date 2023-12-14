@@ -480,6 +480,17 @@ class GUI:
 
                     return True
                 
+            elif event.type == sdl2.SDL_MOUSEWHEEL:
+                # We're going to to pan the viewport on track-pad / mouse wheel
+
+                GAIN = 8  # pixels per wheel click
+                dx = event.wheel.x * GAIN
+                dy = -event.wheel.y * GAIN
+
+                wx, wy = self.get_view_pos()
+                self.set_view_pos(wx + dx, wy + dy)
+                return True
+                                
         return handled
     
 
