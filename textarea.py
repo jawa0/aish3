@@ -28,6 +28,8 @@ class TextArea(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(TextArea, cls)._enrich_kwargs(json, **kwargs)
+
         gui = kwargs.get('gui')
 
         instance = gui.create_control(json["class"], **kwargs)
