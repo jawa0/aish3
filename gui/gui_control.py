@@ -15,12 +15,25 @@
 
 import sdl2
 from config import GUI_INSET_X, GUI_INSET_Y
+import uuid
 
 
 class GUIControl:
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+
+        kwargs = cls._enrich_kwargs(json, **kwargs)            
+        instance = cls(**kwargs)
+        return instance
+
+
+    @classmethod
+    def _enrich_kwargs(cls, json, **kwargs):
+        got_uid = json.get("uid", False)
+        if got_uid:
+            kwargs["uid"] = got_uid
+
         kwargs["saveable"] = json.get("saveable", True)
         kwargs["name"] = json.get("name", "")
 
@@ -33,9 +46,8 @@ class GUIControl:
 
         if "draggable" in json and json["draggable"]:
             kwargs["draggable"] = True
-            
-        instance = cls(**kwargs)
-        return instance
+
+        return kwargs
 
 
     def __json__(self):
@@ -44,6 +56,7 @@ class GUIControl:
             
         json = {}
         json["class"] = self.__class__.__name__
+        json["uid"] = self._uid
         json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
         return json
 
@@ -76,6 +89,7 @@ class GUIControl:
             saveable (bool): whether it's saveable, default is True
             name (str): name of the control, default is "".
         """
+        self._uid = kwargs.get('uid', str(uuid.uuid4()))
         self.gui = kwargs.get('gui')
         self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
         self.font_descriptor = kwargs.get('font_descriptor', self.gui.font_descriptor if self.gui else "default")

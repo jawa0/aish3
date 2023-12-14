@@ -1011,7 +1011,10 @@ class GUI:
         return None
     
 
-    def save(self):        
+    def save(self):
+        logging.debug("Control positions before saving...")
+        self.debug_dump_control_uids_and_coords()
+
         utc_now = datetime.datetime.now(pytz.utc)
         local_timezone = get_localzone()
         local_now = utc_now.astimezone(local_timezone)
@@ -1078,14 +1081,21 @@ class GUI:
 
         logging.info("GUI loaded.")
 
+        logging.debug("Control positions after loading...")
+        self.debug_dump_control_uids_and_coords()
 
-        logging.debug("Fixing control coordinates (unhack)")
-
-        def depth_first_traversal(c: "GUIControl", f: "callable") -> None:
-            if hasattr(c, "children"):
-                for child in c.children:
-                    depth_first_traversal(child, f)
-            f(c)
-
-        logging.debug("Controls coordinates fixed.")
         return True
+
+
+    def _depth_first_traversal(c: "GUIControl", f: "callable") -> None:
+        if hasattr(c, "children"):
+            for child in c.children:
+                GUI._depth_first_traversal(child, f)
+        f(c)
+
+
+    def debug_dump_control_uids_and_coords(self):
+        def print_control(c: "GUIControl") -> None:
+            logging.debug(f'{c._uid} {c.__class__.__name__} {c.bounding_rect}')
+
+        GUI._depth_first_traversal(self.content(), print_control)

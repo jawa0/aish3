@@ -38,6 +38,8 @@ class LLMChatContainer(GUIContainer):
         @classmethod
         def from_json(cls, json, **kwargs):
             assert(json["class"] == cls.__name__)
+            kwargs = super(LLMChatContainer.ChatMessageUI, cls)._enrich_kwargs(json, **kwargs)
+
             gui = kwargs.get('gui')
             assert(gui is not None)
 
@@ -153,6 +155,8 @@ class LLMChatContainer(GUIContainer):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(LLMChatContainer, cls)._enrich_kwargs(json, **kwargs)
+
         gui = kwargs.get('gui')
         assert(gui is not None)
 

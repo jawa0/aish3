@@ -29,6 +29,8 @@ class Label(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(Label, cls)._enrich_kwargs(json, **kwargs)
+        
         gui = kwargs.get('gui')
 
         # print('\n\n******\n\n\n\n')

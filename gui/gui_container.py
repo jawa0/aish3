@@ -27,6 +27,7 @@ class GUIContainer(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(GUIContainer, cls)._enrich_kwargs(json, **kwargs)
 
         # kwargs["inset"] = json
 
