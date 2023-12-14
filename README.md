@@ -44,7 +44,7 @@ yields:
       --fullscreen          run in fullscreen mode
       --width WIDTH         window width (default: 1450)
       --height HEIGHT       window height (default: 800)
-      --voice-in            Enable voice input.
+      --voice-in            Enable voice input (default: False)
       --workspace WORKSPACE workspace file (default: aish_workspace.json)
 
 #### Setting up required environment variables
