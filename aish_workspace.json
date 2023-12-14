@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-13T23:35:05.744833+00:00",
-  "saved_at_local": "2023-12-13T18:35:05.744833-05:00",
+  "saved_at_utc": "2023-12-14T00:59:27.667022+00:00",
+  "saved_at_local": "2023-12-13T19:59:27.667022-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -10,7 +10,7 @@
         1733,
         875,
         2858,
-        1850
+        1836
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -19,148 +19,6 @@
         0
       ],
       "children": [
-        {
-          "class": "LLMChatContainer",
-          "bounding_rect": [
-            0,
-            0,
-            608,
-            336
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "How do I add an image in Mardown? I want to add a screen-shot to my README.md file.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "In Markdown, you can add an image using the following syntax:\n\n```markdown\n![Alt text](URL_or_path_to_image \"Optional title\")\n```\n\n- `Alt text` is the alternative text that describes the image if it cannot be displayed.\n- `URL_or_path_to_image` is the web address or the relative file path to your image.\n- `Optional title` is a title for the image that will appear as a tooltip. This part is optional.\n\nSince you're adding a screenshot to your `README.md`, make sure the image is placed in your repository or hosted online. Here is an example:\n\n```markdown\n![Screenshot of my application](images/screenshot.png \"Application Screenshot\")\n```\n\nIn this case, it's assumed that the `images` folder is in the same directory as your `README.md` file, and `screenshot.png` is the image you want to display. If the image is hosted online, replace `images/screenshot.png` with the actual URL of the image."
-                }
-              ]
-            }
-          ]
-        },
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
@@ -306,8 +164,8 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1755,
-            767,
+            1786,
+            703,
             450,
             30
           ],
@@ -317,23 +175,12 @@
         {
           "class": "Label",
           "bounding_rect": [
-            1754,
-            795,
+            1785,
+            754,
             600,
             30
           ],
           "text": "Cmd+Del while editing a label deletes it",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "Label",
-          "bounding_rect": [
-            1621,
-            980,
-            200,
-            30
-          ],
-          "text": "An LLM Chat",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
@@ -492,8 +339,8 @@
         {
           "class": "LLMChatContainer",
           "bounding_rect": [
-            317,
-            1010,
+            310,
+            996,
             608,
             840
           ],
@@ -862,12 +709,12 @@
         {
           "class": "Label",
           "bounding_rect": [
-            315,
-            965,
-            570,
+            287,
+            810,
+            450,
             30
           ],
-          "text": "Scene-graph reflection / introspection",
+          "text": "GUI Reflection / Introspection",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
@@ -1377,6 +1224,99 @@
             100
           ],
           "text": "Black Hole Singularities \"Faith, not science!\" Prominent Physicist Claims\nhttps://www.youtube.com/watch?v=nz55jONtFAU&t=3s&ab_channel=SabineHossenfelder\n"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            1761,
+            305,
+            465,
+            30
+          ],
+          "text": "Agent Questions / Introspection",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1765,
+            352,
+            240,
+            100
+          ],
+          "text": "- Where are all the places this function is called from?\n- Where is the definition of this function?\n- Is this code ever called?"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1766,
+            460,
+            240,
+            100
+          ],
+          "text": "- What are all the things I need \n  to deliver, for an excellent code change?\n\t- code\n\t- tests\n\t- updated comments\n\t- updated documentation"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            309,
+            956,
+            465,
+            30
+          ],
+          "text": "Scene Graph / Control Hierarchy",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            302,
+            849,
+            240,
+            100
+          ],
+          "text": "- current time\n- assumed user\n- verified user? How?\n- location?\n- screen and window sizes\n- platform info"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            553,
+            849,
+            240,
+            100
+          ],
+          "text": "- clickstream\n- event stream"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1758,
+            998,
+            240,
+            100
+          ],
+          "text": "VSCode is open source\nhttps://github.com/Microsoft/vscode\n\nVSCodium\nhttps://vscodium.com/#:~:text=Microsoft's%20vscode%20source%20code%20is,license%20and%20contains%20telemetry%2Ftracking.\n"
+        },
+        {
+          "class": "Label",
+          "bounding_rect": [
+            1759,
+            951,
+            420,
+            30
+          ],
+          "text": "Programming IDEs Source Code",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "bounding_rect": [
+            1759,
+            1108,
+            240,
+            100
+          ],
+          "text": "- Emacs\n- Vim\n- Notepad++\n- Sublime Text\n- Code Blocks?\n- Scintilla\n- Web JS code editors\n- Ubuntu Text Editor"
         }
       ]
     }
@@ -1396,7 +1336,7 @@
     ]
   },
   "viewport_pos": [
-    2254,
-    856
+    2624,
+    1535
   ]
 }

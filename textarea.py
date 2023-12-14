@@ -150,11 +150,14 @@ class TextArea(GUIControl):
         self._was_last_event_mousewheel = False
 
         if event.type == sdl2.SDL_MOUSEWHEEL:
-            # Here, we handle the vertical scrolling (event.wheel.y) 
-            
-            self._was_last_event_mousewheel = True
-            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)            
-            return True
+            # Scroll this TextArea, but only if it has focus.
+
+            GAIN = 8
+            dy = -event.wheel.y * GAIN
+
+            if self.has_focus():
+                self.scroll_by(dy=dy)
+                return True
         
         elif event.type == sdl2.SDL_KEYDOWN:
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
