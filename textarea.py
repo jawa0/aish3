@@ -17,7 +17,7 @@ import ctypes
 import sdl2
 from sdl2.ext.ttf import FontTTF
 from sdl2.sdlttf import TTF_FontHeight
-from draw import draw_cursor, draw_text
+from draw import draw_cursor, draw_text, set_color
 from gui import GUI, GUIControl
 from gui.fonts import FontRegistry
 from text_edit_buffer import TextEditBuffer
@@ -464,7 +464,9 @@ class TextArea(GUIControl):
             row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
             line = lines[row]
             if line is not None and col is not None:
+                old_color = set_color(self.renderer, (255, 255, 255, 255))
                 draw_cursor(self.renderer, self.font_descriptor, self.text_buffer, self.row_spacing, vr.x, vr.y, vr, self.x_scroll, self.y_scroll)
+                set_color(self.renderer, old_color)
 
 
     def scroll_by(self, dx=0, dy=0):

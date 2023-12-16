@@ -18,6 +18,8 @@ import math
 import sdl2
 
 from config import GUI_INSET_X, GUI_INSET_Y
+from draw import draw_marker_point
+
 import gui
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
@@ -160,6 +162,15 @@ class GUIContainer(GUIControl):
         for child in self:
             if child._visible:
                 child.draw()
+
+        # @debug @todo make this a runtime flag
+        # DEBUG_DRAW
+        # Draw my content area origin (affected by insets)
+        # content_x_world, content_y_world = self.gui.local_to_local(self, None, 0, 0)
+        # content_x_view, content_y_view = self.gui.world_to_view(content_x_world, content_y_world)
+        # draw_marker_point(self.renderer, content_x_view, content_y_view, color=(0, 127, 255, 255), 
+        #             caption="Container Content Origin", font_descriptor=self.font_descriptor)
+
 
 
     def get_children(self):
