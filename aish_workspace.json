@@ -1,17 +1,17 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-16T22:07:38.197627+00:00",
-  "saved_at_local": "2023-12-16T17:07:38.197627-05:00",
+  "saved_at_utc": "2023-12-16T23:09:44.623603+00:00",
+  "saved_at_local": "2023-12-16T18:09:44.623603-05:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "uid": "ae51569e-a962-438b-aa3e-8bb8f35023ee",
       "bounding_rect": [
-        3983,
-        1673,
-        3871,
-        2451
+        0,
+        245,
+        3307,
+        2206
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -25,7 +25,7 @@
           "uid": "1e6c3f66-1ac7-434d-bdab-cd89a1efd9aa",
           "bounding_rect": [
             0,
-            245,
+            0,
             608,
             336
           ],
@@ -178,7 +178,7 @@
           "uid": "8d359e0a-fc4f-4a7b-9fd2-a71cc18b4b39",
           "bounding_rect": [
             2611,
-            1318,
+            1073,
             450,
             30
           ],
@@ -190,7 +190,7 @@
           "uid": "4ddbe3cc-d9fb-4ada-b40d-4efe1ae31adc",
           "bounding_rect": [
             2610,
-            1369,
+            1124,
             600,
             30
           ],
@@ -202,7 +202,7 @@
           "uid": "eba48632-548f-430f-9182-8963e4f3f0d4",
           "bounding_rect": [
             2457,
-            2031,
+            1786,
             608,
             336
           ],
@@ -355,7 +355,7 @@
           "uid": "81f8cc73-9e4a-4d99-b4de-1dd3ef6804b5",
           "bounding_rect": [
             1135,
-            1611,
+            1366,
             608,
             840
           ],
@@ -754,7 +754,7 @@
           "uid": "b709a8a2-9957-43a5-9061-2a1e43021634",
           "bounding_rect": [
             1112,
-            1425,
+            1180,
             450,
             30
           ],
@@ -766,7 +766,7 @@
           "uid": "e973dda4-c13b-4a88-89a4-0da215b2400a",
           "bounding_rect": [
             1799,
-            1395,
+            1150,
             285,
             30
           ],
@@ -778,7 +778,7 @@
           "uid": "20f3d6ce-b5c1-40c8-841e-14457bce0f88",
           "bounding_rect": [
             1801,
-            1434,
+            1189,
             240,
             100
           ],
@@ -786,33 +786,10 @@
         },
         {
           "class": "Label",
-          "uid": "6cb752e5-20c4-41b8-9ce8-f94a7217d80e",
-          "bounding_rect": [
-            1779,
-            0,
-            285,
-            30
-          ],
-          "text": "Coordinate Problems",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "2bd3518c-8b9a-4286-9c93-3f6e145393a3",
-          "bounding_rect": [
-            1782,
-            41,
-            240,
-            100
-          ],
-          "text": "- Save/load and some controls have \nshifted\n- GOAL save/load identical positions\n- revisit why container \nsizeToChildren needs to change\ncontainer position. So many BUGS\n- Go to full translate + zoom + ? rotation ? transform hierarchy"
-        },
-        {
-          "class": "Label",
           "uid": "dd6c44a5-799e-4ee5-8e06-cb0ee715a8eb",
           "bounding_rect": [
             1803,
-            1572,
+            1327,
             135,
             30
           ],
@@ -824,7 +801,7 @@
           "uid": "e960c02c-0920-49f8-afab-a09b0bca35c2",
           "bounding_rect": [
             1799,
-            2092,
+            1847,
             608,
             312
           ],
@@ -936,7 +913,7 @@
           "uid": "a6342ecc-d073-4f6d-8dd9-d8f9637b5bbc",
           "bounding_rect": [
             1804,
-            1712,
+            1467,
             240,
             100
           ],
@@ -947,7 +924,7 @@
           "uid": "6b033c5e-74a7-4e92-90c0-dd202b6c43af",
           "bounding_rect": [
             1805,
-            1820,
+            1575,
             240,
             100
           ],
@@ -958,7 +935,7 @@
           "uid": "7740257d-83a3-43c1-9ee9-0033ba3d0105",
           "bounding_rect": [
             2084,
-            1565,
+            1320,
             330,
             30
           ],
@@ -970,7 +947,7 @@
           "uid": "e9005ec4-9b5e-46c0-9efb-080bcfca8788",
           "bounding_rect": [
             2082,
-            1602,
+            1357,
             240,
             100
           ],
@@ -981,7 +958,7 @@
           "uid": "1cba6dbb-1f97-4a67-9b90-fb4d2463dff9",
           "bounding_rect": [
             2081,
-            1707,
+            1462,
             240,
             100
           ],
@@ -992,7 +969,7 @@
           "uid": "e5218913-da75-4318-9279-abdf45f33e0b",
           "bounding_rect": [
             2081,
-            1813,
+            1568,
             240,
             100
           ],
@@ -1003,7 +980,7 @@
           "uid": "71a525ce-b5cd-48dc-8752-ed18863b149f",
           "bounding_rect": [
             2080,
-            1921,
+            1676,
             240,
             100
           ],
@@ -1014,7 +991,7 @@
           "uid": "28052360-0f0a-4984-8a7d-d2fbc4d84b4c",
           "bounding_rect": [
             1804,
-            1928,
+            1683,
             240,
             100
           ],
@@ -1025,7 +1002,7 @@
           "uid": "d2cd8da1-d041-47fb-9e1d-9205de71e1f7",
           "bounding_rect": [
             1804,
-            1605,
+            1360,
             240,
             100
           ],
@@ -1036,7 +1013,7 @@
           "uid": "e4773681-225b-4d26-a796-fa1eba3bed43",
           "bounding_rect": [
             1806,
-            1185,
+            940,
             315,
             30
           ],
@@ -1048,7 +1025,7 @@
           "uid": "5a8b629d-6787-45c0-a679-717016f4ee41",
           "bounding_rect": [
             1806,
-            1219,
+            974,
             240,
             100
           ],
@@ -1059,7 +1036,7 @@
           "uid": "846a0571-43ae-4729-b378-611ed02e8ef3",
           "bounding_rect": [
             2209,
-            1179,
+            934,
             135,
             30
           ],
@@ -1071,7 +1048,7 @@
           "uid": "1e499710-6a7b-406c-9090-28f33159f989",
           "bounding_rect": [
             2208,
-            1213,
+            968,
             240,
             100
           ],
@@ -1082,7 +1059,7 @@
           "uid": "5130d775-72c2-4f99-873a-b95140100dc7",
           "bounding_rect": [
             1788,
-            782,
+            537,
             240,
             100
           ],
@@ -1093,7 +1070,7 @@
           "uid": "bc342785-4f36-4933-b67b-3497b359d868",
           "bounding_rect": [
             1792,
-            735,
+            490,
             135,
             30
           ],
@@ -1105,7 +1082,7 @@
           "uid": "2dcdbd87-b972-4a70-b074-09b0088bef25",
           "bounding_rect": [
             885,
-            1000,
+            755,
             555,
             30
           ],
@@ -1117,7 +1094,7 @@
           "uid": "50b9a295-b3e0-47ce-be88-49f27e644a9e",
           "bounding_rect": [
             884,
-            1045,
+            800,
             240,
             100
           ],
@@ -1128,7 +1105,7 @@
           "uid": "9b50a89c-56e3-45b0-b377-fcbc8c312ed2",
           "bounding_rect": [
             885,
-            1156,
+            911,
             240,
             100
           ],
@@ -1139,7 +1116,7 @@
           "uid": "e4e444d9-618a-430b-bcbc-8c8ba6cb3dbf",
           "bounding_rect": [
             1142,
-            1046,
+            801,
             240,
             100
           ],
@@ -1150,7 +1127,7 @@
           "uid": "65d18f43-8b6d-46da-9f89-25392fe92512",
           "bounding_rect": [
             1141,
-            1156,
+            911,
             240,
             100
           ],
@@ -1161,7 +1138,7 @@
           "uid": "eb3ddad0-f4e8-47d8-bdc0-a2b4f554a530",
           "bounding_rect": [
             1935,
-            937,
+            692,
             450,
             30
           ],
@@ -1173,7 +1150,7 @@
           "uid": "04a29fb9-ad02-4384-86c0-95ee2e2f259a",
           "bounding_rect": [
             1939,
-            977,
+            732,
             240,
             100
           ],
@@ -1184,7 +1161,7 @@
           "uid": "b5558c9e-ac57-4477-b80a-dcc4f24abfb0",
           "bounding_rect": [
             2188,
-            976,
+            731,
             240,
             100
           ],
@@ -1195,7 +1172,7 @@
           "uid": "825fbb7b-53bc-4e21-9bbe-09433e1a8e2d",
           "bounding_rect": [
             1273,
-            697,
+            452,
             420,
             30
           ],
@@ -1207,7 +1184,7 @@
           "uid": "553071e4-e5a0-4a80-ae8f-f7800cd392d4",
           "bounding_rect": [
             1275,
-            732,
+            499,
             240,
             100
           ],
@@ -1218,7 +1195,7 @@
           "uid": "048fc80a-06da-4797-b827-aeb2630ddbe4",
           "bounding_rect": [
             1560,
-            938,
+            693,
             330,
             30
           ],
@@ -1230,7 +1207,7 @@
           "uid": "7c514a53-918b-4fa0-bd56-acc01ee42003",
           "bounding_rect": [
             1564,
-            977,
+            732,
             240,
             100
           ],
@@ -1241,7 +1218,7 @@
           "uid": "795d4041-44cb-4ccf-ba72-c6ec8f41abb2",
           "bounding_rect": [
             869,
-            700,
+            455,
             255,
             30
           ],
@@ -1253,7 +1230,7 @@
           "uid": "9eaab2fa-dcaa-4a6a-a009-97e86fd7287b",
           "bounding_rect": [
             871,
-            737,
+            492,
             240,
             100
           ],
@@ -1264,7 +1241,7 @@
           "uid": "a995748e-be57-4fbe-afca-51195a751339",
           "bounding_rect": [
             499,
-            1172,
+            927,
             90,
             30
           ],
@@ -1276,7 +1253,7 @@
           "uid": "fefe23e0-2d30-4706-90db-33db6c5837b2",
           "bounding_rect": [
             484,
-            1215,
+            970,
             240,
             100
           ],
@@ -1287,7 +1264,7 @@
           "uid": "06bd536a-f6e1-4d89-8e92-e152469d025b",
           "bounding_rect": [
             2366,
-            615,
+            370,
             195,
             30
           ],
@@ -1299,7 +1276,7 @@
           "uid": "143c01b9-cf35-414f-af22-4977eacda6de",
           "bounding_rect": [
             2366,
-            653,
+            408,
             240,
             100
           ],
@@ -1310,7 +1287,7 @@
           "uid": "525071be-1164-4944-be71-5145e446b7ce",
           "bounding_rect": [
             2368,
-            761,
+            516,
             240,
             100
           ],
@@ -1321,7 +1298,7 @@
           "uid": "b32760e9-beb5-48c7-917a-389a933f6e10",
           "bounding_rect": [
             2672,
-            881,
+            636,
             465,
             30
           ],
@@ -1333,7 +1310,7 @@
           "uid": "7fc345fe-0fba-4f6a-8432-ae5e65b51cba",
           "bounding_rect": [
             2677,
-            928,
+            683,
             240,
             100
           ],
@@ -1344,7 +1321,7 @@
           "uid": "32bfb2f1-0d20-4025-8cbb-30a501273ae4",
           "bounding_rect": [
             2674,
-            1038,
+            793,
             240,
             100
           ],
@@ -1355,7 +1332,7 @@
           "uid": "9dbb2101-a517-4383-8182-5a9a964e7c32",
           "bounding_rect": [
             1134,
-            1571,
+            1326,
             465,
             30
           ],
@@ -1367,7 +1344,7 @@
           "uid": "06b957f2-0168-4a12-8953-f212227e3839",
           "bounding_rect": [
             1127,
-            1464,
+            1219,
             240,
             100
           ],
@@ -1378,7 +1355,7 @@
           "uid": "32080f32-2426-4aa5-9861-62b2070af7df",
           "bounding_rect": [
             1378,
-            1464,
+            1219,
             240,
             100
           ],
@@ -1389,7 +1366,7 @@
           "uid": "57b3f06f-37e5-4065-a56c-3abf5973e9b1",
           "bounding_rect": [
             2583,
-            1613,
+            1368,
             240,
             100
           ],
@@ -1400,7 +1377,7 @@
           "uid": "9700151c-46fc-484a-9879-e8c16678d9af",
           "bounding_rect": [
             2584,
-            1566,
+            1321,
             420,
             30
           ],
@@ -1412,7 +1389,7 @@
           "uid": "8e5d2b74-68fb-4d34-b7f4-8fefff69fd35",
           "bounding_rect": [
             2584,
-            1723,
+            1478,
             240,
             100
           ],
@@ -1423,7 +1400,7 @@
           "uid": "06fe61da-2677-4168-828e-dec1048dc78d",
           "bounding_rect": [
             1,
-            1478,
+            1233,
             608,
             312
           ],
@@ -1535,7 +1512,7 @@
           "uid": "859c1c5e-231d-4750-8c85-5ecd92573631",
           "bounding_rect": [
             0,
-            1371,
+            1126,
             240,
             100
           ],
@@ -1546,7 +1523,7 @@
           "uid": "1f65d94f-3245-404c-baa0-003e6cb68975",
           "bounding_rect": [
             884,
-            1265,
+            1020,
             240,
             100
           ],
@@ -1557,7 +1534,7 @@
           "uid": "fa54d11e-b859-4dd1-b331-e196ade0b7ee",
           "bounding_rect": [
             717,
-            1425,
+            1180,
             270,
             30
           ],
@@ -1569,7 +1546,7 @@
           "uid": "e635261c-395b-420d-8a05-992496125961",
           "bounding_rect": [
             721,
-            1459,
+            1214,
             240,
             100
           ],
@@ -1580,7 +1557,7 @@
           "uid": "46af551d-bb07-445b-97da-bd5a7090a69d",
           "bounding_rect": [
             1425,
-            1125,
+            880,
             285,
             30
           ],
@@ -1592,7 +1569,7 @@
           "uid": "f1e10479-4e94-4f0f-8aff-cdb5126cf164",
           "bounding_rect": [
             1427,
-            1165,
+            920,
             240,
             100
           ],
@@ -1603,7 +1580,7 @@
           "uid": "b1035d92-8a08-4bed-bf86-7ee85e98753b",
           "bounding_rect": [
             3213,
-            245,
+            0,
             90,
             30
           ],
@@ -1615,7 +1592,7 @@
           "uid": "ffb39cdf-f271-4037-82c9-3d50731a2a2e",
           "bounding_rect": [
             3067,
-            293,
+            48,
             240,
             100
           ],
@@ -1626,7 +1603,7 @@
           "uid": "0e1c50c3-d3bc-46a1-95aa-4e3e1adf33ec",
           "bounding_rect": [
             1503,
-            481,
+            236,
             225,
             30
           ],
@@ -1638,505 +1615,23 @@
           "uid": "ce0028bd-0961-49a7-a9ec-b469c54593d7",
           "bounding_rect": [
             1506,
-            517,
+            272,
             240,
             100
           ],
           "text": "- start managing my calendar through AISH\n- how?\n- integrations"
-        },
-        {
-          "class": "LLMChatContainer",
-          "uid": "f235c299-5a4e-4385-9576-b589edced0a3",
-          "bounding_rect": [
-            3263,
-            462,
-            608,
-            504
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "2179fdec-20a1-4aee-834b-9bae263d979e",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "042b499d-5573-4483-9539-7c9c354dbb29",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "4384ffaf-fe96-4f60-86d9-214cfca9c44a",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "083dd651-ae84-4d5b-a2ec-5d0c39fe9c02",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "ae68a594-9b7e-49ae-8460-6f352392e07f",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "77655af2-ca27-4c0b-bcba-def4ab1e53af",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "f047ae15-9b52-419e-8aa4-3e6ccac56721",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "Can one use regexs in .gitignore?"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "20813284-87d9-40ae-9a6d-893633923b9d",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "7e2e2893-4965-4250-8665-436bc55c4a1e",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "4431c969-d2eb-4ee2-9c24-90c07cbb948d",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "Yes, `.gitignore` supports a limited regex-like syntax. While it does not support \nfull regular expressions, the pattern matching available in `.gitignore` is sufficient \nfor most use cases when specifying which files or directories to ignore in a Git \nrepository. Here's an overview of the patterns you can use:\n\n1. Wildcards (`*`): Matches any sequence of characters, excluding directory separators. For instance, `*.log` matches all files with the `.log` extension in the directory where the `.gitignore` file is located.\n\n2. Double Wildcards (`**`): Matches any number of directories. For example, `**/*.log` matches all `.log` files in the repository, regardless of their directory depth.\n\n3. Question mark (`?`): Matches any single character (except directory separators).\n\n4. Bracket expressions (`[...]`): Matches any one of the enclosed characters. For example, `file_[0-9].txt` matches `file_0.txt`, `file_1.txt`, ..., `file_9.txt`.\n\n5. Escaping special characters (`\\`): If you need to ignore a file that contains a character used by the pattern syntax, you can escape it with a backslash. For instance, to ignore a literal asterisk in a filename, you would write `\\*.txt`.\n\n6. A leading slash (`/`): Specifies that the pattern only matches files in the directory containing the `.gitignore` file. For example, `/logs` ignores the `logs` directory at the root of the repository but not a `logs` directory elsewhere.\n\n7. A trailing slash (`/`): Specifies that the pattern matches directories (and the contents within) rather than files. For example, `tmp/` ignores the `tmp` directory and everything within it.\n\nWhile these patterns are not regular expressions in the traditional sense, they offer a form of pattern matching that is generally well-suited for defining which files to exclude from a Git repository."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "1bdc7b35-8124-4fbc-b49c-22517aca21b4",
-              "bounding_rect": [
-                0,
-                272,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "c54765cb-1252-4a63-9c3e-29806c6f9e98",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "e619a827-c482-4810-b671-36129bacde17",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "Great! Is there a way to hide files in the VSCode file list panel by something like\na regular expression? I notice that the files excluded by .gitignore are greyed out\nbut still appear in the list."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "c90fb843-8aff-465d-9fba-c5f11db891e1",
-              "bounding_rect": [
-                0,
-                356,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "6253c6f2-726a-4c09-9edf-dc488b6b9815",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "d84aa1ac-e9f7-4e76-9e88-ca7b0fa5d941",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "In Visual Studio Code, you can configure patterns for files and folders to be \nexcluded from the Explorer and Searches. This is done by using the `files.exclude` \nand `search.exclude` settings, which support glob patterns, not regular expressions.\n\nHowever, these glob patterns are quite powerful and can achieve similar results. To \nhide files in the File Explorer, you can edit your `settings.json` file in VSCode.\n\nHere are the steps to update the `settings.json` file:\n\n1. Press `Ctrl` + `,` (or `Cmd` + `,` on macOS) to open the Settings UI.\n2. In the top right corner of the settings UI, click on the `{}` icon to open the \n`settings.json` file.\n3. Add or modify the `files.exclude` setting to include your patterns.\n\nFor example:\n\n```json\n\"files.exclude\": {\n    // this is a comment, which JSON doesn't actually support\n    // so remove before adding to your settings.json\n    \"**/.git\": true, // this excludes all .git folders and their contents\n    \"**/.svn\": true, // same for .svn\n    \"**/.hg\": true, // and Mercurial\n    \"**/CVS\": true, // and CVS\n    \"**/.DS_Store\": true, // ignores .DS_Store files\n    \"**/*.bak\": true, // ignores all files ending in .bak\n    \"tmp/\": true, // ignores all files within tmp directory\n    \"**/*.log\": { \"when\": \"$(basename).ts\" } // ignores .log files but only when a file with the same basename ending in .ts is present\n}\n```\n\nThe `when` clause in the `files.exclude` setting is a special case that allows for \nconditional hiding. It hides the glob pattern specified only when another specified \nfile is present.\n\nThis mechanism doesn't support full regular expressions, but glob patterns should be \nable to handle most use cases. Make sure that when you edit your `settings.json` file, \nthe syntax follows valid JSON format (unlike in the comments shown in the example \nwhich should be removed)."
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "class": "Label",
-          "uid": "c009ed9d-33a6-425a-84ce-5eebf2fa36ff",
-          "bounding_rect": [
-            3261,
-            423,
-            255,
-            30
-          ],
-          "text": "VS Code Questions",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "LLMChatContainer",
-          "uid": "9df0f776-62eb-493b-8adb-a285886ef82f",
-          "bounding_rect": [
-            2030,
-            34,
-            608,
-            504
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "fb489a11-aeb4-4752-b7e7-4a226ac83fff",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "a2e7c5ca-dc0e-4928-a024-7ddabd4a7977",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "79cb26ba-2e3e-4dae-b1b5-8cfca91b76f4",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "c31a7e1c-18ef-4356-bc29-ee06484172d8",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "92fb980b-1962-4be0-b5e9-1fb3b5e63133",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "0100116e-1aed-434b-9873-543e3ec3d9df",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "df06ee8c-d6a6-4e6a-8605-20994e43afa3",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "Write a docstring for this code:\ndef set_color(renderer, new_color):\n    # Get the current color\n    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()\n    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)\n    old_color = (r.value, g.value, b.value, a.value)\n\n    # Set the new color\n    sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])\n\n    # Return the old color\n    return old_color\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "37cad72f-21bc-4f8b-8c99-778a92d7083f",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "7f91100d-3822-4ebd-91cc-87693fc2d024",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "c1136a2a-ed27-4773-88c9-981b6919daa8",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "```python\ndef set_color(renderer, new_color):\n    \"\"\"\n    Change the renderer's current drawing color to the new specified color.\n\n    This function gets the current drawing color from the renderer, sets a new drawing color, \n    and then returns the old color.\n\n    Parameters:\n    renderer : SDL_Renderer\n        A pointer to the rendering context.\n    new_color : tuple of 4 uint8\n        A (red, green, blue, alpha) tuple representing the RGBA color to set. Each color\n        component should be an integer in the range 0-255.\n\n    Returns:\n    tuple of 4 uint8\n        A (red, green, blue, alpha) tuple representing the old RGBA color that was set\n        before this function changed it.\n\n    Note:\n    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.\n    \"\"\"\n    # Get the current color\n    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()\n    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)\n    old_color = (r.value, g.value, b.value, a.value)\n\n    # Set the new color\n    sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])\n\n    # Return the old color\n    return old_color\n```\nPlease review the docstring and provide any feedback as needed."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "5826658f-5d0f-4631-826f-98ef98fb8a37",
-              "bounding_rect": [
-                0,
-                272,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "7711165d-31b5-431c-98eb-a4d5d59720e8",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "d64bb430-aef4-47c4-a88f-a7f28434dbbc",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "Good, now add type hints"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "41319a42-27a5-4916-a5fe-0acd9f283ad8",
-              "bounding_rect": [
-                0,
-                356,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "ee73a00b-b53b-419e-90ef-2460f30f3525",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "b7406c1d-c1ed-4517-9a75-b5527615b427",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "```python\nfrom typing import Tuple\nimport sdl2\n\ndef set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:\n    \"\"\"\n    Change the renderer's current drawing color to the new specified color.\n\n    This function gets the current drawing color from the renderer, sets a new drawing color, \n    and then returns the old color.\n\n    Parameters:\n    renderer : SDL_Renderer\n        A pointer to the rendering context.\n    new_color : tuple of 4 uint8\n        A (red, green, blue, alpha) tuple representing the RGBA color to set. Each color\n        component should be an integer in the range 0-255.\n\n    Returns:\n    tuple of 4 uint8\n        A (red, green, blue, alpha) tuple representing the old RGBA color that was set\n        before this function changed it.\n\n    Note:\n    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.\n    \"\"\"\n    # Get the current color\n    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()\n    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)\n    old_color = (r.value, g.value, b.value, a.value)\n\n    # Set the new color\n    sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])\n\n    # Return the old color\n    return old_color\n```"
-                }
-              ]
-            }
-          ]
         }
       ]
     }
   },
   "viewport_bookmarks": {
     "1": [
-      5350,
-      1633
+      1147,
+      472
     ],
     "2": [
-      6538,
-      1912
+      2625,
+      242
     ],
     "9": [
       960,
@@ -2144,7 +1639,7 @@
     ]
   },
   "viewport_pos": [
-    5350,
-    1633
+    1147,
+    472
   ]
 }
