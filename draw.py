@@ -46,7 +46,7 @@ def get_char_width(font_descriptor: FontDescriptor, char: str) -> int:
     return char_width
 
 
-def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
+def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None, color=(255, 255, 255, 255)):
     if len(text.strip()) == 0:
         return
     
@@ -69,15 +69,20 @@ def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_sur
     # Draw the text character by character, for now. While this is inefficient, it does
     # allow for the selection background colour to be drawn with simpler logic.
 
+    # Propagate renderer color to text color
+    font_manager.color = sdl2.SDL_Color(color[0], color[1], color[2], color[3])
+
     for i, char in enumerate(text):
 
         # In SDL, when you render text, you get a new surface containing only that text.
         # To copy it to the renderer, you need to create a texture from the surface, and
         # then copy the texture to the renderer. The surface and texture can then be freed.
 
+        old_color = set_color(renderer, (255, 0, 0, 255))
         text_surface = font_manager.render(char)
         if dst_surface is None:
             text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
+        set_color(renderer, old_color)
 
         text_rect = sdl2.SDL_Rect(x, y, text_surface.w, text_surface.h)
 
@@ -201,8 +206,6 @@ def draw_cursor(renderer: 'sdl2.ext.Renderer',
 
         x_offset += width
 
-    old_color = set_color(renderer, (255, 255, 255, 255))
-
     x_cursor = x + x_offset - x_scroll
     y_cursor = y + row * row_spacing - y_scroll 
 
@@ -222,9 +225,27 @@ def draw_cursor(renderer: 'sdl2.ext.Renderer',
             sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
             sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, None)
 
-    set_color(renderer, old_color)
-    # print('draw_cursor', x_cursor, y_cursor)
     return x_cursor, y_cursor
+
+
+def get_color(renderer: 'sdl2.SDL_Renderer') -> Tuple[int, int, int, int]:
+    """
+    Get the renderer's current drawing color.
+
+    Parameters:
+    renderer : SDL_Renderer
+        A pointer to the rendering context.
+
+    Returns:
+    tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the RGBA color that is currently set.
+
+    Note:
+    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.
+    """
+    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)
+    return (r.value, g.value, b.value, a.value)
 
 
 def set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
@@ -250,9 +271,7 @@ def set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int
     This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.
     """
     # Get the current color
-    r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
-    sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)
-    old_color = (r.value, g.value, b.value, a.value)
+    old_color = get_color(renderer)
 
     # Set the new color
     sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])
@@ -261,13 +280,20 @@ def set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int
     return old_color
 
 
-def draw_marker_point(renderer: 'sdl2.ext.Renderer', 
+def draw_marker_point(renderer: 'sdl2.ext.Renderer',
                 vx: int, 
                 vy: int,
+                caption: Optional[str] = None,
+                font_descriptor: Optional[FontDescriptor] = None,
+                color: Tuple[int, int, int, int] = (255, 255, 255, 255),
                 cross_radius: int = 20):
     """
     """
-    old_color = set_color(renderer, (0, 255, 0, 255))
+    # Get the current color so we can set it back when we're done
+    # @perf optional? What if I want to draw a whole run of things of
+    # the same color? Extra state changes.
+    
+    old_color = set_color(renderer, color)
 
     # Draw the horizontal line of the cross
     sdl2.SDL_RenderDrawLine(renderer.sdlrenderer,
@@ -282,5 +308,10 @@ def draw_marker_point(renderer: 'sdl2.ext.Renderer',
                             vy - max(0, cross_radius-1), 
                             vx, 
                             vy + max(0, cross_radius-1))
+    
+    # Optionally, draw text
+    if caption is not None and font_descriptor is not None:
+        draw_text(renderer, font_descriptor, caption, vx + 5, vy + 5, color=color)
 
+    # Set the color back to what it was
     set_color(renderer, old_color)
