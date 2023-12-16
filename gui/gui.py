@@ -142,7 +142,7 @@ class GUI:
         self._content._inset = (0, 0)
         # self._content.draw_bounds = True
 
-        self.content().sizeToChildren()
+        # self.content().sizeToChildren()
 
 
     class ClickContext:
