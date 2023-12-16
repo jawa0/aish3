@@ -34,6 +34,7 @@ from transcribe_audio import VoiceTranscriber
 import utils
 from voice_out import VoiceOut
 from voice_wakeup import PhraseListener
+from draw import draw_marker_point
 
 
 class GUI:
@@ -140,9 +141,9 @@ class GUI:
 
         # @hack @debug @test
         self._content._inset = (0, 0)
-        # self._content.draw_bounds = True
+        self._content.draw_bounds = True
 
-        # self.content().sizeToChildren()
+        self.content().sizeToChildren()
 
 
     class ClickContext:
@@ -831,6 +832,9 @@ class GUI:
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
                 sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+
+        ox, oy = self.world_to_view(0, 0)
+        draw_marker_point(self.renderer, ox, oy)
 
 
     def push_focus_ring(self, focus_ring):

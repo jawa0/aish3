@@ -227,7 +227,28 @@ def draw_cursor(renderer: 'sdl2.ext.Renderer',
     return x_cursor, y_cursor
 
 
-def set_color(renderer, new_color):
+def set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
+    """
+    Change the renderer's current drawing color to the new specified color.
+
+    This function gets the current drawing color from the renderer, sets a new drawing color, 
+    and then returns the old color.
+
+    Parameters:
+    renderer : SDL_Renderer
+        A pointer to the rendering context.
+    new_color : tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the RGBA color to set. Each color
+        component should be an integer in the range 0-255.
+
+    Returns:
+    tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the old RGBA color that was set
+        before this function changed it.
+
+    Note:
+    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.
+    """
     # Get the current color
     r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
     sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)
@@ -239,3 +260,27 @@ def set_color(renderer, new_color):
     # Return the old color
     return old_color
 
+
+def draw_marker_point(renderer: 'sdl2.ext.Renderer', 
+                vx: int, 
+                vy: int,
+                cross_radius: int = 20):
+    """
+    """
+    old_color = set_color(renderer, (0, 255, 0, 255))
+
+    # Draw the horizontal line of the cross
+    sdl2.SDL_RenderDrawLine(renderer.sdlrenderer,
+                            vx - max(0, cross_radius-1), 
+                            vy, 
+                            vx + max(0, cross_radius-1), 
+                            vy)
+    
+    # Draw the vertical line of the cross
+    sdl2.SDL_RenderDrawLine(renderer.sdlrenderer,
+                            vx, 
+                            vy - max(0, cross_radius-1), 
+                            vx, 
+                            vy + max(0, cross_radius-1))
+
+    set_color(renderer, old_color)

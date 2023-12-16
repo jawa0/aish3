@@ -189,6 +189,10 @@ class GUIContainer(GUIControl):
             self.parent.updateLayout()
 
 
+    # I've had so many problems with this sizeToChildren code.
+    # Frankly, as a linear-algebra-comfortable game developer, it's a bit embarassing
+    # I should have just started with a translation + scale transform hierarchy model.
+    # @todo Go to transform hierarchy model of scene-graph.
     def sizeToChildren(self):
         # print(f"************* GUIContainer.sizeToChildren() name='{self._name}' *************")
         # print(f"  self.bounding_rect={self.bounding_rect}, self._inset={self._inset}")
