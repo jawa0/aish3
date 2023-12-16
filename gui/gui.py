@@ -139,9 +139,8 @@ class GUI:
 
         self._clickstream = deque(maxlen=2)
 
-        # @hack @debug @test
         self._content._inset = (0, 0)
-        self._content.draw_bounds = True
+        # self._content.draw_bounds = True
 
         self.content().sizeToChildren()
 
