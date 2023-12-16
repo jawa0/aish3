@@ -14,20 +14,29 @@
 
 
 import logging
-from rect_utils import rect_union
+import math
 import sdl2
+
+from config import GUI_INSET_X, GUI_INSET_Y
+import gui
 from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 from .gui_control import GUIControl
-import gui
-import math
+from rect_utils import rect_union
 
 
 class GUIContainer(GUIControl):
     @classmethod
+    def _enrich_kwargs(cls, json, **kwargs):
+        kwargs = super(GUIContainer, cls)._enrich_kwargs(json, **kwargs)
+        kwargs["inset"] = json.get("inset", [GUI_INSET_X, GUI_INSET_Y])
+        return kwargs
+
+
+    @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
-        kwargs = super(GUIContainer, cls)._enrich_kwargs(json, **kwargs)
+        kwargs = cls._enrich_kwargs(json, **kwargs)
 
         # kwargs["inset"] = json
 
