@@ -56,12 +56,14 @@ class GUIContainer(GUIControl):
             child = child_class.from_json(child_json, **kwargs)
             # print(f'child: {child}')
             if child is not None:
-                instance.add_child(child)
+                instance.add_child(child, updateLayout=False)
 
         if "layout" in json:
             layout_class_name = json["layout"]
             if layout_class_name == "ColumnLayout":
                 instance.set_layout(ColumnLayout())
+
+        instance.updateLayout()
         return instance
     
 
@@ -164,13 +166,14 @@ class GUIContainer(GUIControl):
         return self.children if self.children else []
 
 
-    def add_child(self, child, add_to_focus_ring=True):
+    def add_child(self, child, add_to_focus_ring=True, updateLayout=True):
         # print(f'GUIContainer.add_child(): child={child}')
 
         child.parent = self
         self.children.append(child)
 
-        self.updateLayout()
+        if updateLayout:
+            self.updateLayout()
 
         if add_to_focus_ring:
             self.focus_ring.add(child)
@@ -202,16 +205,12 @@ class GUIContainer(GUIControl):
     # Frankly, as a linear-algebra-comfortable game developer, it's a bit embarassing
     # I should have just started with a translation + scale transform hierarchy model.
     # @todo Go to transform hierarchy model of scene-graph.
+    
     def sizeToChildren(self):
-        # print(f"************* GUIContainer.sizeToChildren() name='{self._name}' *************")
-        # print(f"  self.bounding_rect={self.bounding_rect}, self._inset={self._inset}")
-        # # print(f'GUIContainer.sizeToChildren(): self={self}')
         if not self.children:
             return
         else:
             my_content_x_wrt_parent_content, my_content_y_wrt_parent_content = self.gui.local_to_local(self, self.parent, 0, 0)
-
-            # print(f'GUIContainer.sizeToChildren(): my_content_x_wrt_parent_content={my_content_x_wrt_parent_content}, my_content_y_wrt_parent_content={my_content_y_wrt_parent_content}')
 
             # Child coordinates are always relative to us. Make sure to handle the case where some of
             # them are negative. Also, maybe we deleted our leftmost or topmost. So in these cases,
@@ -240,11 +239,6 @@ class GUIContainer(GUIControl):
                 children_y_min_wrt_my_content_area = 0
                 children_y_max_wrt_my_content_area = 0
 
-            # children_x_min_wrt_my_content_area -= self._inset[0]
-            # children_x_max_wrt_my_content_area += self._inset[0]
-            # children_y_min_wrt_me -= self._inset[1]
-            # children_y_max_wrt_me += self._inset[1]
-            
             # We want to move ourselves so that AFTER, (0, 0) relative to our content area corresponsds to
             # the world coordinates of (children_x_min_wrt_my_content_area, children_y_min_wrt_my_content_area) BEFORE.
 
@@ -254,12 +248,8 @@ class GUIContainer(GUIControl):
             my_x_shift = my_content_area_wx_after - my_content_area_wx_before
             my_y_shift = my_content_area_wy_after - my_content_area_wy_before
 
-            # print(f'GUIContainer.sizeToChildren(): my_x_shift={my_x_shift}, my_y_shift={my_y_shift}')
-        
             child_x_shift = -my_x_shift
             child_y_shift = -my_y_shift
-
-            # print(f'GUIContainer.sizeToChildren(): child_x_shift={child_x_shift}, child_y_shift={child_y_shift}')
 
             for c in self.children:
                 # If the child is screen-relative, don't move it.
@@ -268,13 +258,10 @@ class GUIContainer(GUIControl):
 
                 c.set_position(c.bounding_rect.x + child_x_shift, c.bounding_rect.y + child_y_shift)
 
-            # self.set_position(my_content_x_wrt_parent_content + my_x_shift, my_content_y_wrt_parent_content + my_y_shift)
             self.set_position(self.bounding_rect.x + my_x_shift, self.bounding_rect.y + my_y_shift)
 
             new_width_local = children_x_max_wrt_my_content_area - children_x_min_wrt_my_content_area + 2 * self._inset[0]
             new_height_local = children_y_max_wrt_my_content_area - children_y_min_wrt_my_content_area + 2 * self._inset[1]
-
-            # print(f'GUIContainer.sizeToChildren(): new_width_local={new_width_local}, new_height_local={new_height_local}')
 
             self.set_size(new_width_local, new_height_local, updateLayout=False)
     
