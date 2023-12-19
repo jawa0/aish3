@@ -35,19 +35,15 @@ class ColumnLayout(GUILayout):
         super().__init__(**kwargs)
 
     def update(self):
-        # @todo DRY
-        INSET_X = 1
-        INSET_Y = 1
-
         container = self.get_container()
         if not container:
             return
         
         children = container.get_children()
         is_first = True
-        y = INSET_Y
+        y = 0
         for child in children:
-            child.set_position(INSET_X, y)
+            child.set_position(0, y)
             y += child.bounding_rect.h
 
 
@@ -56,19 +52,15 @@ class RowLayout(GUILayout):
         super().__init__(**kwargs)
 
     def update(self):
-        # @todo DRY
-        INSET_X = 1
-        INSET_Y = 1
-
         container = self.get_container()
         if not container:
             return
         
         children = container.get_children()
         is_first = True
-        x = INSET_X
+        x = 0
         for child in children:
-            child.set_position(x, INSET_Y)
+            child.set_position(x, 0)
             x += child.bounding_rect.w
 
 

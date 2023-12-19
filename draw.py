@@ -13,16 +13,24 @@
 # limitations under the License.
 
 
+from typing import Dict, Optional, Tuple
+
 import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
 
+from gui.fonts import FontDescriptor, FontRegistry
+from text_edit_buffer import TextEditBuffer
 
-_char_width_cache = {}
+# Key: (font_name, font_size, char)
+_char_width_cache: Dict[Tuple[str, int, str], int] = {}
 
-def get_char_width(font_manager, char):
+
+def get_char_width(font_descriptor: FontDescriptor, char: str) -> int:
     global _char_width_cache
 
+    font_manager = FontRegistry().get_fontmanager(font_descriptor)
+    assert(font_manager is not None)
     font_name = font_manager.default_font
     font_size = font_manager.size
     key = (font_name, font_size, char)
@@ -38,10 +46,15 @@ def get_char_width(font_manager, char):
     return char_width
 
 
-def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None):
+def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None, color=(255, 255, 255, 255)):
     if len(text.strip()) == 0:
         return
     
+    # print(f'draw_text: font_descriptor={font_descriptor}')
+    font_manager = FontRegistry().get_fontmanager(font_descriptor)
+    assert(font_manager is not None)
+    # print(f'draw_text: font_manager={font_manager}')
+
     # Keep track of initial x, and y since we will be updating x, y for each character.
     # We need to know where each character is relative to the starting point in order
     # to blit our various surfaces correctly.
@@ -56,15 +69,20 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
     # Draw the text character by character, for now. While this is inefficient, it does
     # allow for the selection background colour to be drawn with simpler logic.
 
+    # Propagate renderer color to text color
+    font_manager.color = sdl2.SDL_Color(color[0], color[1], color[2], color[3])
+
     for i, char in enumerate(text):
 
         # In SDL, when you render text, you get a new surface containing only that text.
         # To copy it to the renderer, you need to create a texture from the surface, and
         # then copy the texture to the renderer. The surface and texture can then be freed.
 
+        old_color = set_color(renderer, (255, 0, 0, 255))
         text_surface = font_manager.render(char)
         if dst_surface is None:
             text_texture = sdl2.SDL_CreateTextureFromSurface(renderer.sdlrenderer, text_surface)
+        set_color(renderer, old_color)
 
         text_rect = sdl2.SDL_Rect(x, y, text_surface.w, text_surface.h)
 
@@ -129,14 +147,51 @@ def draw_text(renderer, font_manager, text, x, y, bounding_rect=None, dst_surfac
         sdl2.SDL_FreeSurface(text_surface)
 
 
-def draw_cursor(renderer, font_manager, 
-                text_buffer, 
-                row_spacing, 
-                x, y, 
-                bounding_rect=None, 
-                x_scroll=0, y_scroll=0,
-                dont_draw_just_calculate=False): 
-    
+def draw_cursor(renderer: 'sdl2.ext.Renderer', 
+                font_descriptor: FontDescriptor, 
+                text_buffer: TextEditBuffer, 
+                row_spacing: int, 
+                x: int, 
+                y: int, 
+                bounding_rect: 'Optional[sdl2.SDL_Rect]' = None, 
+                x_scroll: int = 0, 
+                y_scroll: int = 0,
+                dont_draw_just_calculate: bool = False) -> Tuple[int, int]: 
+    """
+    Draws or calculates the position of the cursor within a text buffer.
+
+    This function determines the cursor's x and y position within a given text
+    buffer, optionally drawing it using the provided renderer. Calculation of
+    the cursor's position accounts for tab expansion and scrolling offsets.
+
+    Args:
+        renderer: The rendering context onto which the cursor may be drawn.
+        font_descriptor: Data describing the font, used to calculate character widths.
+        text_buffer: The text buffer which contains the text and cursor position.
+        row_spacing: The vertical distance from the start of one row of text, to the next, in pixels.
+        x: The x coordinate of the top-left corner of the text area.
+        y: The y coordinate of the top-left corner of the text area.
+        bounding_rect (optional): A rectangle that defines the clipping area for drawing.
+        x_scroll (optional): The horizontal scroll offset.
+        y_scroll (optional): The vertical scroll offset.
+        dont_draw_just_calculate (optional): If set to True, the function will not
+                                              draw the cursor but only calculate
+                                              its position.
+
+    Returns:
+        A tuple (x_cursor, y_cursor) representing the cursor's coordinates. If the
+        cursor is drawn, these coordinates indicate where the cursor was drawn.
+        If drawing is skipped, they indicate where the cursor would have been
+        drawn.
+
+    Note:
+        If `bounding_rect` is provided, the cursor will be drawn clipped to this
+        rectangle. The cursor will not be drawn outside this area.
+
+        If `dont_draw_just_calculate` is True, no drawing operations will occur,
+        and the function serves to return the cursor's computed position.
+    """
+
     row, col_unexpanded = text_buffer.get_row_col(text_buffer.get_point())
     line_unexpanded = text_buffer.get_line(row, expand_tabs=False)
 
@@ -145,13 +200,11 @@ def draw_cursor(renderer, font_manager,
     x_offset = 0
     for char in line_unexpanded[:col_unexpanded]:
         if char == '\t':
-            width = text_buffer.get_tab_spaces() * get_char_width(font_manager, ' ')
+            width = text_buffer.get_tab_spaces() * get_char_width(font_descriptor, ' ')
         else:
-            width = get_char_width(font_manager, char)
+            width = get_char_width(font_descriptor, char)
 
         x_offset += width
-
-    old_color = set_color(renderer, (255, 255, 255, 255))
 
     x_cursor = x + x_offset - x_scroll
     y_cursor = y + row * row_spacing - y_scroll 
@@ -172,16 +225,53 @@ def draw_cursor(renderer, font_manager,
             sdl2.SDL_RenderDrawLine(renderer.sdlrenderer, x_cursor, y_cursor, x_cursor, y_cursor + cursor_height)
             sdl2.SDL_RenderSetClipRect(renderer.sdlrenderer, None)
 
-    set_color(renderer, old_color)
-    # print('draw_cursor', x_cursor, y_cursor)
     return x_cursor, y_cursor
 
 
-def set_color(renderer, new_color):
-    # Get the current color
+def get_color(renderer: 'sdl2.SDL_Renderer') -> Tuple[int, int, int, int]:
+    """
+    Get the renderer's current drawing color.
+
+    Parameters:
+    renderer : SDL_Renderer
+        A pointer to the rendering context.
+
+    Returns:
+    tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the RGBA color that is currently set.
+
+    Note:
+    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.
+    """
     r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
     sdl2.SDL_GetRenderDrawColor(renderer.sdlrenderer, r, g, b, a)
-    old_color = (r.value, g.value, b.value, a.value)
+    return (r.value, g.value, b.value, a.value)
+
+
+def set_color(renderer: 'sdl2.SDL_Renderer', new_color: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
+    """
+    Change the renderer's current drawing color to the new specified color.
+
+    This function gets the current drawing color from the renderer, sets a new drawing color, 
+    and then returns the old color.
+
+    Parameters:
+    renderer : SDL_Renderer
+        A pointer to the rendering context.
+    new_color : tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the RGBA color to set. Each color
+        component should be an integer in the range 0-255.
+
+    Returns:
+    tuple of 4 uint8
+        A (red, green, blue, alpha) tuple representing the old RGBA color that was set
+        before this function changed it.
+
+    Note:
+    This function relies on PySDL2's SDL2 bindings for interacting with SDL_Renderer.
+    """
+    # Get the current color
+    old_color = get_color(renderer)
 
     # Set the new color
     sdl2.SDL_SetRenderDrawColor(renderer.sdlrenderer, new_color[0], new_color[1], new_color[2], new_color[3])
@@ -189,3 +279,39 @@ def set_color(renderer, new_color):
     # Return the old color
     return old_color
 
+
+def draw_marker_point(renderer: 'sdl2.ext.Renderer',
+                vx: int, 
+                vy: int,
+                caption: Optional[str] = None,
+                font_descriptor: Optional[FontDescriptor] = None,
+                color: Tuple[int, int, int, int] = (255, 255, 255, 255),
+                cross_radius: int = 20):
+    """
+    """
+    # Get the current color so we can set it back when we're done
+    # @perf optional? What if I want to draw a whole run of things of
+    # the same color? Extra state changes.
+    
+    old_color = set_color(renderer, color)
+
+    # Draw the horizontal line of the cross
+    sdl2.SDL_RenderDrawLine(renderer.sdlrenderer,
+                            vx - max(0, cross_radius-1), 
+                            vy, 
+                            vx + max(0, cross_radius-1), 
+                            vy)
+    
+    # Draw the vertical line of the cross
+    sdl2.SDL_RenderDrawLine(renderer.sdlrenderer,
+                            vx, 
+                            vy - max(0, cross_radius-1), 
+                            vx, 
+                            vy + max(0, cross_radius-1))
+    
+    # Optionally, draw text
+    if caption is not None and font_descriptor is not None:
+        draw_text(renderer, font_descriptor, caption, vx + 5, vy + 5, color=color)
+
+    # Set the color back to what it was
+    set_color(renderer, old_color)

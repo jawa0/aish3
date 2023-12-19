@@ -1,10 +1,30 @@
+# Copyright 2023 Jabavu W. Adams
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import datetime
 from dotenv import load_dotenv
 import logging
 import openai
+import os
 import os.path
 from pathlib import Path
 
+load_dotenv()   # Load the .env file
+
+# Set the application path to the current working directory when config is loaded
+app_path = os.getcwd()
 
 # Ensure app user config dir exists
 app_name = "aish3"
@@ -13,6 +33,8 @@ app_name = "aish3"
 app_config_path = Path().home() / f".{app_name}"
 app_config_path.mkdir(exist_ok=True, mode=0o700)  # rwx------ permissions
 
+GUI_INSET_X = 2
+GUI_INSET_Y = 2
 
 def setup_logging():
     formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
@@ -48,13 +70,8 @@ def setup_logging():
     for handler in handlers:
         root_logger.addHandler(handler)
 
-
     # Increase OpenAI log level
     logging.getLogger("openai").setLevel(logging.DEBUG)
 
-
-def load():
-    load_dotenv()   # Load the .env file
-    setup_logging()
-
+setup_logging()
 

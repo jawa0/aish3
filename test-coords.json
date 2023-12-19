@@ -1,0 +1,23 @@
+{
+  "saved_at_utc": "2023-11-08T02:38:47.334092+00:00",
+  "saved_at_local": "2023-11-07T21:38:47.334092-05:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "bounding_rect": [
+        5,
+        5,
+        1402,
+        797
+      ],
+      "layout": null,
+      "children": []
+    }
+  },
+  "viewport_bookmarks": {},
+  "viewport_pos": [
+    0,
+    0
+  ]
+}
