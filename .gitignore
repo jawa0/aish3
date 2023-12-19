@@ -1,7 +1,9 @@
 .DS_Store
 
-# API keys
+# AISH configuration / environment variables (includes secrets not to be included in repo)
+# e.g. API keys
 .env
+.env.local
 
 # Python
 __pycache__
@@ -17,4 +19,9 @@ results.txt
 # Some resources, but only in the project dir itself.
 *.zip
 *.mp4
+
+# AISH workspace automatic backups
+*_?.json
+*_??.json
+
 

@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-16T23:09:44.623603+00:00",
-  "saved_at_local": "2023-12-16T18:09:44.623603-05:00",
+  "saved_at_utc": "2023-12-17T02:38:58.739822+00:00",
+  "saved_at_local": "2023-12-16T21:38:58.739822-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -1063,7 +1063,7 @@
             240,
             100
           ],
-          "text": "#72: Add ability to set and jump to bookmarks, with voice"
+          "text": "#72: Add ability to set and jump \nto bookmarks, with voice"
         },
         {
           "class": "Label",
@@ -1639,7 +1639,7 @@
     ]
   },
   "viewport_pos": [
-    1147,
+    1308,
     472
   ]
 }
