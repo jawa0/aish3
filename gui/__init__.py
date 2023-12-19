@@ -12,21 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .fonts import FontRegistry
+from .gui_control import GUIControl
+from .gui_container import GUIContainer
+from .gui import GUI
 
-APPNAME = aish3
 
-macos:
-	@echo "Generating executable for $(APPNAME)..."
-	pyinstaller --onefile $(APPNAME).py
-	@echo "Modifying spec file..."
-	sed -i '' 's|pathex=\[\]|pathex=\["'$(shell pwd)'"\]|g' $(APPNAME).spec
-	@echo "Rebuilding with modified spec file..."
-	pyinstaller $(APPNAME).spec
-
-tests:
-	@echo "Running tests..."
-	python -m unittest discover -s test
-
-clean:
-	@echo "Cleaning up..."
-	rm -rf dist/ build/ $(APPNAME).spec
+GUI.register_control_type("GUIControl", GUIControl)
+GUI.register_control_type("GUIContainer", GUIContainer)

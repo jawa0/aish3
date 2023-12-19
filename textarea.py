@@ -15,8 +15,11 @@
 
 import ctypes
 import sdl2
-from draw import draw_cursor, draw_text
+from sdl2.ext.ttf import FontTTF
+from sdl2.sdlttf import TTF_FontHeight
+from draw import draw_cursor, draw_text, set_color
 from gui import GUI, GUIControl
+from gui.fonts import FontRegistry
 from text_edit_buffer import TextEditBuffer
 import queue
 
@@ -25,6 +28,8 @@ class TextArea(GUIControl):
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(TextArea, cls)._enrich_kwargs(json, **kwargs)
+
         gui = kwargs.get('gui')
 
         instance = gui.create_control(json["class"], **kwargs)
@@ -34,6 +39,37 @@ class TextArea(GUIControl):
 
 
     def __init__(self, row_spacing=18, text_buffer=None, **kwargs):
+        """
+        Initializes a TextArea instance, which is a GUI control for displaying and editing text.
+
+        Inherits from GUIControl and accepts all its keyword arguments, along with some additional specific to TextArea.
+
+        Args:
+            row_spacing (int): The vertical spacing between rows of text. Default is 18.
+            text_buffer (TextEditBuffer, optional): The text buffer to be used by the TextArea. 
+                If None, a new TextEditBuffer is created. Default is None.
+
+        Keyword Args:
+            text (str): Initial text for the TextArea. Default is an empty string.
+            can_focus (bool): Indicates if the control can gain focus. Inherited from GUIControl. Default is True.
+            x (int): Inherited from GUIControl (see GUIControl.__init__()). Default is 0.
+            y (int):  Inherited from GUIControl (see GUIControl.__init__()). Default is 0.
+            w (int): The width of the control. Inherited from GUIControl. Default is 20.
+            h (int): The height of the control. Inherited from GUIControl. Default is 20.
+            saveable (bool): Indicates if the control's state is saveable. Inherited from GUIControl. Default is True.
+            gui (Object): Reference to the GUI object. Inherited from GUIControl. Default is None.
+            renderer (Object): Reference to the renderer object. Inherited from GUIControl. 
+                Default is gui.renderer if gui is not None, else None.
+            font_manager (Object): Reference to the font manager object. Inherited from GUIControl. 
+                Default is gui.font_manager if gui is not None, else None.
+            draw_bounds (bool): Indicates if bounds should be drawn. Inherited from GUIControl. Default is False.
+            draggable (bool): Indicates if the control is draggable. Inherited from GUIControl. Default is False.
+            visible (bool): Indicates if the control is visible. Inherited from GUIControl. Default is True.
+            screen_relative (bool): Indicates if the control's position is relative to the screen. 
+                Inherited from GUIControl. Default is False.
+
+        Calls the superclass initializer and sets up the TextArea specific attributes.
+        """
         # print(f'TextArea.__init__() called')
         super().__init__(**kwargs)
         text = kwargs.get('text', '')
@@ -43,14 +79,27 @@ class TextArea(GUIControl):
         self.y_scroll = 0
         self.x_scroll = 0
         self.combined_text_texture = None
-        self.is_user_scrolling = False
+        self._was_last_event_mousewheel = False
         self.input_q = None
+
+        # @hack @todo FontManager is deprecated. Should use sdl2.ext.ttf.FontTTF
+        fm = FontRegistry().get_fontmanager(self.font_descriptor)
+        assert(fm is not None)
+        font_size_px = fm.size
+
+        font = FontTTF("./res/fonts/FiraCode-Regular.ttf", font_size_px, (255, 255, 255))
+        ttf_font = font.get_ttf_font()
+        line_height_px = TTF_FontHeight(ttf_font)
+        self.row_spacing = line_height_px
+        del ttf_font
+        font.close()
 
 
     def __json__(self):
         json = super().__json__()
-        json["class"] = self.__class__.__name__
-        json["text"] = self.text_buffer.get_text()
+        if json is not None:  # Could be None for a non-saveable control, on save. @todo DRY every derived class will have to do this. Boo.
+            json["class"] = self.__class__.__name__
+            json["text"] = self.text_buffer.get_text()
         return json
     
     
@@ -99,15 +148,18 @@ class TextArea(GUIControl):
 
 
     def handle_event(self, event):
+        current_was_last_event_mousewheel = self._was_last_event_mousewheel
+        self._was_last_event_mousewheel = False
 
         if event.type == sdl2.SDL_MOUSEWHEEL:
-            # Here, we handle the vertical scrolling (event.wheel.y) 
-            
-            self.is_user_scrolling = True
-            self.scroll_by(dx=event.wheel.x * 8, dy=event.wheel.y * -8)
-            self.is_user_scrolling = False
+            # Scroll this TextArea, but only if it has focus.
 
-            return True
+            GAIN = 8
+            dy = -event.wheel.y * GAIN
+
+            if self.has_focus():
+                self.scroll_by(dy=dy)
+                return True
         
         elif event.type == sdl2.SDL_KEYDOWN:
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
@@ -134,7 +186,7 @@ class TextArea(GUIControl):
                 self.set_needs_redraw()
                 return True
             
-            # Cmd+Backspace/Delete delete the TextArea, but only if
+            # Cmd+Backspace/Delete delete the focused control, but only if
             # it is at the top-level of the GUI, not part of some other
             # container.
 
@@ -211,10 +263,7 @@ class TextArea(GUIControl):
                             self.text_buffer.set_mark()
                     else:
                         self.text_buffer.clear_mark()
-                    if self.text_buffer.move_point_down():  
-                        # @todo encapsulate in a controller
-                        # self.scroll_cursor_into_view()
-                        pass
+                    self.text_buffer.move_point_down()
 
                 self.set_needs_redraw()        
                 return True
@@ -292,12 +341,21 @@ class TextArea(GUIControl):
         elif event.type == sdl2.SDL_TEXTINPUT:
             # event.text.text is a bytes object representing a string in UTF-8 encoding
             text = event.text.text.decode('utf-8')
+            
+            # @hack to get command console to stop inserting its wakeup key ~ into
+            # the textbuffer
+            if text == '~' or text == "`":
+                return True
+            
             if self.text_buffer.get_selection() is not None:
                 self.text_buffer.delete_selection()
             self.text_buffer.insert(text)
             self.set_needs_redraw()
             return True
     
+        # We reached the end of our events, so don't clear _was_last_event_mousewheel
+        self._was_last_event_mousewheel = current_was_last_event_mousewheel
+
         return self.parent_handle_event(event)
     
 
@@ -305,7 +363,7 @@ class TextArea(GUIControl):
         if self.combined_text_texture is not None:
             sdl2.SDL_DestroyTexture(self.combined_text_texture)
             self.combined_text_texture = None
-            if not self.is_user_scrolling:
+            if not self._was_last_event_mousewheel:
                 self.scroll_cursor_into_view()
 
 
@@ -317,17 +375,36 @@ class TextArea(GUIControl):
         self.set_needs_redraw()
 
 
+    def _draw_bounds(self, vr):
+        # Draw the bounding rectangle after all text has been drawn
+        # Save the current color
+        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+        old_color = (r.value, g.value, b.value, a.value)
+
+        # Set the new color
+        if self.pulse_busy:
+            r, g, b = (255, 0, 0)
+        elif self.has_focus():
+            r, g, b = (0, 127, 255)
+        else:
+            r, g, b = (100, 100, 100)
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+        # Draw the bounding rectangle
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+
+        # Reset to the old color
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+
     def draw(self):
         lines = self.text_buffer.get_lines()
         
-        # @todo should each specialized control need to implement this?
-        if self._screen_relative:
-            wr = self.bounding_rect
-        else:
-            wr = self.get_world_rect()
+        vr = self.get_view_rect()
 
-        x = wr.x - self.x_scroll
-        y = wr.y - self.y_scroll
+        vx = vr.x - self.x_scroll
+        vy = vr.y - self.y_scroll
 
         # Determine start and end of selection
         selected = self.text_buffer.get_selection()
@@ -364,44 +441,32 @@ class TextArea(GUIControl):
                         elif i == sel_rc1[0]:
                             c_end = sel_rc1[1]
 
-                        draw_text(self.renderer, self.font_manager, 
+                        draw_text(self.renderer, self.font_descriptor, 
                                 line, 
-                                x, y, bounding_rect=wr,
+                                vx, vy, bounding_rect=vr,
                                 dst_surface=surf, 
                                 selection_start=c_start, selection_end=c_end)
                     else:
-                        draw_text(self.renderer, self.font_manager, line, x, y, bounding_rect=wr, dst_surface=surf)
+                        draw_text(self.renderer, self.font_descriptor, line, vx, vy, bounding_rect=vr, dst_surface=surf)
 
-                y += self.row_spacing
+                vy += self.row_spacing
 
             self.combined_text_texture = sdl2.SDL_CreateTextureFromSurface(self.renderer.sdlrenderer, surf)
             sdl2.SDL_FreeSurface(surf)
 
         assert(self.combined_text_texture is not None)
-        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, wr)
+        sdl2.SDL_RenderCopy(self.renderer.sdlrenderer, self.combined_text_texture, None, vr)
 
-        # Draw the bounding rectangle after all text has been drawn
-        # Save the current color
-        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
-        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
-        old_color = (r.value, g.value, b.value, a.value)
-
-        # Set the new color
-        r, g, b = (0, 127, 255) if self.has_focus() else (100, 100, 100)
-        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
-
-        # Draw the bounding rectangle
-        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, wr)
-
-        # Reset to the old color
-        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+        self._draw_bounds(vr)
 
         # Draw cursor
         if self.has_focus():
             row, col = self.text_buffer.get_row_col(self.text_buffer.get_point())
             line = lines[row]
             if line is not None and col is not None:
-                draw_cursor(self.renderer, self.font_manager, self.text_buffer, self.row_spacing, wr.x, wr.y, wr, self.x_scroll, self.y_scroll)
+                old_color = set_color(self.renderer, (255, 255, 255, 255))
+                draw_cursor(self.renderer, self.font_descriptor, self.text_buffer, self.row_spacing, vr.x, vr.y, vr, self.x_scroll, self.y_scroll)
+                set_color(self.renderer, old_color)
 
 
     def scroll_by(self, dx=0, dy=0):
@@ -413,12 +478,12 @@ class TextArea(GUIControl):
     def scroll_cursor_into_view(self):
         # Where is the cursor?
         wr = self.get_world_rect()
-        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_manager, 
+        x_cursor, y_cursor = draw_cursor(self.renderer, self.font_descriptor, 
                                          self.text_buffer, 
                                          self.row_spacing, 
                                          wr.x, wr.y, wr, 
                                          self.x_scroll, self.y_scroll,
-                                         dont_draw_just_calculate=True)  # !!!
+                                         dont_draw_just_calculate=True)  # !!! @todo wtf? @hack
         
         
         cursor_bottom_y = y_cursor + self.row_spacing
@@ -434,7 +499,7 @@ class TextArea(GUIControl):
             # print(f'y_correction: {y_correction}')
             self.scroll_by(dy=y_correction)
 
-        x_pad = 20  # Arbitrary
+        x_pad = 20  # Arbitrary @note this is really an input sensitivy setting
         if x_cursor > wr.x + wr.w - x_pad:
             x_correction = x_cursor - (wr.x + wr.w - x_pad)
             self.scroll_by(dx=x_correction)

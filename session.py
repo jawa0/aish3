@@ -1,5 +1,6 @@
 import logging
-import openai
+
+from openai import OpenAI, chat
 import os
 from queue import Queue
 from typing import Callable, Dict, List, Optional
@@ -43,13 +44,16 @@ class Session:
     def __init__(self):
         logging.debug("Client Session.__init__")
 
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        openai.organization = os.getenv("OPENAI_ORGANIZATION")
+        
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) 
+                                    # organization=os.getenv("OPENAI_ORGANIZATION"))
 
-        self._running_completions: Dict[openai.ChatCompletion, List[ChatCompletionHandler]] = {}
+        self._running_completions: Dict[chat.completion, List[ChatCompletionHandler]] = {}
         
         self._audio = AudioService()
         self._channels = {}
+
+        self.gui = None
 
 
     def start(self):
@@ -111,9 +115,11 @@ class Session:
         return q
 
 
+
     def llm_send_streaming_chat_request(self, model, chat_messages, handlers: List[ChatCompletionHandler]=[]):
-        assert(model == 'gpt-4' or model == 'gpt-3.5-turbo')
-        completion = openai.ChatCompletion.create(model=model, messages=chat_messages, stream=True)
+        assert(model == 'gpt-4' or model == 'gpt-3.5-turbo' or model == 'gpt-4-1106-preview')
+        
+        completion = self.openai_client.chat.completions.create(model=model, messages=chat_messages, stream=True)
         logging.debug(chat_messages)
         self._running_completions[completion] = handlers
 

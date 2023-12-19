@@ -1,23 +1,51 @@
 AISH(3) -- AI Shell 
 ==
 
-_Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire" in English._
+![Screenshot showing a black screen with blue-bordered text areas, white labels, and LLM chat controls](./res/img/aish3-screenshot.png)
+
+This is a Python GUI (SDL) application. The goal is to have a portable hands-free AI assistant and playground.
+
+_Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire, light, or flame" in English._
 
 
 _In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common informal exclamation often used to express frustration, annoyance, or mild surprise, somewhat equivalent to "Oh no!", "Darn!", or "Ugh!" in English._
 
+So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 
-This is a Python command-line (CLI) application. The goal is to have a portable hands-free AI assistant and playground.
+
 Features:
 * Have multiple LLM chats (with ChatGPT)
-* Voice-in speech-to-text transcription
-* Voice-out reading of chat results and other text
-* Make notes in TextAreas
-* Save and Load workspaces
+    * Save and load workspaces containing everything as JSON files
+* Almost have minimalist Miro-like note-taking
+    * Boxes (done) and arrows (todo. Pan around huge workspace. Zoom in and out (todo)
+* Working towards (optional) full hands-free operation
+    * Voice-in speech-to-text transcription
+    * Voice-out reading of chat results and other text
+    * Voice commands
+* Working towards no-code app building
+    * Define GUI in native app and then deploy to web and mobile (todo). The opposite of Electron.
 
 ### Running it
 
 `python aish3.py`
+
+#### Command-line parameters/settings:
+
+`python aish3.py --help`
+
+yields:
+
+    usage: aish3.py [-h] [--fullscreen] [--width WIDTH] [--height HEIGHT] [--voice-in] [--workspace WORKSPACE]
+    
+    AISH window application.
+    
+    options:
+      -h, --help            show this help message and exit
+      --fullscreen          run in fullscreen mode
+      --width WIDTH         window width (default: 1450)
+      --height HEIGHT       window height (default: 800)
+      --voice-in            Enable voice input (default: False)
+      --workspace WORKSPACE workspace file (default: aish_workspace.json)
 
 #### Setting up required environment variables
 
@@ -38,6 +66,11 @@ And finally, to use the wakeup phrase detection, you'll need a PicoVoice access 
 
     PICOVOICE_ACCESS_KEY="..."
 
+If you get tired of entering System prompt text into LLM chats, you can set
+a default system prompt using:
+
+    DEFAULT_SYSTEM_PROMPT="..."
+
 ### Keyboard Commands
 
 |Command|Description|
@@ -47,6 +80,7 @@ And finally, to use the wakeup phrase detection, you'll need a PicoVoice access 
 |Cmd+G|Send messages to GPT-4 for chat completion|
 |Cmd+U|Add another "user" message text field|
 |Cmd+Delete|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
+|Cmd+B|Add a new Label at the current cursor position|
 |Cmd+R|Use Voice out to say some sample text|
 |Cmd+Enter|Toggle active listening mode (speech to text transcription)|
 |Cmd+T|Create a new TextArea (use it like a post-it note)|

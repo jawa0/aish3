@@ -16,8 +16,10 @@
 import sdl2
 import json
 import logging
+import matplotlib
 import os
 import openai
+from typing import Optional
 from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
@@ -26,7 +28,7 @@ from gui_focus import FocusRing
 from session import ChatCompletionHandler
 
 
-PANEL_WIDTH = 350
+PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
 
 
@@ -36,6 +38,8 @@ class LLMChatContainer(GUIContainer):
         @classmethod
         def from_json(cls, json, **kwargs):
             assert(json["class"] == cls.__name__)
+            kwargs = super(LLMChatContainer.ChatMessageUI, cls)._enrich_kwargs(json, **kwargs)
+
             gui = kwargs.get('gui')
             assert(gui is not None)
 
@@ -54,8 +58,12 @@ class LLMChatContainer(GUIContainer):
                 instance.add_child(child)
                 if child_class_name == "Label":
                     instance.label = child
+                    instance.label._draggable = False
                 elif child_class_name == "TextArea":
                     instance.text_area = child
+                    instance.text_area._draggable = False
+            
+            instance.can_focus = False
             return instance
 
 
@@ -71,6 +79,11 @@ class LLMChatContainer(GUIContainer):
                 self.text_area.text_buffer.set_text(text)
                 self.add_child(self.text_area, add_to_focus_ring=False)
 
+                self.label._draggable = False
+                self.text_area._draggable = False
+                self._draggable = False
+                self.can_focus = False
+
 
         def get_role(self):
             return self.label.get_text()
@@ -84,11 +97,11 @@ class LLMChatContainer(GUIContainer):
         def set_text(self, text):
             self.text_area.text_buffer.set_text(text)
 
-        def _set_focus(self, has_focus):
-            if has_focus:
-                return self.gui.set_focus(self.text_area)
-            else:
-                super()._set_focus(has_focus)
+        # def _set_focus(self, has_focus):
+        #     if has_focus:
+        #         return self.gui.set_focus(self.text_area)
+        #     else:
+        #         super()._set_focus(has_focus)
 
 
     @classmethod
@@ -101,29 +114,49 @@ class LLMChatContainer(GUIContainer):
         self.draw_bounds = True
         
         self.set_layout(ColumnLayout())
-        assert(self.focusRing is not None)
+        assert(self.focus_ring is not None)
         self.system = None
         self.utterances = []
 
         if default_setup:
-            self.add_child(Label(text="LLM Chat [gpt-4]", w=PANEL_WIDTH, h=20, **kwargs),
-                           add_to_focus_ring=False)
+            self.title = Label(text="LLM Chat [gpt-4]", 
+                               w=PANEL_WIDTH, h=20, 
+                               draggable=False,
+                               editable=False,
+                               **kwargs)
+            
+            self.add_child(self.title, add_to_focus_ring=False)
 
-            self.system = self.ChatMessageUI(role="System", **kwargs)
+            text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
+            self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
             # self.gui.set_focus(self.system)
 
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
             for utterance in self.utterances:
                 self.add_child(utterance, add_to_focus_ring=False)
-                self.focusRing.add(utterance.text_area)
+
+                # @note FocusRing shenanigans
+                self.focus_ring.add(utterance.text_area)
 
         self.accumulated_response_text = None
-        # self.focusRing.focus(self.system.text_area)
+        # self.focus_ring.focus(self.system.text_area)
+
+        self.busy_colormap = matplotlib.colormaps['summer']
+        self._t_busy = 0.0
+
+
+    def remove_child(self, child):
+        super().remove_child(child)
+
+        # @note UNDO FocusRing shenanigans
+        self.focus_ring.remove(child.text_area)
 
 
     @classmethod
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
+        kwargs = super(LLMChatContainer, cls)._enrich_kwargs(json, **kwargs)
+
         gui = kwargs.get('gui')
         assert(gui is not None)
 
@@ -139,7 +172,25 @@ class LLMChatContainer(GUIContainer):
             instance.add_child(child, add_to_focus_ring=False)
             if child_class_name == "ChatMessageUI":
                 instance.utterances.append(child)
-                instance.focusRing.add(child.text_area)
+                instance.focus_ring.add(child.text_area)
+
+        # @note Override settings on legacy saved components...
+        for child in instance.children:
+            if isinstance(child, Label) and child.get_text().startswith("LLM Chat"):
+                instance.title = child
+                break
+
+        instance.title._draggable = False
+        instance.title._editable = False
+        for utterance in instance.utterances:
+            utterance._draggable = False
+            utterance._editable = False
+
+            utterance.text_area._draggable = False
+            utterance.label._draggable = False
+            utterance.label._editable = False
+
+
         return instance
 
 
@@ -156,11 +207,11 @@ class LLMChatContainer(GUIContainer):
                 
                 # Cmd+U creates a new user message
                 elif keySymbol == sdl2.SDLK_u: 
-                    user = self.ChatMessageUI(role="User", renderer=self.renderer, font_manager=self.font_manager, gui=self.gui)
+                    user = self.ChatMessageUI(role="User", gui=self.gui)
                     self.add_child(user, add_to_focus_ring=False)
                     self.utterances.append(user)
-                    self.focusRing.add(user.text_area)
-                    self.focusRing.focus(user.text_area)
+                    self.focus_ring.add(user.text_area)
+                    self.gui.set_focus(user.text_area, True)
                     return True  # event was handled
                 
                 # Cmd+Backspace/Delete deletes the currently focused message
@@ -168,11 +219,7 @@ class LLMChatContainer(GUIContainer):
                 elif keySymbol == sdl2.SDLK_BACKSPACE:
                     focused_control = self.gui.get_focus()
                     if focused_control is self:
-                        if self.parent:
-                            if self.parent.focusRing:
-                                self.parent.focusRing.focus_next()
-                                self.parent.focusRing.remove(self)
-                            self.parent.remove_child(self)
+                        self.parent.remove_child(self)
                         return True
 
                     chat_message = focused_control.parent
@@ -183,8 +230,8 @@ class LLMChatContainer(GUIContainer):
                         # Can't delete first, System message
                         if len(self.utterances) > 1 and chat_message != self.utterances[0]:
                             # @todo wrap in a remove message method
-                            self.focusRing.focus_previous()
-                            self.focusRing.remove(chat_message.text_area)
+                            # self.focus_ring.focus_previous()
+                            # self.focus_ring.remove(chat_message.text_area)
                             self.utterances.remove(chat_message)
                             self.remove_child(chat_message)
                             return True
@@ -209,13 +256,18 @@ class LLMChatContainer(GUIContainer):
         handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
                                         chunk_handler=self.on_llm_response_chunk,
                                         done_handler=self.on_llm_response_done)
-        
-        self.gui.session.llm_send_streaming_chat_request("gpt-4", messages, handlers=[handler])
+
+        self.pulse_busy = True
+        self._t_busy = 0.0
+
+        model = 'gpt-4-1106-preview'
+        # model = 'gpt-4'
+        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
         self.add_child(answer, add_to_focus_ring=False)
-        self.focusRing.add(answer.text_area, set_focus=True)
+        self.focus_ring.add(answer.text_area, set_focus=True)
 
         # Shrink previous messages
         for u in self.utterances:
@@ -228,20 +280,23 @@ class LLMChatContainer(GUIContainer):
         self.accumulated_response_text = ""
 
 
-    def on_llm_response_chunk(self, chunk_text: str) -> None:
+    def on_llm_response_chunk(self, chunk_text: Optional[str]) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
         assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
 
-        answer.text_area.text_buffer.move_point_to_end()
-        answer.text_area.text_buffer.insert(chunk_text)
-        answer.text_area.set_needs_redraw()
+        if chunk_text is not None:
+            answer.text_area.text_buffer.move_point_to_end()
+            answer.text_area.text_buffer.insert(chunk_text)
+            answer.text_area.set_needs_redraw()
 
-        self.accumulated_response_text += chunk_text
+            self.accumulated_response_text += chunk_text
 
 
     def on_llm_response_done(self) -> None:
-        pass
+        self.pulse_busy = False
+        self._t_busy = 0.0
+
         # self.gui.say(self.accumulated_response_text)
 
 
@@ -252,16 +307,52 @@ class LLMChatContainer(GUIContainer):
             "system_text": self.system.text_area.text_buffer.get_text(),
         }
 
+    
+    def on_update(self, dt):
+        self._t_busy += dt
+    
 
-    def load(self):
-        try:
-            with open("aish_workspace.json", "r") as f:
-                data = json.load(f)
-                self.system.text_area.text_buffer.set_text(data["system_text"])
-                self.system.text_area.text_buffer.move_point_to_start()
-                self.system.text_area.text_buffer.clear_mark()
-        except FileNotFoundError:
-            self.save()
+    def _draw_bounds(self, vr):
+        # Draw the bounding rectangle after all text has been drawn
+        # Save the current color
+        r, g, b, a = sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8(), sdl2.Uint8()
+        sdl2.SDL_GetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, a)
+        old_color = (r.value, g.value, b.value, a.value)
+
+        # Set the new color
+        if self.pulse_busy:
+            PERIOD_SECONDS = 1.0
+            # triangle wave
+            t = self._t_busy % PERIOD_SECONDS / PERIOD_SECONDS
+            if t < PERIOD_SECONDS / 2:            
+                fr, fg, fb, fa = self.busy_colormap(t)
+            else:
+                fr, fg, fb, fa = self.busy_colormap(1 - t)
+
+            r = int(fr * 255)
+            g = int(fg * 255)
+            b = int(fb * 255)
+
+        elif self.has_focus():
+            r, g, b = (0, 127, 255)
+        else:
+            r, g, b = (100, 100, 100)
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
+
+        # Draw the bounding rectangle
+        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+
+        # Reset to the old color
+        sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
+
+
+    def draw(self):
+        super().draw()
+
+        vr = self.get_view_rect()
+
+        if self.pulse_busy:
+            self._draw_bounds(vr)
 
 
 GUI.register_control_type("LLMChatContainer", LLMChatContainer)
