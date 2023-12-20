@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-20T01:04:27.695278+00:00",
-  "saved_at_local": "2023-12-19T20:04:27.695278-05:00",
+  "saved_at_utc": "2023-12-20T21:41:03.261758+00:00",
+  "saved_at_local": "2023-12-20T16:41:03.261758-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -9,9 +9,9 @@
       "uid": "ae51569e-a962-438b-aa3e-8bb8f35023ee",
       "bounding_rect": [
         0,
-        218,
+        77,
         3307,
-        2233
+        2374
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -25,7 +25,7 @@
           "uid": "1e6c3f66-1ac7-434d-bdab-cd89a1efd9aa",
           "bounding_rect": [
             0,
-            27,
+            168,
             608,
             336
           ],
@@ -178,7 +178,7 @@
           "uid": "8d359e0a-fc4f-4a7b-9fd2-a71cc18b4b39",
           "bounding_rect": [
             2611,
-            1100,
+            1241,
             450,
             30
           ],
@@ -190,7 +190,7 @@
           "uid": "4ddbe3cc-d9fb-4ada-b40d-4efe1ae31adc",
           "bounding_rect": [
             2610,
-            1151,
+            1292,
             600,
             30
           ],
@@ -202,7 +202,7 @@
           "uid": "eba48632-548f-430f-9182-8963e4f3f0d4",
           "bounding_rect": [
             2457,
-            1813,
+            1954,
             608,
             336
           ],
@@ -355,7 +355,7 @@
           "uid": "81f8cc73-9e4a-4d99-b4de-1dd3ef6804b5",
           "bounding_rect": [
             1135,
-            1393,
+            1534,
             608,
             840
           ],
@@ -754,7 +754,7 @@
           "uid": "b709a8a2-9957-43a5-9061-2a1e43021634",
           "bounding_rect": [
             1112,
-            1207,
+            1348,
             450,
             30
           ],
@@ -766,7 +766,7 @@
           "uid": "e973dda4-c13b-4a88-89a4-0da215b2400a",
           "bounding_rect": [
             1799,
-            1177,
+            1318,
             285,
             30
           ],
@@ -778,7 +778,7 @@
           "uid": "20f3d6ce-b5c1-40c8-841e-14457bce0f88",
           "bounding_rect": [
             1801,
-            1216,
+            1357,
             240,
             100
           ],
@@ -789,7 +789,7 @@
           "uid": "dd6c44a5-799e-4ee5-8e06-cb0ee715a8eb",
           "bounding_rect": [
             1803,
-            1354,
+            1495,
             135,
             30
           ],
@@ -801,7 +801,7 @@
           "uid": "e960c02c-0920-49f8-afab-a09b0bca35c2",
           "bounding_rect": [
             1799,
-            1874,
+            2015,
             608,
             312
           ],
@@ -913,7 +913,7 @@
           "uid": "a6342ecc-d073-4f6d-8dd9-d8f9637b5bbc",
           "bounding_rect": [
             1804,
-            1494,
+            1635,
             240,
             100
           ],
@@ -924,7 +924,7 @@
           "uid": "6b033c5e-74a7-4e92-90c0-dd202b6c43af",
           "bounding_rect": [
             1805,
-            1602,
+            1743,
             240,
             100
           ],
@@ -935,7 +935,7 @@
           "uid": "7740257d-83a3-43c1-9ee9-0033ba3d0105",
           "bounding_rect": [
             2084,
-            1347,
+            1488,
             330,
             30
           ],
@@ -947,7 +947,7 @@
           "uid": "e9005ec4-9b5e-46c0-9efb-080bcfca8788",
           "bounding_rect": [
             2082,
-            1384,
+            1525,
             240,
             100
           ],
@@ -958,7 +958,7 @@
           "uid": "1cba6dbb-1f97-4a67-9b90-fb4d2463dff9",
           "bounding_rect": [
             2081,
-            1489,
+            1630,
             240,
             100
           ],
@@ -969,7 +969,7 @@
           "uid": "e5218913-da75-4318-9279-abdf45f33e0b",
           "bounding_rect": [
             2081,
-            1595,
+            1736,
             240,
             100
           ],
@@ -980,7 +980,7 @@
           "uid": "71a525ce-b5cd-48dc-8752-ed18863b149f",
           "bounding_rect": [
             2080,
-            1703,
+            1844,
             240,
             100
           ],
@@ -991,7 +991,7 @@
           "uid": "28052360-0f0a-4984-8a7d-d2fbc4d84b4c",
           "bounding_rect": [
             1804,
-            1710,
+            1851,
             240,
             100
           ],
@@ -1002,7 +1002,7 @@
           "uid": "d2cd8da1-d041-47fb-9e1d-9205de71e1f7",
           "bounding_rect": [
             1804,
-            1387,
+            1528,
             240,
             100
           ],
@@ -1013,7 +1013,7 @@
           "uid": "e4773681-225b-4d26-a796-fa1eba3bed43",
           "bounding_rect": [
             1806,
-            967,
+            1108,
             315,
             30
           ],
@@ -1025,7 +1025,7 @@
           "uid": "5a8b629d-6787-45c0-a679-717016f4ee41",
           "bounding_rect": [
             1806,
-            1001,
+            1142,
             240,
             100
           ],
@@ -1036,7 +1036,7 @@
           "uid": "846a0571-43ae-4729-b378-611ed02e8ef3",
           "bounding_rect": [
             2209,
-            961,
+            1102,
             135,
             30
           ],
@@ -1048,7 +1048,7 @@
           "uid": "1e499710-6a7b-406c-9090-28f33159f989",
           "bounding_rect": [
             2208,
-            995,
+            1136,
             240,
             100
           ],
@@ -1059,7 +1059,7 @@
           "uid": "5130d775-72c2-4f99-873a-b95140100dc7",
           "bounding_rect": [
             1788,
-            564,
+            705,
             240,
             100
           ],
@@ -1070,7 +1070,7 @@
           "uid": "bc342785-4f36-4933-b67b-3497b359d868",
           "bounding_rect": [
             1792,
-            517,
+            658,
             135,
             30
           ],
@@ -1082,7 +1082,7 @@
           "uid": "2dcdbd87-b972-4a70-b074-09b0088bef25",
           "bounding_rect": [
             885,
-            782,
+            923,
             555,
             30
           ],
@@ -1094,7 +1094,7 @@
           "uid": "50b9a295-b3e0-47ce-be88-49f27e644a9e",
           "bounding_rect": [
             884,
-            827,
+            968,
             240,
             100
           ],
@@ -1105,7 +1105,7 @@
           "uid": "9b50a89c-56e3-45b0-b377-fcbc8c312ed2",
           "bounding_rect": [
             885,
-            938,
+            1079,
             240,
             100
           ],
@@ -1116,7 +1116,7 @@
           "uid": "e4e444d9-618a-430b-bcbc-8c8ba6cb3dbf",
           "bounding_rect": [
             1142,
-            828,
+            969,
             240,
             100
           ],
@@ -1127,7 +1127,7 @@
           "uid": "65d18f43-8b6d-46da-9f89-25392fe92512",
           "bounding_rect": [
             1141,
-            938,
+            1079,
             240,
             100
           ],
@@ -1138,7 +1138,7 @@
           "uid": "eb3ddad0-f4e8-47d8-bdc0-a2b4f554a530",
           "bounding_rect": [
             1935,
-            719,
+            860,
             450,
             30
           ],
@@ -1150,7 +1150,7 @@
           "uid": "04a29fb9-ad02-4384-86c0-95ee2e2f259a",
           "bounding_rect": [
             1939,
-            759,
+            900,
             240,
             100
           ],
@@ -1161,7 +1161,7 @@
           "uid": "b5558c9e-ac57-4477-b80a-dcc4f24abfb0",
           "bounding_rect": [
             2188,
-            758,
+            899,
             240,
             100
           ],
@@ -1172,7 +1172,7 @@
           "uid": "825fbb7b-53bc-4e21-9bbe-09433e1a8e2d",
           "bounding_rect": [
             1273,
-            479,
+            620,
             420,
             30
           ],
@@ -1184,7 +1184,7 @@
           "uid": "553071e4-e5a0-4a80-ae8f-f7800cd392d4",
           "bounding_rect": [
             1275,
-            526,
+            667,
             240,
             100
           ],
@@ -1195,7 +1195,7 @@
           "uid": "048fc80a-06da-4797-b827-aeb2630ddbe4",
           "bounding_rect": [
             1560,
-            720,
+            861,
             330,
             30
           ],
@@ -1207,7 +1207,7 @@
           "uid": "7c514a53-918b-4fa0-bd56-acc01ee42003",
           "bounding_rect": [
             1564,
-            759,
+            900,
             240,
             100
           ],
@@ -1218,7 +1218,7 @@
           "uid": "795d4041-44cb-4ccf-ba72-c6ec8f41abb2",
           "bounding_rect": [
             869,
-            482,
+            623,
             255,
             30
           ],
@@ -1230,7 +1230,7 @@
           "uid": "9eaab2fa-dcaa-4a6a-a009-97e86fd7287b",
           "bounding_rect": [
             871,
-            519,
+            660,
             240,
             100
           ],
@@ -1240,8 +1240,8 @@
           "class": "Label",
           "uid": "a995748e-be57-4fbe-afca-51195a751339",
           "bounding_rect": [
-            499,
-            954,
+            1426,
+            1194,
             90,
             30
           ],
@@ -1252,8 +1252,8 @@
           "class": "TextArea",
           "uid": "fefe23e0-2d30-4706-90db-33db6c5837b2",
           "bounding_rect": [
-            484,
-            997,
+            1427,
+            1230,
             240,
             100
           ],
@@ -1264,7 +1264,7 @@
           "uid": "06bd536a-f6e1-4d89-8e92-e152469d025b",
           "bounding_rect": [
             2366,
-            397,
+            538,
             195,
             30
           ],
@@ -1276,7 +1276,7 @@
           "uid": "143c01b9-cf35-414f-af22-4977eacda6de",
           "bounding_rect": [
             2366,
-            435,
+            576,
             240,
             100
           ],
@@ -1287,7 +1287,7 @@
           "uid": "525071be-1164-4944-be71-5145e446b7ce",
           "bounding_rect": [
             2368,
-            543,
+            684,
             240,
             100
           ],
@@ -1298,7 +1298,7 @@
           "uid": "b32760e9-beb5-48c7-917a-389a933f6e10",
           "bounding_rect": [
             2672,
-            663,
+            804,
             465,
             30
           ],
@@ -1310,7 +1310,7 @@
           "uid": "7fc345fe-0fba-4f6a-8432-ae5e65b51cba",
           "bounding_rect": [
             2677,
-            710,
+            851,
             240,
             100
           ],
@@ -1321,7 +1321,7 @@
           "uid": "32bfb2f1-0d20-4025-8cbb-30a501273ae4",
           "bounding_rect": [
             2674,
-            820,
+            961,
             240,
             100
           ],
@@ -1332,7 +1332,7 @@
           "uid": "9dbb2101-a517-4383-8182-5a9a964e7c32",
           "bounding_rect": [
             1134,
-            1353,
+            1494,
             465,
             30
           ],
@@ -1344,7 +1344,7 @@
           "uid": "06b957f2-0168-4a12-8953-f212227e3839",
           "bounding_rect": [
             1127,
-            1246,
+            1387,
             240,
             100
           ],
@@ -1355,7 +1355,7 @@
           "uid": "32080f32-2426-4aa5-9861-62b2070af7df",
           "bounding_rect": [
             1378,
-            1246,
+            1387,
             240,
             100
           ],
@@ -1366,7 +1366,7 @@
           "uid": "57b3f06f-37e5-4065-a56c-3abf5973e9b1",
           "bounding_rect": [
             2583,
-            1395,
+            1536,
             240,
             100
           ],
@@ -1377,7 +1377,7 @@
           "uid": "9700151c-46fc-484a-9879-e8c16678d9af",
           "bounding_rect": [
             2584,
-            1348,
+            1489,
             420,
             30
           ],
@@ -1389,141 +1389,18 @@
           "uid": "8e5d2b74-68fb-4d34-b7f4-8fefff69fd35",
           "bounding_rect": [
             2584,
-            1505,
+            1646,
             240,
             100
           ],
           "text": "- Emacs\n- Vim\n- Notepad++\n- Sublime Text\n- Code Blocks?\n- Scintilla\n- Web JS code editors\n- Ubuntu Text Editor"
         },
         {
-          "class": "LLMChatContainer",
-          "uid": "06fe61da-2677-4168-828e-dec1048dc78d",
-          "bounding_rect": [
-            1,
-            1260,
-            608,
-            312
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "c485db81-9221-4e38-9339-3116174e3e4b",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "4793ec86-e88e-4528-8fbe-9e9bf28daae9",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "bf59a8eb-9305-4fb8-aedd-75e69de79ca9",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "98b4bf33-1da4-4eef-9fbf-b779f24c438b",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "f245f58c-3665-4597-afd5-a8111a6b571b",
-              "bounding_rect": [
-                0,
-                164,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "6ca49ab6-7cae-4ca5-baa9-07b93e694c13",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "7b46cb8d-cbf1-4e1e-aee6-423b691a5523",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": ""
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "class": "TextArea",
-          "uid": "859c1c5e-231d-4750-8c85-5ecd92573631",
-          "bounding_rect": [
-            0,
-            1153,
-            240,
-            100
-          ],
-          "text": ""
-        },
-        {
           "class": "TextArea",
           "uid": "1f65d94f-3245-404c-baa0-003e6cb68975",
           "bounding_rect": [
             884,
-            1047,
+            1188,
             240,
             100
           ],
@@ -1534,7 +1411,7 @@
           "uid": "fa54d11e-b859-4dd1-b331-e196ade0b7ee",
           "bounding_rect": [
             717,
-            1207,
+            1348,
             270,
             30
           ],
@@ -1546,7 +1423,7 @@
           "uid": "e635261c-395b-420d-8a05-992496125961",
           "bounding_rect": [
             721,
-            1241,
+            1382,
             240,
             100
           ],
@@ -1557,7 +1434,7 @@
           "uid": "46af551d-bb07-445b-97da-bd5a7090a69d",
           "bounding_rect": [
             1425,
-            907,
+            1048,
             285,
             30
           ],
@@ -1569,7 +1446,7 @@
           "uid": "f1e10479-4e94-4f0f-8aff-cdb5126cf164",
           "bounding_rect": [
             1427,
-            947,
+            1088,
             240,
             100
           ],
@@ -1580,7 +1457,7 @@
           "uid": "b1035d92-8a08-4bed-bf86-7ee85e98753b",
           "bounding_rect": [
             3213,
-            27,
+            168,
             90,
             30
           ],
@@ -1592,7 +1469,7 @@
           "uid": "ffb39cdf-f271-4037-82c9-3d50731a2a2e",
           "bounding_rect": [
             3067,
-            75,
+            216,
             240,
             100
           ],
@@ -1603,7 +1480,7 @@
           "uid": "0e1c50c3-d3bc-46a1-95aa-4e3e1adf33ec",
           "bounding_rect": [
             1503,
-            263,
+            404,
             225,
             30
           ],
@@ -1615,7 +1492,7 @@
           "uid": "ce0028bd-0961-49a7-a9ec-b469c54593d7",
           "bounding_rect": [
             1506,
-            299,
+            440,
             240,
             100
           ],
@@ -1626,7 +1503,7 @@
           "uid": "fd0260c6-70ce-4951-abec-73053abe8852",
           "bounding_rect": [
             1911,
-            0,
+            141,
             255,
             30
           ],
@@ -1638,7 +1515,7 @@
           "uid": "868a3da5-be96-415a-86e7-362f7ca28a30",
           "bounding_rect": [
             1913,
-            41,
+            182,
             240,
             100
           ],
@@ -1649,7 +1526,7 @@
           "uid": "081add78-a043-492f-ac76-e881912095e0",
           "bounding_rect": [
             1924,
-            151,
+            292,
             90,
             30
           ],
@@ -1661,7 +1538,7 @@
           "uid": "70f80de8-318f-42da-b5b9-37bb72f92d55",
           "bounding_rect": [
             1924,
-            187,
+            328,
             240,
             100
           ],
@@ -1672,7 +1549,7 @@
           "uid": "c12be807-127f-4908-8e2c-6b886b100010",
           "bounding_rect": [
             1925,
-            296,
+            437,
             240,
             100
           ],
@@ -1683,7 +1560,7 @@
           "uid": "5ba67c8d-cd8e-4c63-b7c0-f7c21d4c90cc",
           "bounding_rect": [
             2198,
-            40,
+            181,
             165,
             30
           ],
@@ -1695,7 +1572,7 @@
           "uid": "ddd5bafc-bd00-4a7f-b6eb-dc707235329b",
           "bounding_rect": [
             2199,
-            77,
+            218,
             240,
             100
           ],
@@ -1706,7 +1583,7 @@
           "uid": "e6a44d0d-7dd9-469c-a104-7ea263a1e8a7",
           "bounding_rect": [
             2209,
-            188,
+            329,
             240,
             100
           ],
@@ -1717,7 +1594,7 @@
           "uid": "f40f1e3f-276a-4ad7-b0ca-c7c68bf18ff3",
           "bounding_rect": [
             2210,
-            294,
+            435,
             240,
             100
           ],
@@ -1728,11 +1605,56 @@
           "uid": "e55a4717-9501-4d11-b1b4-6dbe48634b60",
           "bounding_rect": [
             2460,
-            295,
+            436,
             240,
             100
           ],
           "text": "OCR\n* gpt4v\n* MathPix\n* Tesseract OCR"
+        },
+        {
+          "class": "Label",
+          "uid": "22292ea8-0de5-4936-b0fa-18074115a14d",
+          "bounding_rect": [
+            779,
+            0,
+            210,
+            30
+          ],
+          "text": "Dimensionality",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "bdb7cdc7-373c-43d3-809b-4ebbdb643304",
+          "bounding_rect": [
+            780,
+            47,
+            240,
+            100
+          ],
+          "text": "Why the simplest explanation isn't always the best\nhttps://www.pnas.org/doi/10.1073/pnas.2319169120\n- PCA\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "a9a774f5-cf6a-4d09-ba88-409103506f1d",
+          "bounding_rect": [
+            781,
+            159,
+            240,
+            100
+          ],
+          "text": "DANCo\nDANCo: Dimensionality from Angle and Norm Concentration\nhttps://arxiv.org/abs/1206.3881\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "ccedb7f3-16d7-498d-9249-fac72d8a4055",
+          "bounding_rect": [
+            1049,
+            45,
+            240,
+            100
+          ],
+          "text": "Scientific American\nHow to Make a Consciousness Meter\nhttps://www.scientificamerican.com/article/how-to-make-a-consciousness-meter/\n\nZap and Zip\nTononi"
         }
       ]
     }
@@ -1752,7 +1674,7 @@
     ]
   },
   "viewport_pos": [
-    1365,
-    131
+    363,
+    7
   ]
 }
