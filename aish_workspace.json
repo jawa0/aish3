@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-20T21:41:03.261758+00:00",
-  "saved_at_local": "2023-12-20T16:41:03.261758-05:00",
+  "saved_at_utc": "2023-12-21T01:05:47.604115+00:00",
+  "saved_at_local": "2023-12-20T20:05:47.604115-05:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -9,9 +9,9 @@
       "uid": "ae51569e-a962-438b-aa3e-8bb8f35023ee",
       "bounding_rect": [
         0,
-        77,
+        76,
         3307,
-        2374
+        2375
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -25,7 +25,7 @@
           "uid": "1e6c3f66-1ac7-434d-bdab-cd89a1efd9aa",
           "bounding_rect": [
             0,
-            168,
+            169,
             608,
             336
           ],
@@ -178,7 +178,7 @@
           "uid": "8d359e0a-fc4f-4a7b-9fd2-a71cc18b4b39",
           "bounding_rect": [
             2611,
-            1241,
+            1242,
             450,
             30
           ],
@@ -190,7 +190,7 @@
           "uid": "4ddbe3cc-d9fb-4ada-b40d-4efe1ae31adc",
           "bounding_rect": [
             2610,
-            1292,
+            1293,
             600,
             30
           ],
@@ -202,7 +202,7 @@
           "uid": "eba48632-548f-430f-9182-8963e4f3f0d4",
           "bounding_rect": [
             2457,
-            1954,
+            1955,
             608,
             336
           ],
@@ -355,7 +355,7 @@
           "uid": "81f8cc73-9e4a-4d99-b4de-1dd3ef6804b5",
           "bounding_rect": [
             1135,
-            1534,
+            1535,
             608,
             840
           ],
@@ -754,7 +754,7 @@
           "uid": "b709a8a2-9957-43a5-9061-2a1e43021634",
           "bounding_rect": [
             1112,
-            1348,
+            1349,
             450,
             30
           ],
@@ -766,7 +766,7 @@
           "uid": "e973dda4-c13b-4a88-89a4-0da215b2400a",
           "bounding_rect": [
             1799,
-            1318,
+            1319,
             285,
             30
           ],
@@ -778,7 +778,7 @@
           "uid": "20f3d6ce-b5c1-40c8-841e-14457bce0f88",
           "bounding_rect": [
             1801,
-            1357,
+            1358,
             240,
             100
           ],
@@ -789,7 +789,7 @@
           "uid": "dd6c44a5-799e-4ee5-8e06-cb0ee715a8eb",
           "bounding_rect": [
             1803,
-            1495,
+            1496,
             135,
             30
           ],
@@ -801,7 +801,7 @@
           "uid": "e960c02c-0920-49f8-afab-a09b0bca35c2",
           "bounding_rect": [
             1799,
-            2015,
+            2016,
             608,
             312
           ],
@@ -913,7 +913,7 @@
           "uid": "a6342ecc-d073-4f6d-8dd9-d8f9637b5bbc",
           "bounding_rect": [
             1804,
-            1635,
+            1636,
             240,
             100
           ],
@@ -924,7 +924,7 @@
           "uid": "6b033c5e-74a7-4e92-90c0-dd202b6c43af",
           "bounding_rect": [
             1805,
-            1743,
+            1744,
             240,
             100
           ],
@@ -935,7 +935,7 @@
           "uid": "7740257d-83a3-43c1-9ee9-0033ba3d0105",
           "bounding_rect": [
             2084,
-            1488,
+            1489,
             330,
             30
           ],
@@ -947,7 +947,7 @@
           "uid": "e9005ec4-9b5e-46c0-9efb-080bcfca8788",
           "bounding_rect": [
             2082,
-            1525,
+            1526,
             240,
             100
           ],
@@ -958,7 +958,7 @@
           "uid": "1cba6dbb-1f97-4a67-9b90-fb4d2463dff9",
           "bounding_rect": [
             2081,
-            1630,
+            1631,
             240,
             100
           ],
@@ -969,7 +969,7 @@
           "uid": "e5218913-da75-4318-9279-abdf45f33e0b",
           "bounding_rect": [
             2081,
-            1736,
+            1737,
             240,
             100
           ],
@@ -980,7 +980,7 @@
           "uid": "71a525ce-b5cd-48dc-8752-ed18863b149f",
           "bounding_rect": [
             2080,
-            1844,
+            1845,
             240,
             100
           ],
@@ -991,7 +991,7 @@
           "uid": "28052360-0f0a-4984-8a7d-d2fbc4d84b4c",
           "bounding_rect": [
             1804,
-            1851,
+            1852,
             240,
             100
           ],
@@ -1002,7 +1002,7 @@
           "uid": "d2cd8da1-d041-47fb-9e1d-9205de71e1f7",
           "bounding_rect": [
             1804,
-            1528,
+            1529,
             240,
             100
           ],
@@ -1013,7 +1013,7 @@
           "uid": "e4773681-225b-4d26-a796-fa1eba3bed43",
           "bounding_rect": [
             1806,
-            1108,
+            1109,
             315,
             30
           ],
@@ -1025,7 +1025,7 @@
           "uid": "5a8b629d-6787-45c0-a679-717016f4ee41",
           "bounding_rect": [
             1806,
-            1142,
+            1143,
             240,
             100
           ],
@@ -1036,7 +1036,7 @@
           "uid": "846a0571-43ae-4729-b378-611ed02e8ef3",
           "bounding_rect": [
             2209,
-            1102,
+            1103,
             135,
             30
           ],
@@ -1048,7 +1048,7 @@
           "uid": "1e499710-6a7b-406c-9090-28f33159f989",
           "bounding_rect": [
             2208,
-            1136,
+            1137,
             240,
             100
           ],
@@ -1059,7 +1059,7 @@
           "uid": "5130d775-72c2-4f99-873a-b95140100dc7",
           "bounding_rect": [
             1788,
-            705,
+            706,
             240,
             100
           ],
@@ -1070,7 +1070,7 @@
           "uid": "bc342785-4f36-4933-b67b-3497b359d868",
           "bounding_rect": [
             1792,
-            658,
+            659,
             135,
             30
           ],
@@ -1082,7 +1082,7 @@
           "uid": "2dcdbd87-b972-4a70-b074-09b0088bef25",
           "bounding_rect": [
             885,
-            923,
+            924,
             555,
             30
           ],
@@ -1094,7 +1094,7 @@
           "uid": "50b9a295-b3e0-47ce-be88-49f27e644a9e",
           "bounding_rect": [
             884,
-            968,
+            969,
             240,
             100
           ],
@@ -1105,7 +1105,7 @@
           "uid": "9b50a89c-56e3-45b0-b377-fcbc8c312ed2",
           "bounding_rect": [
             885,
-            1079,
+            1080,
             240,
             100
           ],
@@ -1116,7 +1116,7 @@
           "uid": "e4e444d9-618a-430b-bcbc-8c8ba6cb3dbf",
           "bounding_rect": [
             1142,
-            969,
+            970,
             240,
             100
           ],
@@ -1127,7 +1127,7 @@
           "uid": "65d18f43-8b6d-46da-9f89-25392fe92512",
           "bounding_rect": [
             1141,
-            1079,
+            1080,
             240,
             100
           ],
@@ -1138,7 +1138,7 @@
           "uid": "eb3ddad0-f4e8-47d8-bdc0-a2b4f554a530",
           "bounding_rect": [
             1935,
-            860,
+            861,
             450,
             30
           ],
@@ -1150,7 +1150,7 @@
           "uid": "04a29fb9-ad02-4384-86c0-95ee2e2f259a",
           "bounding_rect": [
             1939,
-            900,
+            901,
             240,
             100
           ],
@@ -1161,7 +1161,7 @@
           "uid": "b5558c9e-ac57-4477-b80a-dcc4f24abfb0",
           "bounding_rect": [
             2188,
-            899,
+            900,
             240,
             100
           ],
@@ -1172,7 +1172,7 @@
           "uid": "825fbb7b-53bc-4e21-9bbe-09433e1a8e2d",
           "bounding_rect": [
             1273,
-            620,
+            621,
             420,
             30
           ],
@@ -1184,7 +1184,7 @@
           "uid": "553071e4-e5a0-4a80-ae8f-f7800cd392d4",
           "bounding_rect": [
             1275,
-            667,
+            668,
             240,
             100
           ],
@@ -1195,7 +1195,7 @@
           "uid": "048fc80a-06da-4797-b827-aeb2630ddbe4",
           "bounding_rect": [
             1560,
-            861,
+            862,
             330,
             30
           ],
@@ -1207,7 +1207,7 @@
           "uid": "7c514a53-918b-4fa0-bd56-acc01ee42003",
           "bounding_rect": [
             1564,
-            900,
+            901,
             240,
             100
           ],
@@ -1218,7 +1218,7 @@
           "uid": "795d4041-44cb-4ccf-ba72-c6ec8f41abb2",
           "bounding_rect": [
             869,
-            623,
+            624,
             255,
             30
           ],
@@ -1230,7 +1230,7 @@
           "uid": "9eaab2fa-dcaa-4a6a-a009-97e86fd7287b",
           "bounding_rect": [
             871,
-            660,
+            661,
             240,
             100
           ],
@@ -1241,7 +1241,7 @@
           "uid": "a995748e-be57-4fbe-afca-51195a751339",
           "bounding_rect": [
             1426,
-            1194,
+            1195,
             90,
             30
           ],
@@ -1253,7 +1253,7 @@
           "uid": "fefe23e0-2d30-4706-90db-33db6c5837b2",
           "bounding_rect": [
             1427,
-            1230,
+            1231,
             240,
             100
           ],
@@ -1264,7 +1264,7 @@
           "uid": "06bd536a-f6e1-4d89-8e92-e152469d025b",
           "bounding_rect": [
             2366,
-            538,
+            539,
             195,
             30
           ],
@@ -1276,7 +1276,7 @@
           "uid": "143c01b9-cf35-414f-af22-4977eacda6de",
           "bounding_rect": [
             2366,
-            576,
+            577,
             240,
             100
           ],
@@ -1287,7 +1287,7 @@
           "uid": "525071be-1164-4944-be71-5145e446b7ce",
           "bounding_rect": [
             2368,
-            684,
+            685,
             240,
             100
           ],
@@ -1298,7 +1298,7 @@
           "uid": "b32760e9-beb5-48c7-917a-389a933f6e10",
           "bounding_rect": [
             2672,
-            804,
+            805,
             465,
             30
           ],
@@ -1310,7 +1310,7 @@
           "uid": "7fc345fe-0fba-4f6a-8432-ae5e65b51cba",
           "bounding_rect": [
             2677,
-            851,
+            852,
             240,
             100
           ],
@@ -1321,7 +1321,7 @@
           "uid": "32bfb2f1-0d20-4025-8cbb-30a501273ae4",
           "bounding_rect": [
             2674,
-            961,
+            962,
             240,
             100
           ],
@@ -1332,7 +1332,7 @@
           "uid": "9dbb2101-a517-4383-8182-5a9a964e7c32",
           "bounding_rect": [
             1134,
-            1494,
+            1495,
             465,
             30
           ],
@@ -1344,7 +1344,7 @@
           "uid": "06b957f2-0168-4a12-8953-f212227e3839",
           "bounding_rect": [
             1127,
-            1387,
+            1388,
             240,
             100
           ],
@@ -1355,7 +1355,7 @@
           "uid": "32080f32-2426-4aa5-9861-62b2070af7df",
           "bounding_rect": [
             1378,
-            1387,
+            1388,
             240,
             100
           ],
@@ -1366,7 +1366,7 @@
           "uid": "57b3f06f-37e5-4065-a56c-3abf5973e9b1",
           "bounding_rect": [
             2583,
-            1536,
+            1537,
             240,
             100
           ],
@@ -1377,7 +1377,7 @@
           "uid": "9700151c-46fc-484a-9879-e8c16678d9af",
           "bounding_rect": [
             2584,
-            1489,
+            1490,
             420,
             30
           ],
@@ -1389,7 +1389,7 @@
           "uid": "8e5d2b74-68fb-4d34-b7f4-8fefff69fd35",
           "bounding_rect": [
             2584,
-            1646,
+            1647,
             240,
             100
           ],
@@ -1400,7 +1400,7 @@
           "uid": "1f65d94f-3245-404c-baa0-003e6cb68975",
           "bounding_rect": [
             884,
-            1188,
+            1189,
             240,
             100
           ],
@@ -1411,7 +1411,7 @@
           "uid": "fa54d11e-b859-4dd1-b331-e196ade0b7ee",
           "bounding_rect": [
             717,
-            1348,
+            1349,
             270,
             30
           ],
@@ -1423,7 +1423,7 @@
           "uid": "e635261c-395b-420d-8a05-992496125961",
           "bounding_rect": [
             721,
-            1382,
+            1383,
             240,
             100
           ],
@@ -1434,7 +1434,7 @@
           "uid": "46af551d-bb07-445b-97da-bd5a7090a69d",
           "bounding_rect": [
             1425,
-            1048,
+            1049,
             285,
             30
           ],
@@ -1446,7 +1446,7 @@
           "uid": "f1e10479-4e94-4f0f-8aff-cdb5126cf164",
           "bounding_rect": [
             1427,
-            1088,
+            1089,
             240,
             100
           ],
@@ -1457,7 +1457,7 @@
           "uid": "b1035d92-8a08-4bed-bf86-7ee85e98753b",
           "bounding_rect": [
             3213,
-            168,
+            169,
             90,
             30
           ],
@@ -1469,7 +1469,7 @@
           "uid": "ffb39cdf-f271-4037-82c9-3d50731a2a2e",
           "bounding_rect": [
             3067,
-            216,
+            217,
             240,
             100
           ],
@@ -1480,7 +1480,7 @@
           "uid": "0e1c50c3-d3bc-46a1-95aa-4e3e1adf33ec",
           "bounding_rect": [
             1503,
-            404,
+            405,
             225,
             30
           ],
@@ -1492,7 +1492,7 @@
           "uid": "ce0028bd-0961-49a7-a9ec-b469c54593d7",
           "bounding_rect": [
             1506,
-            440,
+            441,
             240,
             100
           ],
@@ -1503,7 +1503,7 @@
           "uid": "fd0260c6-70ce-4951-abec-73053abe8852",
           "bounding_rect": [
             1911,
-            141,
+            142,
             255,
             30
           ],
@@ -1515,7 +1515,7 @@
           "uid": "868a3da5-be96-415a-86e7-362f7ca28a30",
           "bounding_rect": [
             1913,
-            182,
+            183,
             240,
             100
           ],
@@ -1526,7 +1526,7 @@
           "uid": "081add78-a043-492f-ac76-e881912095e0",
           "bounding_rect": [
             1924,
-            292,
+            293,
             90,
             30
           ],
@@ -1538,7 +1538,7 @@
           "uid": "70f80de8-318f-42da-b5b9-37bb72f92d55",
           "bounding_rect": [
             1924,
-            328,
+            329,
             240,
             100
           ],
@@ -1549,7 +1549,7 @@
           "uid": "c12be807-127f-4908-8e2c-6b886b100010",
           "bounding_rect": [
             1925,
-            437,
+            438,
             240,
             100
           ],
@@ -1560,7 +1560,7 @@
           "uid": "5ba67c8d-cd8e-4c63-b7c0-f7c21d4c90cc",
           "bounding_rect": [
             2198,
-            181,
+            182,
             165,
             30
           ],
@@ -1572,7 +1572,7 @@
           "uid": "ddd5bafc-bd00-4a7f-b6eb-dc707235329b",
           "bounding_rect": [
             2199,
-            218,
+            219,
             240,
             100
           ],
@@ -1583,7 +1583,7 @@
           "uid": "e6a44d0d-7dd9-469c-a104-7ea263a1e8a7",
           "bounding_rect": [
             2209,
-            329,
+            330,
             240,
             100
           ],
@@ -1594,7 +1594,7 @@
           "uid": "f40f1e3f-276a-4ad7-b0ca-c7c68bf18ff3",
           "bounding_rect": [
             2210,
-            435,
+            436,
             240,
             100
           ],
@@ -1605,7 +1605,7 @@
           "uid": "e55a4717-9501-4d11-b1b4-6dbe48634b60",
           "bounding_rect": [
             2460,
-            436,
+            437,
             240,
             100
           ],
@@ -1616,7 +1616,7 @@
           "uid": "22292ea8-0de5-4936-b0fa-18074115a14d",
           "bounding_rect": [
             779,
-            0,
+            1,
             210,
             30
           ],
@@ -1628,7 +1628,7 @@
           "uid": "bdb7cdc7-373c-43d3-809b-4ebbdb643304",
           "bounding_rect": [
             780,
-            47,
+            48,
             240,
             100
           ],
@@ -1639,22 +1639,101 @@
           "uid": "a9a774f5-cf6a-4d09-ba88-409103506f1d",
           "bounding_rect": [
             781,
-            159,
+            423,
             240,
             100
           ],
-          "text": "DANCo\nDANCo: Dimensionality from Angle and Norm Concentration\nhttps://arxiv.org/abs/1206.3881\n"
+          "text": "DANCo\n\nDANCo: Dimensionality from Angle and Norm Concentration\nhttps://arxiv.org/abs/1206.3881\n\nDANCo: An intrinsic dimensionality estimator exploiting angle and norm concentration\nhttps://doi.org/10.1016/j.patcog.2014.02.013\n\n"
         },
         {
           "class": "TextArea",
           "uid": "ccedb7f3-16d7-498d-9249-fac72d8a4055",
           "bounding_rect": [
-            1049,
-            45,
+            1096,
+            37,
             240,
             100
           ],
-          "text": "Scientific American\nHow to Make a Consciousness Meter\nhttps://www.scientificamerican.com/article/how-to-make-a-consciousness-meter/\n\nZap and Zip\nTononi"
+          "text": "Scientific American\nHow to Make a Consciousness Meter\nhttps://www.scientificamerican.com/article/how-to-make-a-consciousness-meter/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "40857572-a714-403c-9e9f-08197111ee09",
+          "bounding_rect": [
+            1096,
+            146,
+            240,
+            100
+          ],
+          "text": "Zap and Zip paper seems to be:\nQuantifying Cortical EEG Responses to TMS in (Un)consciousness\nhttps://journals.sagepub.com/doi/10.1177/1550059413513723\n"
+        },
+        {
+          "class": "Label",
+          "uid": "def0d71e-f33a-4289-8f2e-f024c849b155",
+          "bounding_rect": [
+            1093,
+            0,
+            165,
+            30
+          ],
+          "text": "Zap and Zip",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "d3d5752b-3cee-4654-9d8b-bfd167e8f54e",
+          "bounding_rect": [
+            1035,
+            424,
+            240,
+            100
+          ],
+          "text": "What is dimensionality of MNIST\n- for different digits?\n- stays same for shifted digits?\n- what is set of shifts valid for\nall digits?\n"
+        },
+        {
+          "class": "Label",
+          "uid": "d041c847-db2c-4512-adfa-b70fb6656298",
+          "bounding_rect": [
+            778,
+            276,
+            360,
+            30
+          ],
+          "text": "Intrinsic Dimension (id)",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "69482c9c-660a-4264-af5a-751fcdb41876",
+          "bounding_rect": [
+            782,
+            313,
+            240,
+            100
+          ],
+          "text": "Intrinsic Dimension\nhttps://en.wikipedia.org/wiki/Intrinsic_dimension\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "735d36dd-f03b-4df8-adcc-2e0e7ca8dfbf",
+          "bounding_rect": [
+            780,
+            159,
+            240,
+            100
+          ],
+          "text": "Dimensionality Reduction\nhttps://en.wikipedia.org/wiki/Dimensionality_reduction\n\nNonlinear dimensionality reduction\nhttps://en.wikipedia.org/wiki/Nonlinear_dimensionality_reduction\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "6c096d04-56b9-4609-8273-f88c2b54e6ae",
+          "bounding_rect": [
+            1033,
+            312,
+            240,
+            100
+          ],
+          "text": "Isomap\nhttps://en.wikipedia.org/wiki/Isomap#:~:text=Isomap%20is%20one%20representative%20of,imposed%20by%20a%20weighted%20graph.\n"
         }
       ]
     }
