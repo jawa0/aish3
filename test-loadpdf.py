@@ -1,13 +1,13 @@
 import fitz
 
-FILE_PATH = "res/knowledge/pdf/David Flanagan - JavaScript_ The Definitive Guide_ Master the World's Most-Used Programming Language-O'Reilly Media (2020).pdf"
+FILE_PATH = "res/knowledge/pdf/Calculus Made Easy.pdf"
 
 print(f'Opening "{FILE_PATH}"...')
 
 doc = fitz.open(FILE_PATH)
 print(f'Document has {len(doc)} pages.')
 
-I_PAGE = 5
+I_PAGE = 11
 ZOOM = 3.0
 
 print(f'Page {I_PAGE}...')
