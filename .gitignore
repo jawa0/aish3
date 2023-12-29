@@ -25,4 +25,7 @@ results.txt
 *_??.json
 *_???.json
 
+# Cosine
+.cosine/**
+
 
