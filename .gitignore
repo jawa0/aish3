@@ -23,5 +23,6 @@ results.txt
 # AISH workspace automatic backups
 *_?.json
 *_??.json
+*_???.json
 
 
