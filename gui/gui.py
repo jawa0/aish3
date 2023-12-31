@@ -78,7 +78,8 @@ class GUI:
                  workspace_filename=None, 
                  client_session=None, 
                  enable_voice_in=False, 
-                 enable_voice_out=False):        
+                 enable_voice_out=False,
+                 create_hook: Optional[callable]=None):        
         
         assert(client_session is not None)
         self.session = client_session
@@ -144,6 +145,9 @@ class GUI:
         # @todo runtime feature flag
         # DEBUG_DRAW
         # self._content.draw_bounds = True
+
+        if create_hook is not None:
+            create_hook(self)
 
         self.content().sizeToChildren()
 

@@ -66,33 +66,34 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
         logging.error("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
         raise Exception("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
 
+    def setup_gui(gui: GUI):
+        gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
+        gui.content().add_child(gui.listening_indicator)
+
+        voice_transcript_height = 60
+        gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
+        gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
+        gui.content().add_child(gui.voice_transcript)
+
+        # gui.command_console = CommandConsole(saveable=False,
+        #                                      screen_relative=True,
+        #                                     can_focus=True,
+        #                                     visible=False,
+        #                                     x=10,
+        #                                     y=50,
+        #                                     w=1000,
+        #                                     h=500,
+        #                                     gui=gui)
+        # gui.content().add_child(gui.command_console)
+
     gui = GUI(renderer, 
                 font_descriptor, 
                 workspace_filename=workspace_filename, 
                 client_session=session,
                 enable_voice_in=enable_voice_in,
-                enable_voice_out=False)
+                enable_voice_out=False,
+                create_hook=setup_gui)
     
-    # @hack
-    gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
-    gui.content().add_child(gui.listening_indicator)
-
-    voice_transcript_height = 60
-    gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
-    gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
-    gui.content().add_child(gui.voice_transcript)
-
-    # gui.command_console = CommandConsole(saveable=False,
-    #                                      screen_relative=True,
-    #                                     can_focus=True,
-    #                                     visible=False,
-    #                                     x=10,
-    #                                     y=50,
-    #                                     w=1000,
-    #                                     h=500,
-    #                                     gui=gui)
-    # gui.content().add_child(gui.command_console)
-
     running = True
     t_prev_update = time.time()
 
