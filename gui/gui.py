@@ -52,7 +52,10 @@ class GUI:
 
     @classmethod
     def control_class(cls, class_name):
-        return cls._factories.get(class_name, None)
+        # return cls._factories.get(class_name, None)
+
+        # I want to know if it can't find the class name
+        return cls._factories[class_name]
     
 
     def create_control(self, class_name, **kwargs):
@@ -532,6 +535,20 @@ class GUI:
         self.content().add_child(chat)
 
 
+    def cmd_new_agent_chat(self, wx: int, wy: int) -> None:
+        """Expects wx, and wy to be world (workspace) coordinates."""
+
+        logging.info('Command: create new Agent chat')
+        print(f'wx, wy = {wx}, {wy}')
+
+        assert(wx is not None and wy is not None)
+
+        parent = self.content()
+        x, y = parent.world_to_local(wx, wy)
+        chat = self.create_control("LLMAgentChat", x=x, y=y)
+        self.content().add_child(chat)
+
+
     def cmd_new_label(self, wx: int, wy: int, text: str="New Label") -> None:
         """Expects wx, and wy to be world (workspace) coordinates."""
 
@@ -619,6 +636,12 @@ class GUI:
                     return True
                 
                 self.cmd_goto_viewport_bookmark(i_bookmark)
+                return True
+            
+            # Cmd+A creates a new Agent chat
+            if keySym == sdl2.SDLK_a:
+                wx, wy = self.view_to_world(vx, vy)
+                self.cmd_new_agent_chat(wx, wy)
                 return True
             
             # Cmd+B creates a new Label

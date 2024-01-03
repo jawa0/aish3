@@ -30,6 +30,7 @@ from draw import draw_text
 from session import Session
 from label import Label
 from textarea import TextArea
+from llm_agent_chat import LLMAgentChat
 
 
 def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):

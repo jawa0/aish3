@@ -39,11 +39,11 @@ class LLMChatContainer(GUIContainer):
         def from_json(cls, json, **kwargs):
             assert(json["class"] == cls.__name__)
             kwargs = super(LLMChatContainer.ChatMessageUI, cls)._enrich_kwargs(json, **kwargs)
+            kwargs["default_setup"] = False  # @todo reverse sense, and rename to "from_json"?
 
             gui = kwargs.get('gui')
             assert(gui is not None)
 
-            kwargs["default_setup"] = False
             instance = gui.create_control(json["class"], **kwargs)
             instance.set_bounds(*json["bounding_rect"])
 
@@ -109,7 +109,7 @@ class LLMChatContainer(GUIContainer):
         return cls(**kwargs)
     
 
-    def __init__(self, default_setup=True, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.draw_bounds = True
         
@@ -118,6 +118,7 @@ class LLMChatContainer(GUIContainer):
         self.system = None
         self.utterances = []
 
+        default_setup = kwargs.get('default_setup', True)
         if default_setup:
             self.title = Label(text="LLM Chat [gpt-4]", 
                                w=PANEL_WIDTH, h=20, 
@@ -156,11 +157,11 @@ class LLMChatContainer(GUIContainer):
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
         kwargs = super(LLMChatContainer, cls)._enrich_kwargs(json, **kwargs)
+        kwargs["default_setup"] = False
 
         gui = kwargs.get('gui')
         assert(gui is not None)
 
-        kwargs["default_setup"] = False
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
 
@@ -300,14 +301,6 @@ class LLMChatContainer(GUIContainer):
         # self.gui.say(self.accumulated_response_text)
 
 
-    def get_json(self):
-        return {
-            "type": "LLMChatContainer",
-            "version": 1,
-            "system_text": self.system.text_area.text_buffer.get_text(),
-        }
-
-    
     def on_update(self, dt):
         self._t_busy += dt
     
