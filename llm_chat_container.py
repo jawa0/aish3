@@ -230,7 +230,11 @@ class LLMChatContainer(GUIContainer):
                         has_system = hasattr(self, "system") and self.system is not None
                         if not has_system or chat_message != self.system:
                             # @todo wrap in a remove message method
-                            self.utterances.remove(chat_message)
+                            try:
+                                self.utterances.remove(chat_message)
+                            except ValueError:  # We don't always add 
+                                pass
+
                             self.remove_child(chat_message)
                             return True
 
@@ -277,22 +281,27 @@ class LLMChatContainer(GUIContainer):
     def on_llm_response_start(self) -> None:
         self.accumulated_response_text = ""
 
+        if not hasattr(self, "current_response_destination") or self.current_response_destination is None:
+            assert(len(self.utterances) > 0)
+            answer = self.utterances[-1]
+            role = answer.get_role()
+            assert(isinstance(answer, self.ChatMessageUI) and role == "Assistant")
+            self.current_response_destination = answer
+
 
     def on_llm_response_chunk(self, chunk_text: Optional[str]) -> None:
-        assert(len(self.utterances) > 0)
-        answer = self.utterances[-1]
-        role = answer.get_role()
-        assert(isinstance(answer, self.ChatMessageUI) and role == "Assistant")
-
         if chunk_text is not None:
-            answer.text_area.text_buffer.move_point_to_end()
-            answer.text_area.text_buffer.insert(chunk_text)
-            answer.text_area.set_needs_redraw()
+            answer_text_area = self.current_response_destination.text_area
+            answer_text_area.text_buffer.move_point_to_end()
+            answer_text_area.text_buffer.insert(chunk_text)
+            answer_text_area.set_needs_redraw()
 
             self.accumulated_response_text += chunk_text
 
 
     def on_llm_response_done(self) -> None:
+        self.current_response_destination = None
+
         self.pulse_busy = False
         self._t_busy = 0.0
 

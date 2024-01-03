@@ -65,7 +65,7 @@ class LLMAgentChat(LLMChatContainer):
 
         self.system_prompt = \
 """
-You are an AI assisstant. We are engaging in a dialogue where I take the role of the 
+You are an AI assistant. We are engaging in a dialogue where I take the role of the 
 teacher and you take the role of the student. I will be telling you things, and I 
 want you to remember these things by storing what I tell you to your knowledge base. 
 Let's call these things I tell you "factoids". For each factoid you are told, you 
@@ -90,7 +90,13 @@ Client Local Time {{ ClientLocalTime }}
 """        
 # Client Location: {{ClientLocation}}
 # User Location: {{UserLocation}}
+        
+        self.factoid_ner_prompt_template = \
+"""
+Do Named Entity Extraction (NER) to discover all entities mentioned in the following text:
 
+{{ Content }}
+"""
 
     def send(self):
         if len(self.utterances) == 0 or self.utterances[-1].get_role() != "User":
@@ -115,7 +121,7 @@ Client Local Time {{ ClientLocalTime }}
         
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": prompt}]
 
-        handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
+        factoid_handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
                                         chunk_handler=self.on_llm_response_chunk,
                                         done_handler=self.on_llm_response_done)
 
@@ -129,8 +135,44 @@ Client Local Time {{ ClientLocalTime }}
         self.utterances.append(answer)
 
         model = 'gpt-4-1106-preview'
-        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
+        # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
+        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
 
+        # NER
+
+        data["Content"] = content
+        ner_prompt = pystache.render(self.factoid_ner_prompt_template, data)
+        ner_messages = [{"role": "system", "content": ""}, {"role": "user", "content": ner_prompt}]
+        ner_handler = ChatCompletionHandler(start_handler=self.on_ner_response_start,
+                                        chunk_handler=self.on_ner_response_chunk,
+                                        done_handler=self.on_ner_response_done)
+
+        # Add NER TextArea
+        ner = self.gui.create_control("ChatMessageUI", role="NER", text='')
+        self.add_child(ner, add_to_focus_ring=False)
+        self.focus_ring.add(ner.text_area)
+        self.current_ner_destination = ner
+        # self.utterances.append(ner)
+
+        self.gui.session.llm_send_streaming_chat_request(model, ner_messages, handlers=[ner_handler])
+
+
+    def on_ner_response_start(self) -> None:
+        self.ner_response_text = ""
+
+
+    def on_ner_response_chunk(self, chunk_text: Optional[str]) -> None:
+        if chunk_text is not None:
+            assert(self.current_ner_destination is not None)
+            self.current_ner_destination.text_area.text_buffer.move_point_to_end()
+            self.current_ner_destination.text_area.text_buffer.insert(chunk_text)
+            self.current_ner_destination.text_area.set_needs_redraw()
+
+            self.ner_response_text += chunk_text
+
+
+    def on_ner_response_done(self) -> None:
+        self.current_ner_destination = None
 
 
     @classmethod

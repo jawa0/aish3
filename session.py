@@ -126,3 +126,15 @@ class Session:
         for handler in handlers:
             if hasattr(handler, 'on_start'):
                 handler.on_start()
+
+
+    def llm_send_chat_request(self, model, chat_messages, handlers: List[ChatCompletionHandler]=[]):
+        assert(model == 'gpt-4' or model == 'gpt-3.5-turbo' or model == 'gpt-4-1106-preview')
+        
+        completion = self.openai_client.chat.completions.create(model=model, messages=chat_messages, stream=False)
+        logging.debug(chat_messages)
+        self._running_completions[completion] = handlers
+
+        for handler in handlers:
+            if hasattr(handler, 'on_start'):
+                handler.on_start()
