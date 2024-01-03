@@ -97,6 +97,21 @@ Do Named Entity Extraction (NER) to discover all entities mentioned in the follo
 
 {{ Content }}
 """
+        self.factoid_vss_summary_prompt_template = \
+"""
+Generate a one sentence summary of this information that can be used to search for it
+later, using vector similarity search on the sentence embedding of the summary:
+
+{{ Content }}
+"""
+
+        self.factoid_keywords_prompt_template = \
+"""
+Generate keywords for this information that can be used later to do keyword search for it
+later:
+
+{{ Content }}
+"""
 
     def send(self):
         if len(self.utterances) == 0 or self.utterances[-1].get_role() != "User":
@@ -116,6 +131,10 @@ Do Named Entity Extraction (NER) to discover all entities mentioned in the follo
             "ClientUTCTime": str(now_utc),
             "ClientLocalTime": str(now_local),
         }
+
+        # 
+        # Factoid storage
+        #
 
         prompt = pystache.render(self.factoid_prompt_template, data)
         
@@ -138,7 +157,9 @@ Do Named Entity Extraction (NER) to discover all entities mentioned in the follo
         # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
         self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
 
-        # NER
+        #
+        # Named Entity Recognition (NER)
+        #
 
         data["Content"] = content
         ner_prompt = pystache.render(self.factoid_ner_prompt_template, data)
@@ -155,6 +176,44 @@ Do Named Entity Extraction (NER) to discover all entities mentioned in the follo
         # self.utterances.append(ner)
 
         self.gui.session.llm_send_streaming_chat_request(model, ner_messages, handlers=[ner_handler])
+
+        #
+        # Summary sentence for vector similarity search
+        #
+
+        data["Content"] = content
+        vss_prompt = pystache.render(self.factoid_vss_summary_prompt_template, data)
+        vss_messages = [{"role": "system", "content": ""}, {"role": "user", "content": vss_prompt}]
+        vss_handler = ChatCompletionHandler(start_handler=self.on_vss_response_start,
+                                        chunk_handler=self.on_vss_response_chunk,
+                                        done_handler=self.on_vss_response_done)
+
+        # Add VSS TextArea
+        vss = self.gui.create_control("ChatMessageUI", role="Summary Sentence", text='')
+        self.add_child(vss, add_to_focus_ring=False)
+        self.focus_ring.add(vss.text_area)
+        self.current_vss_destination = vss
+
+        self.gui.session.llm_send_streaming_chat_request(model, vss_messages, handlers=[vss_handler])
+
+        #
+        # Summary keywords for keyword search
+        #
+
+        data["Content"] = content
+        kw_prompt = pystache.render(self.factoid_keywords_prompt_template, data)
+        kw_messages = [{"role": "system", "content": ""}, {"role": "user", "content": kw_prompt}]
+        kw_handler = ChatCompletionHandler(start_handler=self.on_keywords_response_start,
+                                        chunk_handler=self.on_keywords_response_chunk,
+                                        done_handler=self.on_keywords_response_done)
+
+        # Add Keywords TextArea
+        keywords = self.gui.create_control("ChatMessageUI", role="Summary Keywords", text='')
+        self.add_child(keywords, add_to_focus_ring=False)
+        self.focus_ring.add(keywords.text_area)
+        self.current_kw_destination = keywords
+
+        self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
 
 
     def on_ner_response_start(self) -> None:
@@ -173,6 +232,42 @@ Do Named Entity Extraction (NER) to discover all entities mentioned in the follo
 
     def on_ner_response_done(self) -> None:
         self.current_ner_destination = None
+
+
+    def on_vss_response_start(self) -> None:
+        self.vss_response_text = ""
+
+
+    def on_vss_response_chunk(self, chunk_text: Optional[str]) -> None:
+        if chunk_text is not None:
+            assert(self.current_vss_destination is not None)
+            self.current_vss_destination.text_area.text_buffer.move_point_to_end()
+            self.current_vss_destination.text_area.text_buffer.insert(chunk_text)
+            self.current_vss_destination.text_area.set_needs_redraw()
+
+            self.vss_response_text += chunk_text
+
+
+    def on_vss_response_done(self) -> None:
+        self.current_vss_destination = None
+
+
+    def on_keywords_response_start(self) -> None:
+        self.keywords_response_text = ""
+
+
+    def on_keywords_response_chunk(self, chunk_text: Optional[str]) -> None:
+        if chunk_text is not None:
+            assert(self.current_kw_destination is not None)
+            self.current_kw_destination.text_area.text_buffer.move_point_to_end()
+            self.current_kw_destination.text_area.text_buffer.insert(chunk_text)
+            self.current_kw_destination .text_area.set_needs_redraw()
+
+            self.keywords_response_text += chunk_text
+
+
+    def on_keywords_response_done(self) -> None:
+        self.keywords_response_text = None
 
 
     @classmethod
