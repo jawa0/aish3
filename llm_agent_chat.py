@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from datetime import datetime
 import sdl2
 import json
 import logging
@@ -27,6 +28,14 @@ from gui_layout import ColumnLayout
 from gui_focus import FocusRing
 from session import ChatCompletionHandler
 from llm_chat_container import LLMChatContainer
+
+import getpass
+import platform
+import pystache
+import pytz
+from tzlocal import get_localzone
+
+
 
 
 PANEL_WIDTH = 600
@@ -53,6 +62,75 @@ class LLMAgentChat(LLMChatContainer):
             self.remove_child(system)
             self.utterances.remove(system)
             del self.system
+
+        self.system_prompt = \
+"""
+You are an AI assisstant. We are engaging in a dialogue where I take the role of the 
+teacher and you take the role of the student. I will be telling you things, and I 
+want you to remember these things by storing what I tell you to your knowledge base. 
+Let's call these things I tell you "factoids". For each factoid you are told, you 
+should also remember the time you were told it, and by whom.
+"""
+
+        self.factoid_prompt_template = \
+"""
+Factoid:
+
+{{ Content }}
+
+Metadata:
+
+Source of factoid (User): {{ User }}
+Client Software: AISH3 Python GUI client
+Client System Platform: {{ ClientPlatform }}
+Client Timezone {{ ClientTimezone }}
+Client UTC Time {{ ClientUTCTime }}
+Client Local Time {{ ClientLocalTime }}
+
+"""        
+# Client Location: {{ClientLocation}}
+# User Location: {{UserLocation}}
+
+
+    def send(self):
+        if len(self.utterances) == 0 or self.utterances[-1].get_role() != "User":
+            return
+        
+        content = self.utterances[-1].get_text()
+
+        now_utc = datetime.now(pytz.utc)
+        tz_local = get_localzone()
+        now_local = now_utc.astimezone(tz_local)
+            
+        data = {
+            "Content": content,
+            "User": getpass.getuser(),
+            "ClientPlatform": str(platform.platform()),
+            "ClientTimezone": str(tz_local),
+            "ClientUTCTime": str(now_utc),
+            "ClientLocalTime": str(now_local),
+        }
+
+        prompt = pystache.render(self.factoid_prompt_template, data)
+        
+        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": prompt}]
+
+        handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
+                                        chunk_handler=self.on_llm_response_chunk,
+                                        done_handler=self.on_llm_response_done)
+
+        self.pulse_busy = True
+        self._t_busy = 0.0
+
+        # Add Answer TextArea
+        answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
+        self.add_child(answer, add_to_focus_ring=False)
+        self.focus_ring.add(answer.text_area, set_focus=True)
+        self.utterances.append(answer)
+
+        model = 'gpt-4-1106-preview'
+        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
+
 
 
     @classmethod

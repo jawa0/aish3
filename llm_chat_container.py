@@ -281,7 +281,8 @@ class LLMChatContainer(GUIContainer):
     def on_llm_response_chunk(self, chunk_text: Optional[str]) -> None:
         assert(len(self.utterances) > 0)
         answer = self.utterances[-1]
-        assert(isinstance(answer, self.ChatMessageUI) and answer.get_role() == "Assistant")
+        role = answer.get_role()
+        assert(isinstance(answer, self.ChatMessageUI) and role == "Assistant")
 
         if chunk_text is not None:
             answer.text_area.text_buffer.move_point_to_end()
