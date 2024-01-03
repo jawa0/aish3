@@ -47,7 +47,12 @@ class LLMAgentChat(LLMChatContainer):
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
             self.title.set_text("Agent Chat")
-            self.system.text_area.text_buffer.set_text("")
+
+            # We don't have a system prompt, so remove the one created in LLMChatContainer
+            system = self.system
+            self.remove_child(system)
+            self.utterances.remove(system)
+            del self.system
 
 
     @classmethod
@@ -97,41 +102,12 @@ class LLMAgentChat(LLMChatContainer):
 
 
     def handle_event(self, event):
-        if event.type == sdl2.SDL_KEYDOWN:
-            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
-            keySymbol = event.key.keysym.sym
+        handled = super().handle_event(event)
 
-            if cmdPressed:
-                # Cmd+G sends messages to GPT
-                if keySymbol == sdl2.SDLK_g:
-                    self.send()
-                    return True
-                
-                # Cmd+U creates a new user message
-                elif keySymbol == sdl2.SDLK_u: 
-                    user = LLMChatContainer.ChatMessageUI(role="User", gui=self.gui)
-                    self.add_child(user, add_to_focus_ring=False)
-                    self.utterances.append(user)
-                    self.focus_ring.add(user.text_area)
-                    self.gui.set_focus(user.text_area, True)
-                    return True  # event was handled
-                
-                # Cmd+Backspace/Delete deletes the currently focused message
-                # If the whole LLMChatContainer is focused, then delete this chat.
-                elif keySymbol == sdl2.SDLK_BACKSPACE:
-                    focused_control = self.gui.get_focus()
-                    if focused_control is self:
-                        self.parent.remove_child(self)
-                        return True
-
-            
-            if keySymbol == sdl2.SDLK_RETURN:
-                # Delegate to GUIContainer
-                handled = super().handle_event(event)
-                if handled:
-                    return True
-            
-        return self.parent.handle_event(event)
+        if handled:
+            return True
+        else:
+            return self.parent.handle_event(event)
 
 
     def on_update(self, dt):

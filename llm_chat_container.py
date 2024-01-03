@@ -130,7 +130,6 @@ class LLMChatContainer(GUIContainer):
 
             text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
             self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
-            # self.gui.set_focus(self.system)
 
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
             for utterance in self.utterances:
@@ -140,7 +139,6 @@ class LLMChatContainer(GUIContainer):
                 self.focus_ring.add(utterance.text_area)
 
         self.accumulated_response_text = None
-        # self.focus_ring.focus(self.system.text_area)
 
         self.busy_colormap = matplotlib.colormaps['summer']
         self._t_busy = 0.0
@@ -229,10 +227,9 @@ class LLMChatContainer(GUIContainer):
                         assert(self in ancestors)
 
                         # Can't delete first, System message
-                        if len(self.utterances) > 1 and chat_message != self.utterances[0]:
+                        has_system = hasattr(self, "system") and self.system is not None
+                        if not has_system or chat_message != self.system:
                             # @todo wrap in a remove message method
-                            # self.focus_ring.focus_previous()
-                            # self.focus_ring.remove(chat_message.text_area)
                             self.utterances.remove(chat_message)
                             self.remove_child(chat_message)
                             return True
