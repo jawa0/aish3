@@ -264,18 +264,22 @@ class LLMChatContainer(GUIContainer):
 
         model = 'gpt-4-1106-preview'
         # model = 'gpt-4'
-        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-        self.add_child(answer, add_to_focus_ring=False)
-        self.focus_ring.add(answer.text_area, set_focus=True)
 
         # Shrink previous messages
         for u in self.utterances:
             u.text_area.set_size(PANEL_WIDTH, 60)
         self.utterances.append(answer)
         self.updateLayout()
+
+        self.add_child(answer, add_to_focus_ring=False)
+        self.focus_ring.add(answer.text_area, set_focus=True)
+
+        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
+
+
 
 
     def on_llm_response_start(self) -> None:
