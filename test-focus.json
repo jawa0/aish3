@@ -1,0 +1,453 @@
+{
+  "version": "0.2",
+  "saved_at_utc": "2024-01-06T06:15:13.180856+00:00",
+  "saved_at_local": "2024-01-06T01:15:13.180856-05:00",
+  "gui": {
+    "class": "GUI",
+    "content": {
+      "class": "GUIContainer",
+      "uid": "31cc4243-0764-4467-ab3d-b9f39014e7af",
+      "bounding_rect": [
+        16,
+        35,
+        1259,
+        641
+      ],
+      "layout": null,
+      "name": "GUI Content Root",
+      "inset": [
+        0,
+        0
+      ],
+      "children": [
+        {
+          "class": "Label",
+          "uid": "2468cda1-c87d-4a8b-98f6-ed45db8db5db",
+          "bounding_rect": [
+            0,
+            0,
+            135,
+            30
+          ],
+          "text": "New Label",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "d22e7268-11e0-4c24-89be-896ae10d295a",
+          "bounding_rect": [
+            262,
+            1,
+            240,
+            100
+          ],
+          "text": ""
+        },
+        {
+          "class": "LLMChatContainer",
+          "uid": "0b5c087b-df6e-4fd3-ad86-7453d8114426",
+          "bounding_rect": [
+            8,
+            137,
+            608,
+            504
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "uid": "0baf5241-1d7f-48e8-a663-75daa6b680bd",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "7dfd7d56-b51a-49de-bc33-ef8d710294db",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "2743b9a0-aace-48f4-86e7-f7b1eec72972",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "0261a60f-61d8-42e1-8f69-9bc20cb25066",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "e0047e60-f5c4-4e20-924a-ba4935111d50",
+              "bounding_rect": [
+                0,
+                104,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "ec35e4f6-3012-4281-beed-18ddcb47778f",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "5d489e06-8e13-40f3-b8c7-27c324096d29",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "list 5 animals"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "82d5e043-7027-467b-a68a-d6592d8b77d2",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "922663a1-deb8-43f8-bf1c-309fc2836240",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "764c5105-6c8e-42d3-86e8-0e73a3a7ee75",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "1. Elephant\n2. Dolphin\n3. Falcon\n4. Wolf\n5. Octopus"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "93e1cb0b-18d0-4ed1-a7af-0d9f7bebae2b",
+              "bounding_rect": [
+                0,
+                272,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "0d88e3f3-1679-4c43-af66-cbd672cf9a34",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "27769c83-c03f-4290-b153-4c251bb36a09",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "list 4 colours\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "b337037b-e15b-427c-bac5-da7814bd5b68",
+              "bounding_rect": [
+                0,
+                356,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "cac49713-b977-466f-b8c7-467cacf22baf",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "9404d23b-a182-4c4e-ae0c-0b6f09546c63",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "1. Crimson\n2. Sapphire\n3. Emerald\n4. Amber"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "TextArea",
+          "uid": "2b0da07b-7564-4662-9a4e-b0351afb5a63",
+          "bounding_rect": [
+            651,
+            11,
+            240,
+            100
+          ],
+          "text": ""
+        },
+        {
+          "class": "LLMChatContainer",
+          "uid": "856497bd-e2ac-4efb-97f7-b31057b86ea5",
+          "bounding_rect": [
+            651,
+            136,
+            608,
+            336
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "uid": "379473d9-7677-4029-94f8-f375934fe145",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "e9ae128a-7e4c-42ce-ad3c-d8887d3fea32",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "d9c757aa-ba8d-4ac9-8510-c8209b8fe1fc",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "3d4e9779-82af-4c62-8056-04c4dfdcc868",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "8dc508b8-e39a-43ae-ba44-578731440e78",
+              "bounding_rect": [
+                0,
+                104,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "2b7b6c34-cd92-439d-8dea-e749170b48a0",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "a0f1a61d-3e03-4f28-b92a-82d4edb8b516",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "count to 20"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "2362a210-d13d-4325-92db-aceb2e0e09dc",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "a47c2511-02f9-42d5-8bae-66c7d831e432",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "4e106880-6f71-4ef9-8d9e-9ef3285cfa68",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "viewport_bookmarks": {},
+  "viewport_pos": [
+    0,
+    -1
+  ]
+}

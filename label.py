@@ -152,13 +152,13 @@ class LabelEditor(TextArea):
         self.edit_target = None
 
 
-    def _set_focus(self, getting_focus):
+    def _change_focus(self, am_getting_focus: bool) -> bool:
         # Losing focus cancels editing
-        if self.has_focus() and not getting_focus:
+        if self.has_focus() and not am_getting_focus:
             self._stop_editing()
             return True
 
-        return super()._set_focus(getting_focus)
+        return super()._change_focus(am_getting_focus)
 
 
     def handle_event(self, event):

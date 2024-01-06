@@ -25,7 +25,6 @@ from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
-from gui_focus import FocusRing
 from session import ChatCompletionHandler
 from llm_chat_container import LLMChatContainer
 
@@ -149,8 +148,7 @@ later:
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-        self.add_child(answer, add_to_focus_ring=False)
-        self.focus_ring.add(answer.text_area, set_focus=True)
+        self.add_child(answer)
         self.utterances.append(answer)
 
         model = 'gpt-4-1106-preview'
@@ -170,8 +168,7 @@ later:
 
         # Add NER TextArea
         ner = self.gui.create_control("ChatMessageUI", role="NER", text='')
-        self.add_child(ner, add_to_focus_ring=False)
-        self.focus_ring.add(ner.text_area)
+        self.add_child(ner)
         self.current_ner_destination = ner
         # self.utterances.append(ner)
 
@@ -190,8 +187,7 @@ later:
 
         # Add VSS TextArea
         vss = self.gui.create_control("ChatMessageUI", role="Summary Sentence", text='')
-        self.add_child(vss, add_to_focus_ring=False)
-        self.focus_ring.add(vss.text_area)
+        self.add_child(vss)
         self.current_vss_destination = vss
 
         self.gui.session.llm_send_streaming_chat_request(model, vss_messages, handlers=[vss_handler])
@@ -209,8 +205,7 @@ later:
 
         # Add Keywords TextArea
         keywords = self.gui.create_control("ChatMessageUI", role="Summary Keywords", text='')
-        self.add_child(keywords, add_to_focus_ring=False)
-        self.focus_ring.add(keywords.text_area)
+        self.add_child(keywords)
         self.current_kw_destination = keywords
 
         self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
@@ -287,10 +282,9 @@ later:
             # child = gui.create_control(child_class_name, **kwargs)
             child_class = GUI.control_class(child_class_name)
             child = child_class.from_json(child_json, **kwargs)
-            instance.add_child(child, add_to_focus_ring=False)
+            instance.add_child(child)
             if child_class_name == "ChatMessageUI":
                 instance.utterances.append(child)
-                instance.focus_ring.add(child.text_area)
 
         # @note Override settings on legacy saved components...
         for child in instance.children:

@@ -24,7 +24,6 @@ from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
-from gui_focus import FocusRing
 from session import ChatCompletionHandler
 
 
@@ -63,7 +62,7 @@ class LLMChatContainer(GUIContainer):
                     instance.text_area = child
                     instance.text_area._draggable = False
             
-            instance.can_focus = False
+            instance._can_focus = False
             return instance
 
 
@@ -73,16 +72,16 @@ class LLMChatContainer(GUIContainer):
             default_setup = kwargs.get('default_setup', True)
             if default_setup:
                 self.label = Label(text=role, w=PANEL_WIDTH, h=20, **kwargs)
-                self.add_child(self.label, add_to_focus_ring=False)
+                self.add_child(self.label)
 
                 self.text_area = TextArea(18, w=PANEL_WIDTH, h=PANEL_HEIGHT, **kwargs)
                 self.text_area.text_buffer.set_text(text)
-                self.add_child(self.text_area, add_to_focus_ring=False)
+                self.add_child(self.text_area)
 
                 self.label._draggable = False
                 self.text_area._draggable = False
                 self._draggable = False
-                self.can_focus = False
+                self._can_focus = False
 
 
         def get_role(self):
@@ -97,12 +96,6 @@ class LLMChatContainer(GUIContainer):
         def set_text(self, text):
             self.text_area.text_buffer.set_text(text)
 
-        # def _set_focus(self, has_focus):
-        #     if has_focus:
-        #         return self.gui.set_focus(self.text_area)
-        #     else:
-        #         super()._set_focus(has_focus)
-
 
     @classmethod
     def create(cls, **kwargs):
@@ -114,7 +107,6 @@ class LLMChatContainer(GUIContainer):
         self.draw_bounds = True
         
         self.set_layout(ColumnLayout())
-        assert(self.focus_ring is not None)
         self.system = None
         self.utterances = []
 
@@ -126,17 +118,14 @@ class LLMChatContainer(GUIContainer):
                                editable=False,
                                **kwargs)
             
-            self.add_child(self.title, add_to_focus_ring=False)
+            self.add_child(self.title)
 
             text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
             self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
 
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
             for utterance in self.utterances:
-                self.add_child(utterance, add_to_focus_ring=False)
-
-                # @note FocusRing shenanigans
-                self.focus_ring.add(utterance.text_area)
+                self.add_child(utterance)
 
         self.accumulated_response_text = None
 
@@ -146,9 +135,6 @@ class LLMChatContainer(GUIContainer):
 
     def remove_child(self, child):
         super().remove_child(child)
-
-        # @note UNDO FocusRing shenanigans
-        self.focus_ring.remove(child.text_area)
 
 
     @classmethod
@@ -168,10 +154,9 @@ class LLMChatContainer(GUIContainer):
             # child = gui.create_control(child_class_name, **kwargs)
             child_class = GUI.control_class(child_class_name)
             child = child_class.from_json(child_json, **kwargs)
-            instance.add_child(child, add_to_focus_ring=False)
+            instance.add_child(child)
             if child_class_name == "ChatMessageUI":
                 instance.utterances.append(child)
-                instance.focus_ring.add(child.text_area)
 
         # @note Override settings on legacy saved components...
         for child in instance.children:
@@ -195,7 +180,9 @@ class LLMChatContainer(GUIContainer):
 
     def handle_event(self, event):
         if event.type == sdl2.SDL_KEYDOWN:
+            shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            ctrlPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL)
             keySymbol = event.key.keysym.sym
 
             if cmdPressed:
@@ -207,9 +194,8 @@ class LLMChatContainer(GUIContainer):
                 # Cmd+U creates a new user message
                 elif keySymbol == sdl2.SDLK_u: 
                     user = self.ChatMessageUI(role="User", gui=self.gui)
-                    self.add_child(user, add_to_focus_ring=False)
+                    self.add_child(user)
                     self.utterances.append(user)
-                    self.focus_ring.add(user.text_area)
                     self.gui.set_focus(user.text_area, True)
                     return True  # event was handled
                 
@@ -229,7 +215,7 @@ class LLMChatContainer(GUIContainer):
                         # Can't delete first, System message
                         has_system = hasattr(self, "system") and self.system is not None
                         if not has_system or chat_message != self.system:
-                            # @todo wrap in a remove message method
+                            self.focus_previous_message()
                             try:
                                 self.utterances.remove(chat_message)
                             except ValueError:  # We don't always add 
@@ -237,18 +223,57 @@ class LLMChatContainer(GUIContainer):
 
                             self.remove_child(chat_message)
                             return True
-
-            
+                            
             if keySymbol == sdl2.SDLK_RETURN:
                 # Delegate to GUIContainer
                 handled = super().handle_event(event)
                 if handled:
                     return True
             
+            elif keySymbol == sdl2.SDLK_TAB:
+                # TAB focuses next control in focus ring
+                # Shift+TAB focuses previous control
+
+                if not ctrlPressed:
+                    # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
+
+                    if shiftPressed:  # if shift was also held
+                        self.focus_previous_message()
+                    else:
+                        self.focus_next_message()
+                    
+                    return True
+
+
         return self.parent.handle_event(event)
 
 
-    def _set_focus(self, focus):
+    def focus_next_message(self):
+        focused = self.gui.get_focus()
+        if focused is not None and isinstance(focused, TextArea):
+            ancestors = self.gui.get_ancestor_chain(focused)
+            if self in ancestors:
+                message = focused.parent
+                assert(message is not None and isinstance(message, self.ChatMessageUI))
+                i = self.utterances.index(message)
+                i = (i + 1) % len(self.utterances)
+                self.gui.set_focus(self.utterances[i].text_area, True)
+
+
+    def focus_previous_message(self):
+        focused = self.gui.get_focus()
+        if focused is not None and isinstance(focused, TextArea):
+            ancestors = self.gui.get_ancestor_chain(focused)
+            if self in ancestors:
+                message = focused.parent
+                assert(message is not None and isinstance(message, self.ChatMessageUI))
+                i = self.utterances.index(message)
+                i = (i - 1) % len(self.utterances)
+                self.gui.set_focus(self.utterances[i].text_area, True)
+
+
+    # @note what is the point? This is saying that we can always accept focus, but we don't do anything on focus.
+    def _change_focus(self, am_getting_focus: bool) -> bool:
         return True
 
 
@@ -274,9 +299,7 @@ class LLMChatContainer(GUIContainer):
         self.utterances.append(answer)
         self.updateLayout()
 
-        self.add_child(answer, add_to_focus_ring=False)
-        self.focus_ring.add(answer.text_area, set_focus=True)
-
+        self.add_child(answer)
         self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
 
 

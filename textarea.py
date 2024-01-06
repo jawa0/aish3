@@ -103,14 +103,14 @@ class TextArea(GUIControl):
         return json
     
     
-    def _set_focus(self, has_focus):
+    def _change_focus(self, am_getting_focus: bool) -> bool:
         # @hack @todo make this optional
-        if has_focus:
+        if am_getting_focus:
             self.input_q = self.gui.session.subscribe("transcribed_text")
         else:
             self.input_q = None
 
-        return super()._set_focus(has_focus)
+        return super()._change_focus(am_getting_focus)
     
 
     def on_update(self, dt):

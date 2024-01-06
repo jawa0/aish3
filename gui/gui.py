@@ -95,13 +95,8 @@ class GUI:
         # assert(self.renderer)
         # assert(self.font_descriptor)
 
-        self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root")
-        self._content.can_focus = False
-        
-        assert(self._content.focus_ring is not None)
-        self.focus_stack = []
-        self.push_focus_ring(self._content.focus_ring)
-        
+        self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root", can_focus=False)
+                
         # May be self.content or any depth of descendant of self.content
         self._focused_control = None
 
@@ -715,17 +710,16 @@ class GUI:
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
-            # Focus down into focus_ring of currently focused control...
             focused = self.get_focus()
 
             # @hack
-            # Breadth-first search for first focusable descendant. Should be using FocusRings
+            # Breadth-first search for first focusable descendant.
             # but there's a tensions between these two appraoaches.
 
             q = [focused]
             while len(q) > 0:
                 control = q.pop(0)
-                if control.can_focus and control != focused:
+                if control.can_focus() and control != focused:
                     self.set_focus(control)
                     return True
 
@@ -734,37 +728,14 @@ class GUI:
 
 
         elif keySym == sdl2.SDLK_ESCAPE:
-            # self.pop_focus_ring()
-
             focused = self.get_focus()
             if focused and focused != self.content():
                 lineage = self.get_ancestor_chain(focused)
                 for a in reversed(lineage):
-                    if a.can_focus:
+                    if a.can_focus():
                         self.set_focus(a)
                         return True
 
-        elif keySym == sdl2.SDLK_TAB:
-            # TAB focuses next control in focus ring
-            # Shift+TAB focuses previous control
-
-            # top of focus ring stack will be *our* focus ring, which manages our children.
-            # So, we actually want the focus ring that is just below the top of the stack
-            self.pop_focus_ring()
-            focus_ring = self.get_focus_ring()
-            assert(focus_ring is not None)
-
-            if ctrlPressed:
-                # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
-                pass
-            else:
-                if shiftPressed:  # if shift was also held
-                    if focus_ring.focus_previous():
-                        return True  # event was handled
-                else:
-                    if focus_ring.focus_next():
-                        return True  # event was handled
-                    
         return False
 
 
@@ -869,23 +840,7 @@ class GUI:
         #                   caption="World Origin", font_descriptor=self.font_descriptor)
 
 
-    def push_focus_ring(self, focus_ring):
-        assert(focus_ring is not None)
-        self.focus_stack.append(focus_ring)
-
-
-    def pop_focus_ring(self):
-        # return self.focus_stack.pop()
-        if len(self.focus_stack) > 0:
-            return self.focus_stack.pop()
-        # return None
-
-
-    def get_focus_ring(self):
-        return self.focus_stack[-1] if len(self.focus_stack) > 0 else None
-
-
-    def get_focus(self):
+    def get_focus(self) -> "GUIControl":
         return self._focused_control
     
     
@@ -896,7 +851,7 @@ class GUI:
             # Can't focus on a control that can't be focused.
             # @note @todo shouldn't this happen automatically?
 
-            if not control.can_focus:
+            if not control.can_focus():
                 return False
         
             # If another control has focus, then remove focus from it.
@@ -904,11 +859,11 @@ class GUI:
                 self._focused_control is not None and \
                 self._focused_control != control:
 
-                    self._focused_control._set_focus(False)
+                    self._focused_control._change_focus(False)
                     self._focused_control = None
 
             # Focus is switching -- we need to update the FocusRing stack. It's gnarlier, but also
-            # kind of prettier than I original thought. We can click on a controls that's neither
+            # kind of prettier than I original thought. We can click on a control that's neither
             # our ancestor, nor a descendant. We need to handle this from a FocusRing perspective.
             # pop up our ancestor chain, and then push down the destination control's ancestor chain.
 
@@ -925,20 +880,13 @@ class GUI:
             
             # Set focus on the control.
             self._focused_control = control
-
-            # containing_ring = control.containing_focus_ring()
-            # if containing_ring is not None:
-            #     currentfocus_ring = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
-
-            #     if currentfocus_ring != containing_ring:
-            #         self.focus_stack.append(containing_ring)
                     
-            return self._focused_control._set_focus(True)
+            return self._focused_control._change_focus(True)
         else:
             # Make sure it's not focused.
             if self._focused_control == control:
                 self._focused_control = None
-            return control._set_focus(False)
+            return control._change_focus(False)
         
 
     def view_to_world(self, vx: int, vy: int) -> "tuple[int, int]":
@@ -1012,7 +960,7 @@ class GUI:
     def check_hit(self, world_x: int, world_y: int, only_draggable:bool=False) -> "Union[GUIControl, None]":
         """Expects world (workspace) coordinates, not viewport (screen) coordinates.
         Returns the control that was hit, or None if no control was hit. Will not return controls
-        that have can_focus=False, unless they are draggable. If only_draggable is True, then will only return controls that
+        that have can_focus() == False, unless they are draggable. If only_draggable is True, then will only return controls that
         have draggable=True.
         See also: GUI.view_to_world()"""
 
@@ -1031,7 +979,7 @@ class GUI:
                 depth_q = node.children + depth_q
 
             skip_it = (not node._visible) or \
-                      (not (node.can_focus or node._draggable)) \
+                      (not (node.can_focus() or node._draggable)) \
                       or (node == self.content()) or \
                       (only_draggable and not node._draggable)            
             
@@ -1091,13 +1039,6 @@ class GUI:
                 content_json = gui_json["gui"]["content"]
                 gui_class = GUI.control_class(content_json["class"])
                 self._content = gui_class.from_json(content_json, gui=self)
-                self.push_focus_ring(self._content.focus_ring)
-
-                focus_ring = self.get_focus_ring()
-                assert(focus_ring is not None)
-                focus_ring.focus_first()
-
-                # print(gui_json["viewport_bookmarks"])
                 self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
                 
                 vx, vy = gui_json.get("viewport_pos", (0, 0))
