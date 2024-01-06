@@ -110,7 +110,7 @@ class GUIControl:
         # assert(self.renderer)
         # assert(self.font_descriptor)
 
-        self.can_focus = can_focus
+        self._can_focus = can_focus
         self.parent = None
         self.set_bounds(x, y, w, h)
         self.containing_focus_ring = None
@@ -283,10 +283,20 @@ class GUIControl:
         return False
 
 
-    def _set_focus(self, getting_focus):
-        if self._visible and self.can_focus:
-            if self.has_focus() and self.parent and getting_focus == False:
-                self.parent.focused_child = None  # @todo still need this? GUI should handle this @todo
+    def accept_focus(self) -> bool:
+        return self._change_focus(True)
+
+
+    def lose_focus(self) -> bool:
+        return self._change_focus(False)
+
+
+    def can_focus(self) -> bool:    # @todo @note should/can this be a property?
+        return self._visible and self._can_focus
+    
+
+    def _change_focus(self, am_getting_focus: bool) -> bool:
+        if self.can_focus():
             return True
         else:
             return False
