@@ -92,11 +92,7 @@ class GUI:
         # assert(self.font_descriptor)
 
         self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root", can_focus=False)
-        
-        assert(self._content.focus_ring is not None)
-        self.focus_stack = []
-        self.push_focus_ring(self._content.focus_ring)
-        
+                
         # May be self.content or any depth of descendant of self.content
         self._focused_control = None
 
@@ -687,11 +683,10 @@ class GUI:
                     return True
                 
         if keySym == sdl2.SDLK_RETURN:
-            # Focus down into focus_ring of currently focused control...
             focused = self.get_focus()
 
             # @hack
-            # Breadth-first search for first focusable descendant. Should be using FocusRings
+            # Breadth-first search for first focusable descendant.
             # but there's a tensions between these two appraoaches.
 
             q = [focused]
@@ -706,8 +701,6 @@ class GUI:
 
 
         elif keySym == sdl2.SDLK_ESCAPE:
-            # self.pop_focus_ring()
-
             focused = self.get_focus()
             if focused and focused != self.content():
                 lineage = self.get_ancestor_chain(focused)
@@ -716,27 +709,6 @@ class GUI:
                         self.set_focus(a)
                         return True
 
-        elif keySym == sdl2.SDLK_TAB:
-            # TAB focuses next control in focus ring
-            # Shift+TAB focuses previous control
-
-            # top of focus ring stack will be *our* focus ring, which manages our children.
-            # So, we actually want the focus ring that is just below the top of the stack
-            self.pop_focus_ring()
-            focus_ring = self.get_focus_ring()
-            assert(focus_ring is not None)
-
-            if ctrlPressed:
-                # Ctrl+TAB inserts a tab character - we handle this in the TextArea class
-                pass
-            else:
-                if shiftPressed:  # if shift was also held
-                    if focus_ring.focus_previous():
-                        return True  # event was handled
-                else:
-                    if focus_ring.focus_next():
-                        return True  # event was handled
-                    
         return False
 
 
@@ -841,23 +813,7 @@ class GUI:
         #                   caption="World Origin", font_descriptor=self.font_descriptor)
 
 
-    def push_focus_ring(self, focus_ring):
-        assert(focus_ring is not None)
-        self.focus_stack.append(focus_ring)
-
-
-    def pop_focus_ring(self):
-        # return self.focus_stack.pop()
-        if len(self.focus_stack) > 0:
-            return self.focus_stack.pop()
-        # return None
-
-
-    def get_focus_ring(self):
-        return self.focus_stack[-1] if len(self.focus_stack) > 0 else None
-
-
-    def get_focus(self):
+    def get_focus(self) -> "GUIControl":
         return self._focused_control
     
     
@@ -897,13 +853,6 @@ class GUI:
             
             # Set focus on the control.
             self._focused_control = control
-
-            # containing_ring = control.containing_focus_ring()
-            # if containing_ring is not None:
-            #     currentfocus_ring = self.focus_stack[-1] if len(self.focus_stack) > 0 else None
-
-            #     if currentfocus_ring != containing_ring:
-            #         self.focus_stack.append(containing_ring)
                     
             return self._focused_control._change_focus(True)
         else:
@@ -1063,13 +1012,6 @@ class GUI:
                 content_json = gui_json["gui"]["content"]
                 gui_class = GUI.control_class(content_json["class"])
                 self._content = gui_class.from_json(content_json, gui=self)
-                self.push_focus_ring(self._content.focus_ring)
-
-                focus_ring = self.get_focus_ring()
-                assert(focus_ring is not None)
-                focus_ring.focus_first()
-
-                # print(gui_json["viewport_bookmarks"])
                 self._viewport_bookmarks = gui_json.get("viewport_bookmarks", {})
                 
                 vx, vy = gui_json.get("viewport_pos", (0, 0))

@@ -90,7 +90,7 @@ class GUIControl:
             name (str): name of the control, default is "".
         """
         self._uid = kwargs.get('uid', str(uuid.uuid4()))
-        self.gui = kwargs.get('gui')
+        self.gui: "GUI" = kwargs.get('gui')
         self.renderer = kwargs.get('renderer', self.gui.renderer if self.gui else None)
         self.font_descriptor = kwargs.get('font_descriptor', self.gui.font_descriptor if self.gui else "default")
         self.draw_bounds = kwargs.get('draw_bounds', False)
@@ -113,7 +113,6 @@ class GUIControl:
         self._can_focus = can_focus
         self.parent = None
         self.set_bounds(x, y, w, h)
-        self.containing_focus_ring = None
         self.pulse_busy = False
         self.editor = None
 
@@ -123,16 +122,11 @@ class GUIControl:
     
 
     def focus_in(self):
-        if hasattr(self, "focus_ring"):
-            self.gui.push_focus_ring(self.focus_ring)
-            # self.focus_ring.focus_first()  # @note: a FocusRing should (but doesn't) know when it gets pushed so this could be encapsulated
+        pass
 
 
     def focus_out(self):
-        # Focus up into previous focus_ring on stack
-        if hasattr(self, "focus_ring"):
-            assert(self.gui.get_focus_ring() == self.focus_ring)
-            self.gui.pop_focus_ring()
+        pass
 
 
     def set_bounds(self, x, y, w, h):

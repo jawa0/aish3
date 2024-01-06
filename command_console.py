@@ -35,7 +35,7 @@ class CommandConsole(GUIContainer):
                                    draggable=False,
                                    w=PANEL_WIDTH, 
                                    gui=self.gui)
-        self.add_child(self.console_label, add_to_focus_ring=False)
+        self.add_child(self.console_label)
 
         self.console_area = TextArea(w=PANEL_WIDTH, draggable=False, h=60, gui=self.gui)
         self.add_child(self.console_area)
