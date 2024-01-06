@@ -22,7 +22,6 @@ from draw import draw_marker_point
 
 import gui
 from gui_layout import ColumnLayout
-from gui_focus import FocusRing
 from .gui_control import GUIControl
 from rect_utils import rect_union
 
@@ -76,7 +75,6 @@ class GUIContainer(GUIControl):
         self.children = children if children is not None else []
 
         self.set_layout(layout)
-        self.focus_ring = FocusRing(gui=self.gui)
 
 
     def __iter__(self):
@@ -177,7 +175,7 @@ class GUIContainer(GUIControl):
         return self.children if self.children else []
 
 
-    def add_child(self, child, add_to_focus_ring=True, updateLayout=True):
+    def add_child(self, child, updateLayout=True):
         # print(f'GUIContainer.add_child(): child={child}')
 
         child.parent = self
@@ -186,13 +184,8 @@ class GUIContainer(GUIControl):
         if updateLayout:
             self.updateLayout()
 
-        if add_to_focus_ring:
-            self.focus_ring.add(child)
-            self.gui.set_focus(child, True)
-
 
     def remove_child(self, child):
-        self.focus_ring.remove(child)  # @note It's possible child won't be in that focus ring
         self.children.remove(child)
         if self.gui.get_focus() == child:
             self.gui.set_focus(child, False)
