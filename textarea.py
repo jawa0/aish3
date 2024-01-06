@@ -34,7 +34,7 @@ class TextArea(GUIControl):
 
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
-        instance.text_buffer.set_text(json["text"])
+        instance.set_text(json["text"])
         return instance
 
 
@@ -113,6 +113,10 @@ class TextArea(GUIControl):
         return super()._change_focus(am_getting_focus)
     
 
+    def set_text(self, text: str) -> None:
+        self.text_buffer.set_text(text)
+
+
     def on_update(self, dt):
         if self.input_q is not None:
             try:
@@ -121,7 +125,7 @@ class TextArea(GUIControl):
                     if len(text) == 0:
                         continue
 
-                    # self.text_buffer.set_text(text)
+                    # self.set_text(text)
 
                     # Don't just overwrite text, but insert it at the current cursor position
                     # However, delete any current selection. We'll use this as a way to 
@@ -331,7 +335,7 @@ class TextArea(GUIControl):
 
                     # If we're cutting, then delete all the text
                     if keySymbol == sdl2.SDLK_x:
-                        self.text_buffer.set_text('')
+                        self.set_text('')
 
                 # Set the clipboard text
                 sdl2.SDL_SetClipboardText(text.encode('utf-8'))

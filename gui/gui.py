@@ -500,7 +500,7 @@ class GUI:
     
 
 
-    def cmd_new_text_area(self, wx: Optional[int], wy: Optional[int]) -> None:
+    def cmd_new_text_area(self, text: Optional[str], wx: Optional[int], wy: Optional[int]) -> "TextArea":
         """Expects wx, and wy to be world (workspace) coordinates."""
 
         logging.info('Command: create new text area')
@@ -512,8 +512,11 @@ class GUI:
         x, y = parent.world_to_local(wx, wy)
         print(f'x, y = {x}, {y}')
         textArea = self.create_control("TextArea", w=240, h=100, x=x, y=y)
+        if text is not None:
+            textArea.set_text(text)
         parent.add_child(textArea)
-        self.set_focus(textArea)
+        # self.set_focus(textArea)
+        return textArea
 
 
     def cmd_new_llm_chat(self, wx: int, wy: int) -> None:
@@ -928,7 +931,7 @@ class GUI:
         return chain
     
 
-    def local_to_local(self, src_control, dst_control, x_src_local: int, y_src_local: int) -> "tuple[int, int]":
+    def local_to_local(self, src_control: "GUIControl", dst_control: "GUIControl", x_src_local: int, y_src_local: int) -> "tuple[int, int]":
         """
         Convert coordinates local to content area of one control (src_control) into coordinates local to 
         content area of another control (dst_control). If dst_control is None, then the coordinates are

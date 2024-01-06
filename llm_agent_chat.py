@@ -62,6 +62,7 @@ class LLMAgentChat(LLMChatContainer):
             self.utterances.remove(system)
             del self.system
 
+        self.notification_container = None
         self.system_prompt = \
 """
 You are an AI assistant. We are engaging in a dialogue where I take the role of the 
@@ -112,6 +113,30 @@ later:
 {{ Content }}
 """
 
+    def push_notification(self, notification: "GUIControl") -> None:
+        if not self.notification_container:
+            self._create_notification_container()
+        self.notification_container.add_child(notification)
+
+    
+    def _create_notification_container(self) -> None:
+        x_local = self.bounding_rect.w
+        y_local = -self._inset[1]
+        x, y = self.gui.local_to_local(self, self.parent, x_local, y_local)
+        self.notification_container = GUIContainer(gui=self.gui, 
+                                                   x=x, y=y, 
+                                                   inset=(2, 2), 
+                                                   name="Agent Notifcation Container", 
+                                                   can_focus=False,
+                                                   draggable=False,
+                                                   saveable=False)
+        self.notification_container.set_size(100, 20)
+        self.notification_container.draw_bounds = True
+        self.notification_container.set_layout(ColumnLayout())
+        self.parent.add_child(self.notification_container)
+
+
+
     def send(self):
         if len(self.utterances) == 0 or self.utterances[-1].get_role() != "User":
             return
@@ -141,10 +166,13 @@ later:
 
         factoid_handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
                                         chunk_handler=self.on_llm_response_chunk,
-                                        done_handler=self.on_llm_response_done)
+                                        done_handler=self.on_user_message_response_done)
 
         self.pulse_busy = True
         self._t_busy = 0.0
+
+        self.notify_user_input = self.gui.cmd_new_text_area("Processing user message...", 0, 0)
+        self.push_notification(self.notify_user_input)
 
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
@@ -154,7 +182,7 @@ later:
         model = 'gpt-4-1106-preview'
         # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
         self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
-
+        
         #
         # Named Entity Recognition (NER)
         #
@@ -173,6 +201,9 @@ later:
         # self.utterances.append(ner)
 
         self.gui.session.llm_send_streaming_chat_request(model, ner_messages, handlers=[ner_handler])
+
+        notification = self.gui.cmd_new_text_area("Doing NER...", 0, 0)
+        self.push_notification(notification)
 
         #
         # Summary sentence for vector similarity search
@@ -209,6 +240,11 @@ later:
         self.current_kw_destination = keywords
 
         self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
+
+
+    def on_user_message_response_done(self) -> None:
+        self.notification_container.remove_child(self.notify_user_input)
+        super().on_llm_response_done()
 
 
     def on_ner_response_start(self) -> None:
