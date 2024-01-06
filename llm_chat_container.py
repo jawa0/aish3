@@ -63,7 +63,7 @@ class LLMChatContainer(GUIContainer):
                     instance.text_area = child
                     instance.text_area._draggable = False
             
-            instance.can_focus = False
+            instance._can_focus = False
             return instance
 
 
@@ -82,7 +82,7 @@ class LLMChatContainer(GUIContainer):
                 self.label._draggable = False
                 self.text_area._draggable = False
                 self._draggable = False
-                self.can_focus = False
+                self._can_focus = False
 
 
         def get_role(self):
@@ -96,12 +96,6 @@ class LLMChatContainer(GUIContainer):
         
         def set_text(self, text):
             self.text_area.text_buffer.set_text(text)
-
-        # def _set_focus(self, has_focus):
-        #     if has_focus:
-        #         return self.gui.set_focus(self.text_area)
-        #     else:
-        #         super()._set_focus(has_focus)
 
 
     @classmethod
@@ -228,11 +222,15 @@ class LLMChatContainer(GUIContainer):
                         assert(self in ancestors)
 
                         # Can't delete first, System message
-                        if len(self.utterances) > 1 and chat_message != self.utterances[0]:
+                        has_system = hasattr(self, "system") and self.system is not None
+                        if not has_system or chat_message != self.system:
                             # @todo wrap in a remove message method
-                            # self.focus_ring.focus_previous()
-                            # self.focus_ring.remove(chat_message.text_area)
-                            self.utterances.remove(chat_message)
+                            try:
+                                self.utterances.remove(chat_message)
+                            except ValueError:  # We don't always add, so won't always be in list (see derived classes if any)
+                                pass
+
+                            self.focus_ring.focus_previous()
                             self.remove_child(chat_message)
                             return True
 
@@ -246,7 +244,8 @@ class LLMChatContainer(GUIContainer):
         return self.parent.handle_event(event)
 
 
-    def _set_focus(self, focus):
+    # @note what is the point? This is saying that we can always accept focus, but we don't do anything on focus.
+    def _change_focus(self, am_getting_focus: bool) -> bool:
         return True
 
 
