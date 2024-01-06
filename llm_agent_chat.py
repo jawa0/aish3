@@ -113,6 +113,19 @@ later:
 {{ Content }}
 """
 
+        self.detect_user_teaching_prompt_template = \
+"""
+You are a conversational AI agent. The following text is a message from a user to you.
+Considering the content of the message, do you think that the user is teaching you some
+information that the user wants you to remember? If so, then respond with exactly "is_info_chunk".
+If not, or if you are unsure, respond with "unknown". Respond only with one of these two strings.
+Do not emit any other text or punctuation.
+
+Message:
+
+{{ Content }}
+"""
+
     def push_notification(self, notification: "GUIControl") -> None:
         if not self.notification_container:
             self._create_notification_container()
@@ -131,7 +144,7 @@ later:
                                                    draggable=False,
                                                    saveable=False)
         self.notification_container.set_size(100, 20)
-        self.notification_container.draw_bounds = True
+        self.notification_container.draw_bounds = False
         self.notification_container.set_layout(ColumnLayout())
         self.parent.add_child(self.notification_container)
 
@@ -164,82 +177,82 @@ later:
         
         messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": prompt}]
 
-        factoid_handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
-                                        chunk_handler=self.on_llm_response_chunk,
-                                        done_handler=self.on_user_message_response_done)
+        # factoid_handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
+        #                                 chunk_handler=self.on_llm_response_chunk,
+        #                                 done_handler=self.on_user_message_response_done)
+
+        # self.notify_user_input = self.gui.cmd_new_text_area("Processing user message...", 0, 0)
+        # self.push_notification(self.notify_user_input)
+
+        # # Add Answer TextArea
+        # answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
+        # self.add_child(answer)
+        # self.utterances.append(answer)
+
+        # model = 'gpt-4-1106-preview'
+        # # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
+        # self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
+        
+        #
+        # Detect whether user is telling agent some info to remember.
+        #
 
         self.pulse_busy = True
         self._t_busy = 0.0
 
-        self.notify_user_input = self.gui.cmd_new_text_area("Processing user message...", 0, 0)
-        self.push_notification(self.notify_user_input)
-
-        # Add Answer TextArea
-        answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-        self.add_child(answer)
-        self.utterances.append(answer)
-
-        model = 'gpt-4-1106-preview'
-        # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
-        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
-        
-        #
-        # Named Entity Recognition (NER)
-        #
-
         data["Content"] = content
-        ner_prompt = pystache.render(self.factoid_ner_prompt_template, data)
-        ner_messages = [{"role": "system", "content": ""}, {"role": "user", "content": ner_prompt}]
-        ner_handler = ChatCompletionHandler(start_handler=self.on_ner_response_start,
-                                        chunk_handler=self.on_ner_response_chunk,
-                                        done_handler=self.on_ner_response_done)
+        check_is_info_prompt = pystache.render(self.detect_user_teaching_prompt_template, data)
+        check_is_info_messages = [{"role": "system", "content": ""}, {"role": "user", "content": check_is_info_prompt}]
+        check_is_info_handler = ChatCompletionHandler(start_handler=self.on_check_is_info_response_start,
+                                                      chunk_handler=self.on_check_is_info_response_chunk,
+                                                      done_handler=self.on_check_is_info_response_done)
 
-        # Add NER TextArea
-        ner = self.gui.create_control("ChatMessageUI", role="NER", text='')
-        self.add_child(ner)
-        self.current_ner_destination = ner
-        # self.utterances.append(ner)
+        # Add response TextArea
+        check_is_info = self.gui.create_control("ChatMessageUI", role="Is user telling me info to remember?", text='')
+        self.add_child(check_is_info)
+        self.current_check_is_info_destination = check_is_info
+        self.utterances.append(check_is_info)
 
-        self.gui.session.llm_send_streaming_chat_request(model, ner_messages, handlers=[ner_handler])
+        self.gui.session.llm_send_streaming_chat_request('gpt-4-1106-preview', check_is_info_messages, handlers=[check_is_info_handler])
 
-        notification = self.gui.cmd_new_text_area("Doing NER...", 0, 0)
-        self.push_notification(notification)
+        self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
+        self.push_notification(self.notify_detect_info_chunk)
 
-        #
-        # Summary sentence for vector similarity search
-        #
+        # #
+        # # Summary sentence for vector similarity search
+        # #
 
-        data["Content"] = content
-        vss_prompt = pystache.render(self.factoid_vss_summary_prompt_template, data)
-        vss_messages = [{"role": "system", "content": ""}, {"role": "user", "content": vss_prompt}]
-        vss_handler = ChatCompletionHandler(start_handler=self.on_vss_response_start,
-                                        chunk_handler=self.on_vss_response_chunk,
-                                        done_handler=self.on_vss_response_done)
+        # data["Content"] = content
+        # vss_prompt = pystache.render(self.factoid_vss_summary_prompt_template, data)
+        # vss_messages = [{"role": "system", "content": ""}, {"role": "user", "content": vss_prompt}]
+        # vss_handler = ChatCompletionHandler(start_handler=self.on_vss_response_start,
+        #                                 chunk_handler=self.on_vss_response_chunk,
+        #                                 done_handler=self.on_vss_response_done)
 
-        # Add VSS TextArea
-        vss = self.gui.create_control("ChatMessageUI", role="Summary Sentence", text='')
-        self.add_child(vss)
-        self.current_vss_destination = vss
+        # # Add VSS TextArea
+        # vss = self.gui.create_control("ChatMessageUI", role="Summary Sentence", text='')
+        # self.add_child(vss)
+        # self.current_vss_destination = vss
 
-        self.gui.session.llm_send_streaming_chat_request(model, vss_messages, handlers=[vss_handler])
+        # self.gui.session.llm_send_streaming_chat_request(model, vss_messages, handlers=[vss_handler])
 
-        #
-        # Summary keywords for keyword search
-        #
+        # #
+        # # Summary keywords for keyword search
+        # #
 
-        data["Content"] = content
-        kw_prompt = pystache.render(self.factoid_keywords_prompt_template, data)
-        kw_messages = [{"role": "system", "content": ""}, {"role": "user", "content": kw_prompt}]
-        kw_handler = ChatCompletionHandler(start_handler=self.on_keywords_response_start,
-                                        chunk_handler=self.on_keywords_response_chunk,
-                                        done_handler=self.on_keywords_response_done)
+        # data["Content"] = content
+        # kw_prompt = pystache.render(self.factoid_keywords_prompt_template, data)
+        # kw_messages = [{"role": "system", "content": ""}, {"role": "user", "content": kw_prompt}]
+        # kw_handler = ChatCompletionHandler(start_handler=self.on_keywords_response_start,
+        #                                 chunk_handler=self.on_keywords_response_chunk,
+        #                                 done_handler=self.on_keywords_response_done)
 
-        # Add Keywords TextArea
-        keywords = self.gui.create_control("ChatMessageUI", role="Summary Keywords", text='')
-        self.add_child(keywords)
-        self.current_kw_destination = keywords
+        # # Add Keywords TextArea
+        # keywords = self.gui.create_control("ChatMessageUI", role="Summary Keywords", text='')
+        # self.add_child(keywords)
+        # self.current_kw_destination = keywords
 
-        self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
+        # self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
 
 
     def on_user_message_response_done(self) -> None:
@@ -247,22 +260,29 @@ later:
         super().on_llm_response_done()
 
 
-    def on_ner_response_start(self) -> None:
-        self.ner_response_text = ""
+    def on_detect_info_chunk_response_done(self) -> None:
+        self.notification_container.remove_child(self.notify_detect_info_chunk)
+        super().on_llm_response_done()
 
 
-    def on_ner_response_chunk(self, chunk_text: Optional[str]) -> None:
+    def on_check_is_info_response_start(self) -> None:
+        self.check_is_info_response_text = ""
+
+
+    def on_check_is_info_response_chunk(self, chunk_text: Optional[str]) -> None:
         if chunk_text is not None:
-            assert(self.current_ner_destination is not None)
-            self.current_ner_destination.text_area.text_buffer.move_point_to_end()
-            self.current_ner_destination.text_area.text_buffer.insert(chunk_text)
-            self.current_ner_destination.text_area.set_needs_redraw()
+            assert(self.current_check_is_info_destination is not None)
+            self.current_check_is_info_destination.text_area.text_buffer.move_point_to_end()
+            self.current_check_is_info_destination.text_area.text_buffer.insert(chunk_text)
+            self.current_check_is_info_destination.text_area.set_needs_redraw()
 
-            self.ner_response_text += chunk_text
+            self.check_is_info_response_text += chunk_text
 
 
-    def on_ner_response_done(self) -> None:
-        self.current_ner_destination = None
+    def on_check_is_info_response_done(self) -> None:
+        self.current_check_is_info_destination = None
+        self.notification_container.remove_child(self.notify_detect_info_chunk)
+        super().on_llm_response_done()
 
 
     def on_vss_response_start(self) -> None:
