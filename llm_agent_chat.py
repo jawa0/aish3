@@ -21,12 +21,15 @@ import matplotlib
 import os
 import openai
 from typing import Optional
+
+from agent import Agent
 from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
 from session import ChatCompletionHandler
 from llm_chat_container import LLMChatContainer
+from prompt import PromptTemplate
 
 import getpass
 import platform
@@ -35,10 +38,15 @@ import pytz
 from tzlocal import get_localzone
 
 
-
-
 PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
+
+
+class LLMRequest:
+    def __init__(self):
+        pass
+
+
 
 
 class LLMAgentChat(LLMChatContainer):
@@ -54,6 +62,8 @@ class LLMAgentChat(LLMChatContainer):
 
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
+            self.agent = Agent()
+
             self.title.set_text("Agent Chat")
 
             # We don't have a system prompt, so remove the one created in LLMChatContainer
@@ -61,6 +71,7 @@ class LLMAgentChat(LLMChatContainer):
             self.remove_child(system)
             self.utterances.remove(system)
             del self.system
+
 
         self.notification_container = None
         self.system_prompt = \
@@ -113,7 +124,7 @@ later:
 {{ Content }}
 """
 
-        self.detect_user_teaching_prompt_template = \
+        self.detect_user_teaching_prompt_template_str = \
 """
 You are a conversational AI agent. The following text is a message from a user to you.
 Considering the content of the message, do you think that the user is teaching you some
@@ -125,6 +136,8 @@ Message:
 
 {{ Content }}
 """
+        self.detect_user_teaching_prompt_template = PromptTemplate(self.detect_user_teaching_prompt_template_str)
+
 
     def push_notification(self, notification: "GUIControl") -> None:
         if not self.notification_container:
@@ -201,7 +214,7 @@ Message:
         self._t_busy = 0.0
 
         data["Content"] = content
-        check_is_info_prompt = pystache.render(self.detect_user_teaching_prompt_template, data)
+        check_is_info_prompt = self.detect_user_teaching_prompt_template.fill(**data)
         check_is_info_messages = [{"role": "system", "content": ""}, {"role": "user", "content": check_is_info_prompt}]
         check_is_info_handler = ChatCompletionHandler(start_handler=self.on_check_is_info_response_start,
                                                       chunk_handler=self.on_check_is_info_response_chunk,
