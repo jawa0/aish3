@@ -13,6 +13,7 @@ class LLMRequest:
         self._completion: chat.completion = None
         self._handlers = set(handlers)
         self._task = None
+        self._s_response = ""
 
         self.set_prompt(prompt)        
     
@@ -35,6 +36,7 @@ class LLMRequest:
     async def _go(self):
         # print('**** LLMRequest.go()')
 
+        self._s_response = ""
         for handler in self._handlers:
             if hasattr(handler, '_on_start'):
                 handler._on_start()
@@ -52,6 +54,8 @@ class LLMRequest:
                 delta = chunk.choices[0].delta
                 if hasattr(delta, 'content'):
                     chunk_text = chunk.choices[0].delta.content
+                    if chunk_text is not None:
+                        self._s_response += chunk_text
                     for handler in self._handlers:
                         if hasattr(handler, '_on_next'):
                             handler._on_next(chunk_text)
@@ -63,6 +67,8 @@ class LLMRequest:
             # Call all done handlers for that completion
 
             # print('**** LLMRequest.go() StopIteration')
+
+            print(self._s_response)
             for handler in self._handlers:
                 if hasattr(handler, '_on_finish'):
                     handler._on_finish()

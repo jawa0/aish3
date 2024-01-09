@@ -119,7 +119,7 @@ later:
 {{ Content }}
 """
 
-        self.detect_user_teaching_prompt_template_str = \
+        s_detect_info_to_store = \
 """
 You are a conversational AI agent. The following text is a message from a user to you.
 Considering the content of the message, do you think that the user is teaching you some
@@ -131,7 +131,27 @@ Message:
 
 {{ Content }}
 """
-        self.detect_user_teaching_prompt_template = PromptTemplate(self.detect_user_teaching_prompt_template_str)
+        self.detect_info_to_store_template = PromptTemplate(s_detect_info_to_store)
+
+
+        s_extract_info = \
+"""
+You are a conversational AI agent. The following text is a message from a user to you. Your job is
+to return a string conaining only the information that the user wants you to store, without any
+preamble or postamble telling you to store the information. Return a string containing only the 
+information. Do not emit any other text or punctuation.
+
+Here are some examples:
+
+"fact: water is wet" -> "water is wet"
+"store: atoms are made of electrons, protons, and neutrons" -> "atoms are made of electrons, protons, and neutrons"
+"Ottawa is the capital of Canada" -> "Ottawa is the capital of Canada"
+
+Message:
+
+{{ Content }}
+"""
+        self.extract_info_template = PromptTemplate(s_extract_info)
 
 
     def push_notification(self, notification: "GUIControl") -> None:
@@ -209,8 +229,10 @@ Message:
         self._t_busy = 0.0
 
         data["Content"] = content
-        check_is_info_prompt = self.detect_user_teaching_prompt_template.fill(**data)
-        check_is_info_messages = [{"role": "system", "content": ""}, {"role": "user", "content": check_is_info_prompt}]
+        check_is_info_prompt = self.detect_info_to_store_template.fill(**data)
+        check_is_info_messages = [{"role": "system", "content": ""}, 
+                                  {"role": "user", "content": check_is_info_prompt}]
+        
         check_is_info_handler = ChatCompletionHandler(start_handler=self.on_check_is_info_response_start,
                                                       chunk_handler=self.on_check_is_info_response_chunk,
                                                       done_handler=self.on_check_is_info_response_done)
@@ -231,11 +253,11 @@ Message:
         #
 
         # @todo move to session
-        llm_request = LLMRequest(session=self.gui.session, prompt=LiteralPrompt("List 20 animals."))
+        self.extract_info_template.fill(**data)
+        llm_request = LLMRequest(session=self.gui.session, prompt=self.extract_info_template)
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         llm_request.send()
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-
 
         # #
         # # Summary sentence for vector similarity search
