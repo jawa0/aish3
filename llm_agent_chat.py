@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import asyncio
 from datetime import datetime
 import sdl2
 import json
@@ -28,8 +29,9 @@ from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
 from session import ChatCompletionHandler
+from llm import LLMRequest
 from llm_chat_container import LLMChatContainer
-from prompt import PromptTemplate
+from prompt import LiteralPrompt, PromptTemplate
 
 import getpass
 import platform
@@ -40,13 +42,6 @@ from tzlocal import get_localzone
 
 PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
-
-
-class LLMRequest:
-    def __init__(self):
-        pass
-
-
 
 
 class LLMAgentChat(LLMChatContainer):
@@ -230,6 +225,19 @@ Message:
 
         self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
         self.push_notification(self.notify_detect_info_chunk)
+
+        # @test
+        # Sketching out LLMRequest usage
+        #
+
+        # @todo move to session
+        llm_request = LLMRequest(session=self.gui.session, prompt=LiteralPrompt("List 50 animals."))
+        
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        # asyncio.run(llm_request.go())
+        await llm_request.go()
+        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 
         # #
         # # Summary sentence for vector similarity search

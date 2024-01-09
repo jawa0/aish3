@@ -13,13 +13,15 @@
 # limitations under the License.
 
 
+import argparse
+import asyncio
+import logging
+import os
+import time
+
 import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
-import argparse
-import logging
-import time
-import os
 
 import config
 from gui import GUI, FontRegistry
