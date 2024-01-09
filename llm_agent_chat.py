@@ -231,11 +231,9 @@ Message:
         #
 
         # @todo move to session
-        llm_request = LLMRequest(session=self.gui.session, prompt=LiteralPrompt("List 50 animals."))
-        
+        llm_request = LLMRequest(session=self.gui.session, prompt=LiteralPrompt("List 20 animals."))
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        # asyncio.run(llm_request.go())
-        await llm_request.go()
+        llm_request.send()
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 

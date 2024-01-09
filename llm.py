@@ -12,6 +12,7 @@ class LLMRequest:
         self._session = session
         self._completion: chat.completion = None
         self._handlers = set(handlers)
+        self._task = None
 
         self.set_prompt(prompt)        
     
@@ -20,7 +21,20 @@ class LLMRequest:
         self._prompt = prompt
 
 
-    async def go(self):
+    def send(self):
+        # print('**** ENTER LLMRequest.send()')
+        loop = asyncio.get_running_loop()
+        self._task = loop.create_task(self._go())
+        # print('**** LEAVE LLMRequest.send()')
+
+    
+    def is_done(self):
+        return self._task is None or self._task.done()
+    
+
+    async def _go(self):
+        # print('**** LLMRequest.go()')
+
         for handler in self._handlers:
             if hasattr(handler, '_on_start'):
                 handler._on_start()
@@ -32,20 +46,28 @@ class LLMRequest:
         self._completion = self._openai_client.chat.completions.create(model=model, messages=chat_messages, stream=True)
         try:
             while True:
+                # print('**** LLMRequest.go() calling next()')
                 chunk = next(self._completion)    # Could raise StopIteration
+                # print('**** LLMRequest.go() got chunk')
                 delta = chunk.choices[0].delta
                 if hasattr(delta, 'content'):
                     chunk_text = chunk.choices[0].delta.content
                     for handler in self._handlers:
                         if hasattr(handler, '_on_next'):
                             handler._on_next(chunk_text)
+                
+                await asyncio.sleep(0.001)
 
         except StopIteration:
             # This means the completion we tried to call next() on is done.
             # Call all done handlers for that completion
+
+            # print('**** LLMRequest.go() StopIteration')
             for handler in self._handlers:
                 if hasattr(handler, '_on_finish'):
                     handler._on_finish()
+
+        # print('**** LLMRequest.go() done')
 
 
     def _on_start(self):

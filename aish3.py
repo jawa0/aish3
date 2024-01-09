@@ -35,7 +35,7 @@ from textarea import TextArea
 from llm_agent_chat import LLMAgentChat
 
 
-def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
+async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
     logging.info('App start.')
 
     # sdl2.ext.init()
@@ -102,6 +102,10 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
 
     fps_smoothed = 0.0
     while running:
+        #
+        # Handle any pending SDL events, to prevent GUI from becoming unresponsive.
+        #
+
         events = sdl2.ext.get_events()
         if events:
             for event in events:
@@ -139,7 +143,16 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
                     gui.handle_event(event)
 
         else:
-            session.update()
+            #
+            # Give a chance for the asyncio event loop to do some work...
+            #
+
+            await asyncio.sleep(0.0001)
+            await session.update()
+
+            #
+            # Update our app GUI and draw scene
+            #
 
             t_update = time.time()
             dt = t_update - t_prev_update
@@ -176,8 +189,10 @@ if __name__ == "__main__":
     parser.add_argument('--workspace', default='aish_workspace.json', help='workspace file (default: aish_workspace.json)')
     args = parser.parse_args()
 
-    run(fullscreen=args.fullscreen, 
-        width=args.width, 
-        height=args.height, 
-        workspace_filename=args.workspace, 
-        enable_voice_in=args.voice_in)
+    asyncio.run(
+        run(fullscreen=args.fullscreen, 
+            width=args.width, 
+            height=args.height, 
+            workspace_filename=args.workspace, 
+            enable_voice_in=args.voice_in)
+    )

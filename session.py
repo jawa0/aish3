@@ -49,6 +49,7 @@ class Session:
                                     # organization=os.getenv("OPENAI_ORGANIZATION"))
 
         self._running_completions: Dict[chat.completion, List[ChatCompletionHandler]] = {}
+        self._tasks = []
         
         self._audio = AudioService()
         self._channels = {}
@@ -66,7 +67,7 @@ class Session:
         self._audio.stop()
 
 
-    def update(self):
+    async def update(self):
         # logging.debug("ENTER Client Session.update")
         done_completions = []
 
@@ -97,7 +98,7 @@ class Session:
         # Remove finished completion callbacks
         for done_completion in done_completions:
             del self._running_completions[done_completion]
-        
+
         # logging.debug("EXIT Client Session.update")
 
 
