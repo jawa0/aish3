@@ -255,9 +255,7 @@ Message:
         # @todo move to session
         self.extract_info_template.fill(**data)
         llm_request = LLMRequest(session=self.gui.session, prompt=self.extract_info_template)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        llm_request.send()
-        print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        llm_request.send_nowait()
 
         # #
         # # Summary sentence for vector similarity search

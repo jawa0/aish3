@@ -22,7 +22,7 @@ class LLMRequest:
         self._prompt = prompt
 
 
-    def send(self):
+    def send_nowait(self):
         # print('**** ENTER LLMRequest.send()')
         loop = asyncio.get_running_loop()
         self._task = loop.create_task(self._go())
