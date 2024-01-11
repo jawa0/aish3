@@ -46,7 +46,6 @@ PANEL_HEIGHT = 120
 
 class LLMAgentChat(LLMChatContainer):
 
-    
     @classmethod
     def create(cls, **kwargs):
         return cls(**kwargs)
