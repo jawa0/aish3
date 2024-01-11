@@ -6,9 +6,11 @@ class MemoryStore:
         self._memories = {}
 
 
-    def store(self, memory, context):
+    def store(self, memory: str, context=None):
         uid = uuid.uuid4()
         self._memories[uid] = memory
+
+        print(f'Storing memory: {memory} with uid: {uid}')
 
 
     def retrieve_by_uid(self, uid):

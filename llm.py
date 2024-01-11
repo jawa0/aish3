@@ -3,20 +3,33 @@ from openai import OpenAI, chat
 import os
 from prompt import LiteralPrompt, Prompt
 from session import ChatCompletionHandler, Session
-# from typing import Optional
+from typing import Callable, Dict, List, Literal, Tuple
 
 
 class LLMRequest:
-    def __init__(self, session: Session, prompt: Prompt = LiteralPrompt(""), handlers: list = []):
-        self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) 
+    def __init__(self, session: Session, 
+                 prompt: Prompt = LiteralPrompt(""), 
+                 handlers: [Tuple[Literal["start", "next", "stop"], Callable]] = [], 
+                 previous_messages: List[Dict[str, str]] = []):
+        
+        self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self._session = session
         self._completion: chat.completion = None
-        self._handlers = set(handlers)
         self._task = None
         self._s_response = ""
+        self._previous_messages = previous_messages
 
-        self.set_prompt(prompt)        
+        self.set_prompt(prompt)
+
+        self._handlers = {"start": [], "next": [], "stop": []}
+        for kind, callback in handlers:
+            self._handlers[kind].append(callback)
     
+
+    @property
+    def response_text(self):
+        return self._s_response
+
 
     def set_prompt(self, prompt: Prompt):
         self._prompt = prompt
@@ -27,6 +40,7 @@ class LLMRequest:
         loop = asyncio.get_running_loop()
         self._task = loop.create_task(self._go())
         # print('**** LEAVE LLMRequest.send()')
+        return self._task
 
     
     def is_done(self):
@@ -37,15 +51,21 @@ class LLMRequest:
         # print('**** LLMRequest.go()')
 
         self._s_response = ""
-        for handler in self._handlers:
-            if hasattr(handler, '_on_start'):
-                handler._on_start()
+        for cb in self._handlers["start"]:
+            cb(self)
 
         model = 'gpt-4-1106-preview'
-        chat_messages = [{'role': 'system', 'content': ''}, 
+
+        if self._previous_messages:
+            chat_messages = [{'role': 'system', 'content': ''},
                          {'role': 'user', 'content': self._prompt.get_prompt_text()}]
-        
-        self._completion = self._openai_client.chat.completions.create(model=model, messages=chat_messages, stream=True)
+        else:
+            chat_messages = self._previous_messages + \
+                [{'role': 'user', 'content': self._prompt.get_prompt_text()}]
+            
+        self._completion = self._openai_client.chat.completions.create(model=model, 
+                                                                       messages=chat_messages, 
+                                                                       stream=True)
         try:
             while True:
                 # print('**** LLMRequest.go() calling next()')
@@ -56,9 +76,8 @@ class LLMRequest:
                     chunk_text = chunk.choices[0].delta.content
                     if chunk_text is not None:
                         self._s_response += chunk_text
-                    for handler in self._handlers:
-                        if hasattr(handler, '_on_next'):
-                            handler._on_next(chunk_text)
+                    for cb in self._handlers["next"]:
+                        cb(self, chunk_text)
                 
                 await asyncio.sleep(0.001)
 
@@ -69,20 +88,8 @@ class LLMRequest:
             # print('**** LLMRequest.go() StopIteration')
 
             print(self._s_response)
-            for handler in self._handlers:
-                if hasattr(handler, '_on_finish'):
-                    handler._on_finish()
+
+            for cb in self._handlers["stop"]:
+                cb(self)
 
         # print('**** LLMRequest.go() done')
-
-
-    def _on_start(self):
-        print('LLMRequest._on_start()')
-
-    
-    def _on_next(self, chunk: str):
-        print('LLMRequest._on_next()')
-
-    def _on_finish(self):
-        print('LLMRequest._on_finish()')
-

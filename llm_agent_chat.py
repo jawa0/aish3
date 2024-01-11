@@ -55,10 +55,10 @@ class LLMAgentChat(LLMChatContainer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.agent = Agent()
+
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
-            self.agent = Agent()
-
             self.title.set_text("Agent Chat")
 
             # We don't have a system prompt, so remove the one created in LLMChatContainer
@@ -197,65 +197,42 @@ Message:
             "ClientLocalTime": str(now_local),
         }
 
-        # 
-        # Factoid storage
-        #
-
-        prompt = pystache.render(self.factoid_prompt_template, data)
-        
-        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": prompt}]
-
-        # factoid_handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
-        #                                 chunk_handler=self.on_llm_response_chunk,
-        #                                 done_handler=self.on_user_message_response_done)
-
-        # self.notify_user_input = self.gui.cmd_new_text_area("Processing user message...", 0, 0)
-        # self.push_notification(self.notify_user_input)
-
-        # # Add Answer TextArea
-        # answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-        # self.add_child(answer)
-        # self.utterances.append(answer)
-
-        # model = 'gpt-4-1106-preview'
-        # # self.gui.session.llm_send_chat_request(model, messages, handlers=[factoid_handler])
-        # self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[factoid_handler])
-        
         #
         # Detect whether user is telling agent some info to remember.
         #
 
-        self.pulse_busy = True
-        self._t_busy = 0.0
+        def on_got_info_chunk(llm_request: LLMRequest):
+            self.agent.memory.store(memory=llm_request.response_text)
 
-        data["Content"] = content
-        check_is_info_prompt = self.detect_info_to_store_template.fill(**data)
-        check_is_info_messages = [{"role": "system", "content": ""}, 
-                                  {"role": "user", "content": check_is_info_prompt}]
-        
-        check_is_info_handler = ChatCompletionHandler(start_handler=self.on_check_is_info_response_start,
-                                                      chunk_handler=self.on_check_is_info_response_chunk,
-                                                      done_handler=self.on_check_is_info_response_done)
+        def on_info_check_done(llm_request: LLMRequest):
+            # @todo: sanitize output
+            if "is_info_chunk" in llm_request.response_text:
+                self.extract_info_template.fill(**data)
+                llm_request = LLMRequest(session=self.gui.session, 
+                                         prompt=self.extract_info_template,
+                                         handlers=[("stop", on_got_info_chunk)])
+                llm_request.send_nowait()
 
-        # Add response TextArea
-        check_is_info = self.gui.create_control("ChatMessageUI", role="Is user telling me info to remember?", text='')
-        self.add_child(check_is_info)
-        self.current_check_is_info_destination = check_is_info
-        self.utterances.append(check_is_info)
 
-        self.gui.session.llm_send_streaming_chat_request('gpt-4-1106-preview', check_is_info_messages, handlers=[check_is_info_handler])
+        self.detect_info_to_store_template.fill(**data)
+        rq_is_info_ = LLMRequest(session=self.gui.session, 
+                                 prompt=self.detect_info_to_store_template,
+                                 handlers=[("stop", on_info_check_done)])
+        rq_is_info_.send_nowait()
 
-        self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
-        self.push_notification(self.notify_detect_info_chunk)
+        # self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
+        # self.push_notification(self.notify_detect_info_chunk)
 
         # @test
         # Sketching out LLMRequest usage
         #
 
-        # @todo move to session
-        self.extract_info_template.fill(**data)
-        llm_request = LLMRequest(session=self.gui.session, prompt=self.extract_info_template)
-        llm_request.send_nowait()
+        # # Add response TextArea
+        # ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+        # self.add_child(ta_answer)
+        # self.current_check_is_info_destination = ta_answer
+        # self.utterances.append(ta_answer)
+
 
         # #
         # # Summary sentence for vector similarity search
@@ -296,31 +273,6 @@ Message:
 
     def on_user_message_response_done(self) -> None:
         self.notification_container.remove_child(self.notify_user_input)
-        super().on_llm_response_done()
-
-
-    def on_detect_info_chunk_response_done(self) -> None:
-        self.notification_container.remove_child(self.notify_detect_info_chunk)
-        super().on_llm_response_done()
-
-
-    def on_check_is_info_response_start(self) -> None:
-        self.check_is_info_response_text = ""
-
-
-    def on_check_is_info_response_chunk(self, chunk_text: Optional[str]) -> None:
-        if chunk_text is not None:
-            assert(self.current_check_is_info_destination is not None)
-            self.current_check_is_info_destination.text_area.text_buffer.move_point_to_end()
-            self.current_check_is_info_destination.text_area.text_buffer.insert(chunk_text)
-            self.current_check_is_info_destination.text_area.set_needs_redraw()
-
-            self.check_is_info_response_text += chunk_text
-
-
-    def on_check_is_info_response_done(self) -> None:
-        self.current_check_is_info_destination = None
-        self.notification_container.remove_child(self.notify_detect_info_chunk)
         super().on_llm_response_done()
 
 
