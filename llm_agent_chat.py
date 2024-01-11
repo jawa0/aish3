@@ -68,57 +68,27 @@ class LLMAgentChat(LLMChatContainer):
 
 
         self.notification_container = None
-        self.system_prompt = \
-"""
-You are an AI assistant. We are engaging in a dialogue where I take the role of the 
-teacher and you take the role of the student. I will be telling you things, and I 
-want you to remember these things by storing what I tell you to your knowledge base. 
-Let's call these things I tell you "factoids". For each factoid you are told, you 
-should also remember the time you were told it, and by whom.
-"""
 
-        self.factoid_prompt_template = \
-"""
-Factoid:
+#         self.factoid_prompt_template = \
+# """
+# Factoid:
 
-{{ Content }}
+# {{ Content }}
 
-Metadata:
+# Metadata:
 
-Source of factoid (User): {{ User }}
-Client Software: AISH3 Python GUI client
-Client System Platform: {{ ClientPlatform }}
-Client Timezone {{ ClientTimezone }}
-Client UTC Time {{ ClientUTCTime }}
-Client Local Time {{ ClientLocalTime }}
+# Source of information (User): {{ User }}
+# Client Software: AISH3 Python GUI client
+# Client System Platform: {{ ClientPlatform }}
+# Client Timezone {{ ClientTimezone }}
+# Client UTC Time {{ ClientUTCTime }}
+# Client Local Time {{ ClientLocalTime }}
 
-"""        
-# Client Location: {{ClientLocation}}
-# User Location: {{UserLocation}}
+# """        
+# # Client Location: {{ClientLocation}}
+# # User Location: {{UserLocation}}
         
-        self.factoid_ner_prompt_template = \
-"""
-Do Named Entity Extraction (NER) to discover all entities mentioned in the following text:
-
-{{ Content }}
-"""
-        self.factoid_vss_summary_prompt_template = \
-"""
-Generate a one sentence summary of this information that can be used to search for it
-later, using vector similarity search on the sentence embedding of the summary:
-
-{{ Content }}
-"""
-
-        self.factoid_keywords_prompt_template = \
-"""
-Generate keywords for this information that can be used later to do keyword search for it
-later:
-
-{{ Content }}
-"""
-
-        s_detect_info_to_store = \
+        self.detect_info_to_store_template = PromptTemplate(
 """
 You are a conversational AI agent. The following text is a message from a user to you.
 Considering the content of the message, do you think that the user is teaching you some
@@ -129,14 +99,12 @@ Do not emit any other text or punctuation.
 Message:
 
 {{ Content }}
-"""
-        self.detect_info_to_store_template = PromptTemplate(s_detect_info_to_store)
+""")
 
-
-        s_extract_info = \
+        self.extract_info_template = PromptTemplate(
 """
 You are a conversational AI agent. The following text is a message from a user to you. Your job is
-to return a string conaining only the information that the user wants you to store, without any
+to return a string containing only the information that the user wants you to store, without any
 preamble or postamble telling you to store the information. Return a string containing only the 
 information. Do not emit any other text or punctuation.
 
@@ -149,9 +117,52 @@ Here are some examples:
 Message:
 
 {{ Content }}
-"""
-        self.extract_info_template = PromptTemplate(s_extract_info)
+""")
 
+        self.factoid_keywords_prompt_template = PromptTemplate(
+"""
+You are a conversational AI agent. The following text is a message from a user to you.
+Considering the content of the message, generate keywords for its content that can be used later 
+to retrieve this message, using keyword search on the keywords. Return a JSON array of keyword
+strings.
+
+Example output:
+
+{ "keywords": ["keyword 1", "keyword 2", "keyword 3", ... ] }
+
+Message:
+
+{{ Content }}
+""")
+
+        self.factoid_vss_summary_prompt_template = PromptTemplate(
+"""
+You are a conversational AI agent. The following text is a message from a user to you.
+Considering the content of the message, generate a sentence that paraphrases and summarizes the 
+message. The goalis to generate an embedding for this summary sentence that can later be used with vector similarity
+search to retrieve the message. Include details that make this message different from other
+messages. It should read like an item from a table of contents. If there is a key point to the 
+message, make sure the summary includes that key point. Respond with a single sentence. 
+Do not emit any other text or punctuation. Do not include text like "Summary:"
+
+Message:
+
+{{ Content }}
+""")
+
+        self.info_ner_template = PromptTemplate(
+"""
+You are a conversational AI agent. The following text is a message from a user to you.
+Perform Named Entity Recognition (NER) on the message text. Return a JSON array of entity strings.
+
+Example output:
+
+{ "entities": ["entity 1", "entity 2", "entity 3", ... ] }
+
+Message:
+
+{{ Content }}
+""")
 
     def push_notification(self, notification: "GUIControl") -> None:
         if not self.notification_container:
@@ -200,9 +211,6 @@ Message:
         # Detect whether user is telling agent some info to remember.
         #
 
-        def on_got_info_chunk(llm_request: LLMRequest):
-            self.agent.memory.store(memory=llm_request.response_text)
-
         def on_info_check_done(llm_request: LLMRequest):
             # @todo: sanitize output
             if "is_info_chunk" in llm_request.response_text:
@@ -212,19 +220,64 @@ Message:
                                          handlers=[("stop", on_got_info_chunk)])
                 llm_request.send_nowait()
 
-
         self.detect_info_to_store_template.fill(**data)
         rq_is_info_ = LLMRequest(session=self.gui.session, 
                                  prompt=self.detect_info_to_store_template,
                                  handlers=[("stop", on_info_check_done)])
         rq_is_info_.send_nowait()
 
+        def on_got_info_chunk(llm_request: LLMRequest):
+            #
+            # Get keywords
+            #
+
+            data = {"Content": llm_request.response_text}
+            self.factoid_keywords_prompt_template.fill(**data)
+
+            rq_keywords = LLMRequest(session=self.gui.session,
+                                        prompt=self.factoid_keywords_prompt_template,
+                                        handlers=[("stop", on_keywords_response_done)],
+                                        respond_with_json=True)
+            rq_keywords.send_nowait()
+
+            #
+            # Get summary sentence for embedding
+            #
+
+            self.factoid_vss_summary_prompt_template.fill(**data)
+            rq_vss = LLMRequest(session=self.gui.session,
+                                    prompt=self.factoid_vss_summary_prompt_template,
+                                    handlers=[("stop", on_vss_response_done)])
+            rq_vss.send_nowait()
+
+            #
+            # Extract entities
+            #
+
+            self.info_ner_template.fill(**data)
+            rq_ner = LLMRequest(session=self.gui.session,
+                                    prompt=self.info_ner_template,
+                                    handlers=[("stop", on_ner_response_done)],
+                                    respond_with_json=True)
+            rq_ner.send_nowait()
+
+            #
+            # Store info chunk in memory
+            #
+
+            self.agent.memory.store(memory=llm_request.response_text)
+
+        def on_keywords_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK KEYWORDS: {llm_request.response_text}')
+        
+        def on_vss_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK SUMMARY: {llm_request.response_text}')
+
+        def on_ner_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK ENTITIES: {llm_request.response_text}')
+
         # self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
         # self.push_notification(self.notify_detect_info_chunk)
-
-        # @test
-        # Sketching out LLMRequest usage
-        #
 
         # # Add response TextArea
         # ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
@@ -233,82 +286,9 @@ Message:
         # self.utterances.append(ta_answer)
 
 
-        # #
-        # # Summary sentence for vector similarity search
-        # #
-
-        # data["Content"] = content
-        # vss_prompt = pystache.render(self.factoid_vss_summary_prompt_template, data)
-        # vss_messages = [{"role": "system", "content": ""}, {"role": "user", "content": vss_prompt}]
-        # vss_handler = ChatCompletionHandler(start_handler=self.on_vss_response_start,
-        #                                 chunk_handler=self.on_vss_response_chunk,
-        #                                 done_handler=self.on_vss_response_done)
-
-        # # Add VSS TextArea
-        # vss = self.gui.create_control("ChatMessageUI", role="Summary Sentence", text='')
-        # self.add_child(vss)
-        # self.current_vss_destination = vss
-
-        # self.gui.session.llm_send_streaming_chat_request(model, vss_messages, handlers=[vss_handler])
-
-        # #
-        # # Summary keywords for keyword search
-        # #
-
-        # data["Content"] = content
-        # kw_prompt = pystache.render(self.factoid_keywords_prompt_template, data)
-        # kw_messages = [{"role": "system", "content": ""}, {"role": "user", "content": kw_prompt}]
-        # kw_handler = ChatCompletionHandler(start_handler=self.on_keywords_response_start,
-        #                                 chunk_handler=self.on_keywords_response_chunk,
-        #                                 done_handler=self.on_keywords_response_done)
-
-        # # Add Keywords TextArea
-        # keywords = self.gui.create_control("ChatMessageUI", role="Summary Keywords", text='')
-        # self.add_child(keywords)
-        # self.current_kw_destination = keywords
-
-        # self.gui.session.llm_send_streaming_chat_request(model, kw_messages, handlers=[kw_handler])
-
-
-    def on_user_message_response_done(self) -> None:
-        self.notification_container.remove_child(self.notify_user_input)
-        super().on_llm_response_done()
-
-
-    def on_vss_response_start(self) -> None:
-        self.vss_response_text = ""
-
-
-    def on_vss_response_chunk(self, chunk_text: Optional[str]) -> None:
-        if chunk_text is not None:
-            assert(self.current_vss_destination is not None)
-            self.current_vss_destination.text_area.text_buffer.move_point_to_end()
-            self.current_vss_destination.text_area.text_buffer.insert(chunk_text)
-            self.current_vss_destination.text_area.set_needs_redraw()
-
-            self.vss_response_text += chunk_text
-
-
-    def on_vss_response_done(self) -> None:
-        self.current_vss_destination = None
-
-
-    def on_keywords_response_start(self) -> None:
-        self.keywords_response_text = ""
-
-
-    def on_keywords_response_chunk(self, chunk_text: Optional[str]) -> None:
-        if chunk_text is not None:
-            assert(self.current_kw_destination is not None)
-            self.current_kw_destination.text_area.text_buffer.move_point_to_end()
-            self.current_kw_destination.text_area.text_buffer.insert(chunk_text)
-            self.current_kw_destination .text_area.set_needs_redraw()
-
-            self.keywords_response_text += chunk_text
-
-
-    def on_keywords_response_done(self) -> None:
-        self.keywords_response_text = None
+    # def on_user_message_response_done(self) -> None:
+    #     self.notification_container.remove_child(self.notify_user_input)
+    #     super().on_llm_response_done()
 
 
     @classmethod

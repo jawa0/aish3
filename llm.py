@@ -10,7 +10,8 @@ class LLMRequest:
     def __init__(self, session: Session, 
                  prompt: Prompt = LiteralPrompt(""), 
                  handlers: [Tuple[Literal["start", "next", "stop"], Callable]] = [], 
-                 previous_messages: List[Dict[str, str]] = []):
+                 previous_messages: List[Dict[str, str]] = [],
+                 respond_with_json: bool = False):
         
         self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self._session = session
@@ -18,6 +19,7 @@ class LLMRequest:
         self._task = None
         self._s_response = ""
         self._previous_messages = previous_messages
+        self._respond_with_json = respond_with_json
 
         self.set_prompt(prompt)
 
@@ -62,10 +64,12 @@ class LLMRequest:
         else:
             chat_messages = self._previous_messages + \
                 [{'role': 'user', 'content': self._prompt.get_prompt_text()}]
-            
-        self._completion = self._openai_client.chat.completions.create(model=model, 
-                                                                       messages=chat_messages, 
-                                                                       stream=True)
+
+        args = {"model": model, "messages": chat_messages, "stream": True}  
+        if self._respond_with_json:
+            args["response_format"] = { "type": "json_object" }
+
+        self._completion = self._openai_client.chat.completions.create(**args)
         try:
             while True:
                 # print('**** LLMRequest.go() calling next()')
@@ -84,10 +88,6 @@ class LLMRequest:
         except StopIteration:
             # This means the completion we tried to call next() on is done.
             # Call all done handlers for that completion
-
-            # print('**** LLMRequest.go() StopIteration')
-
-            print(self._s_response)
 
             for cb in self._handlers["stop"]:
                 cb(self)
