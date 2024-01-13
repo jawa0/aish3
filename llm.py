@@ -9,9 +9,10 @@ from typing import Callable, Dict, List, Literal, Tuple
 class LLMRequest:
     def __init__(self, session: Session, 
                  prompt: Prompt = LiteralPrompt(""), 
-                 handlers: [Tuple[Literal["start", "next", "stop"], Callable]] = [], 
                  previous_messages: List[Dict[str, str]] = [],
-                 respond_with_json: bool = False):
+                 handlers: [Tuple[Literal["start", "next", "stop"], Callable]] = [], 
+                 respond_with_json: bool = False,
+                 custom_data: Dict = {}):
         
         self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self._session = session
@@ -20,6 +21,7 @@ class LLMRequest:
         self._s_response = ""
         self._previous_messages = previous_messages
         self._respond_with_json = respond_with_json
+        self._custom_data = custom_data
 
         self.set_prompt(prompt)
 
@@ -32,6 +34,16 @@ class LLMRequest:
     def response_text(self):
         return self._s_response
 
+
+    @property
+    def task(self):
+        return self._task
+    
+
+    @property
+    def custom_data(self):
+        return self._custom_data
+    
 
     def set_prompt(self, prompt: Prompt):
         self._prompt = prompt

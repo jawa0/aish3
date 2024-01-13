@@ -31,6 +31,7 @@ from gui_layout import ColumnLayout
 from session import ChatCompletionHandler
 from llm import LLMRequest
 from llm_chat_container import LLMChatContainer
+from memory import Memory
 from prompt import LiteralPrompt, PromptTemplate
 
 import getpass
@@ -227,6 +228,10 @@ Message:
         rq_is_info_.send_nowait()
 
         def on_got_info_chunk(llm_request: LLMRequest):
+            # Store info chunk as a memory. We'll update its keywords and summary
+            # sentence later.
+            mem_uid = self.agent.memory.store(memory=Memory(text=llm_request.response_text))
+
             #
             # Get keywords
             #
@@ -237,8 +242,9 @@ Message:
             rq_keywords = LLMRequest(session=self.gui.session,
                                         prompt=self.factoid_keywords_prompt_template,
                                         handlers=[("stop", on_keywords_response_done)],
-                                        respond_with_json=True)
-            rq_keywords.send_nowait()
+                                        respond_with_json=True,
+                                        custom_data={"mem_uid": mem_uid})
+            task_keyword = rq_keywords.send_nowait()
 
             #
             # Get summary sentence for embedding
@@ -247,31 +253,44 @@ Message:
             self.factoid_vss_summary_prompt_template.fill(**data)
             rq_vss = LLMRequest(session=self.gui.session,
                                     prompt=self.factoid_vss_summary_prompt_template,
-                                    handlers=[("stop", on_vss_response_done)])
-            rq_vss.send_nowait()
+                                    handlers=[("stop", on_vss_response_done)],
+                                    custom_data={"mem_uid": mem_uid})
+            task_vss = rq_vss.send_nowait()
 
-            #
-            # Extract entities
-            #
+            # #
+            # # Extract entities
+            # #
 
-            self.info_ner_template.fill(**data)
-            rq_ner = LLMRequest(session=self.gui.session,
-                                    prompt=self.info_ner_template,
-                                    handlers=[("stop", on_ner_response_done)],
-                                    respond_with_json=True)
-            rq_ner.send_nowait()
-
-            #
-            # Store info chunk in memory
-            #
-
-            self.agent.memory.store(memory=llm_request.response_text)
+            # self.info_ner_template.fill(**data)
+            # rq_ner = LLMRequest(session=self.gui.session,
+            #                         prompt=self.info_ner_template,
+            #                         handlers=[("stop", on_ner_response_done)],
+            #                         respond_with_json=True)
+            # rq_ner.send_nowait()
 
         def on_keywords_response_done(llm_request: LLMRequest):
-            print(f'** INFO CHUNK KEYWORDS: {llm_request.response_text}')
+            print(f'** INFO CHUNK KEYWORDS (str): {llm_request.response_text}')
+            kw_json = json.loads(llm_request.response_text)
+            print(f'** INFO CHUNK KEYWORDS (JSON): {kw_json}')
+            keywords = kw_json["keywords"]
+
+            mem_uid = llm_request.custom_data["mem_uid"]
+            assert(mem_uid is not None)
+            mem = self.agent.memory.retrieve_by_uid(mem_uid)
+            print(f'** UPDATING KEYWORDS for Memory {mem_uid}')
+            mem.keywords = keywords
+
+
         
         def on_vss_response_done(llm_request: LLMRequest):
             print(f'** INFO CHUNK SUMMARY: {llm_request.response_text}')
+
+            mem_uid = llm_request.custom_data["mem_uid"]
+            assert(mem_uid is not None)
+            mem = self.agent.memory.retrieve_by_uid(mem_uid)
+            print(f'** UPDATING SUMMARY for Memory {mem_uid}')
+            mem.summary_sentence = llm_request.response_text
+
 
         def on_ner_response_done(llm_request: LLMRequest):
             print(f'** INFO CHUNK ENTITIES: {llm_request.response_text}')
