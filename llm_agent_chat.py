@@ -361,6 +361,22 @@ Message:
         if handled:
             return True
         else:
+            # We're going to handle save to save our agent's memories, but then pass the
+            # event on to our parent so that it gets processed as though we hadn't hooked
+            # it.
+            if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_s and \
+                (event.key.keysym.mod & sdl2.KMOD_GUI):
+
+                self.agent.memory.save("memory.json")
+                return False
+            
+            # Handle load
+            if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_l \
+                and (event.key.keysym.mod & sdl2.KMOD_GUI):
+
+                self.agent.memory.load("memory.json")
+                return False
+
             return self.parent.handle_event(event)
 
 
