@@ -500,7 +500,7 @@ class GUI:
     
 
 
-    def cmd_new_text_area(self, text: Optional[str], wx: Optional[int], wy: Optional[int]) -> "TextArea":
+    def cmd_new_text_area(self, text: Optional[str]=None, wx: Optional[int]=0, wy: Optional[int]=0) -> "TextArea":
         """Expects wx, and wy to be world (workspace) coordinates."""
 
         logging.info('Command: create new text area')
@@ -676,7 +676,7 @@ class GUI:
                 wx, wy = self.view_to_world(vx, vy)
                 print(f'wx, wy = {wx}, {wy}')
                 
-                self.cmd_new_text_area(wx, wy)
+                self.cmd_new_text_area(wx=wx, wy=wy)
                 return True
 
             if keySym == sdl2.SDLK_RETURN:

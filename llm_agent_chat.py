@@ -89,6 +89,28 @@ class LLMAgentChat(LLMChatContainer):
 # # Client Location: {{ClientLocation}}
 # # User Location: {{UserLocation}}
         
+        self.agent_system_prompt = PromptTemplate(
+"""
+You are a conversational AI agent and assistant named "AISH".
+""")
+        
+        self.agent_passhtrough_prompt = PromptTemplate(
+"""
+A user has sent you this message. Please respond. 
+
+User message:
+
+{{Content}}
+
+Contextual information and metadata:
+
+User: {{User}}
+Client Platform: {{ClientPlatform}}
+Client Timezone: {{ClientTimezone}}
+Client UTC Time: {{ClientUTCTime}}
+Client Local Time: {{ClientLocalTime}}
+""")
+
         self.detect_info_to_store_template = PromptTemplate(
 """
 You are a conversational AI agent. The following text is a message from a user to you.
@@ -101,6 +123,7 @@ Message:
 
 {{ Content }}
 """)
+
 
         self.extract_info_template = PromptTemplate(
 """
@@ -220,6 +243,40 @@ Message:
                                          prompt=self.extract_info_template,
                                          handlers=[("stop", on_got_info_chunk)])
                 llm_request.send_nowait()
+
+            else:
+                self.agent_system_prompt.fill(**data)
+                self.agent_passhtrough_prompt.fill(**data)
+
+                prev_messages = [{"role": "system", 
+                                  "content": self.agent_system_prompt.get_prompt_text()},
+                ]
+
+                def on_passthrough_response_start(llm_request: LLMRequest):
+                    # Add response TextArea
+                    ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+                    self.add_child(ta_answer)
+                    self.utterances.append(ta_answer)
+
+                def on_passthrough_response_next(llm_request: LLMRequest, chunk_text: str):
+                    # Add response TextArea
+                    ta_answer = self.utterances[-1]
+                    ta_answer.set_text(llm_request.response_text)
+
+                def on_passthrough_response_done(llm_request: LLMRequest):
+                    # Add response TextArea
+                    ta_answer = self.utterances[-1].text_area
+                    ta_answer.set_text(llm_request.response_text)
+                    ta_answer.set_needs_redraw()
+
+                llm_request = LLMRequest(session=self.gui.session,
+                                         prompt=self.agent_passhtrough_prompt,
+                                         previous_messages=prev_messages,
+                                         handlers=[("start", on_passthrough_response_start),
+                                                   ("next", on_passthrough_response_next),
+                                                   ("stop", on_passthrough_response_done)])
+                llm_request.send_nowait()
+
 
         self.detect_info_to_store_template.fill(**data)
         rq_is_info_ = LLMRequest(session=self.gui.session, 
