@@ -3,13 +3,15 @@ from openai import OpenAI, chat
 import os
 from prompt import LiteralPrompt, Prompt
 from session import ChatCompletionHandler, Session
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Callable, Dict, List, Literal, Optional, Tuple
 
 
 class LLMRequest:
     def __init__(self, session: Session, 
                  prompt: Prompt = LiteralPrompt(""), 
                  previous_messages: List[Dict[str, str]] = [],
+                 tools: Optional[List[Dict]] = [],
+                 tool_choice: Optional[str] = None,
                  handlers: [Tuple[Literal["start", "next", "stop"], Callable]] = [], 
                  respond_with_json: bool = False,
                  custom_data: Dict = {}):
@@ -22,6 +24,8 @@ class LLMRequest:
         self._previous_messages = previous_messages
         self._respond_with_json = respond_with_json
         self._custom_data = custom_data
+        self._tools = tools
+        self._tool_choice = tool_choice
 
         self.set_prompt(prompt)
 
@@ -80,6 +84,11 @@ class LLMRequest:
         args = {"model": model, "messages": chat_messages, "stream": True}  
         if self._respond_with_json:
             args["response_format"] = { "type": "json_object" }
+
+        if self._tools is not None and len(self._tools) > 0:
+            args["tools"] = self._tools
+            # if self._tool_choice is not None:
+            #     args["tool_choice"] = self._tool_choice
 
         self._completion = self._openai_client.chat.completions.create(**args)
         try:

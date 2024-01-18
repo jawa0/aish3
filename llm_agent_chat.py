@@ -188,6 +188,18 @@ Message:
 {{ Content }}
 """)
 
+        self.search_template = PromptTemplate(
+"""
+You are a conversational AI agent. The following text is a message from a user to you. If you believe
+that this message is a request to search your knowledge base, then generate a JSON function call using 
+the appropriate tool.
+
+Message:
+
+{{ Content }}
+""")
+
+
     def push_notification(self, notification: "GUIControl") -> None:
         if not self.notification_container:
             self._create_notification_container()
@@ -245,6 +257,62 @@ Message:
                 llm_request.send_nowait()
 
             else:
+
+                # Is this a retrieval request?
+
+                tools = [
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "retrieve_memories_by_keywords",
+                            "description": "Retrieve stored memories by keywords.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "keywords": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }   
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "retrieve_memories_by_similarity",
+                            "description": "Retrieve stored memories by similarity to a given string.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "search_string": {
+                                        "type": "string"
+                                    }
+                                }   
+                            }
+                        }
+                    }
+                ]
+
+                def on_maybe_retrieve_memory(llm_request: LLMRequest):
+                    print(f'** MEMORY SEARCH REQUEST?\n"{llm_request.response_text}"')
+
+
+                self.search_template.fill(**data)
+                print(self.search_template.get_prompt_text())
+                llm_request = LLMRequest(session=self.gui.session,
+                                         prompt=self.search_template,
+                                         tools=tools,
+                                         tool_choice="auto",
+                                         handlers=[("stop", on_maybe_retrieve_memory)])
+                llm_request.send_nowait()
+
+                #
+                # Just send user message to the agent...
+                #
+
                 self.agent_system_prompt.fill(**data)
                 self.agent_passhtrough_prompt.fill(**data)
 
@@ -252,29 +320,33 @@ Message:
                                   "content": self.agent_system_prompt.get_prompt_text()},
                 ]
 
+
                 def on_passthrough_response_start(llm_request: LLMRequest):
                     # Add response TextArea
-                    ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
-                    self.add_child(ta_answer)
-                    self.utterances.append(ta_answer)
+                    cmui_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+                    self.add_child(cmui_answer)
+                    self.utterances.append(cmui_answer)
+
 
                 def on_passthrough_response_next(llm_request: LLMRequest, chunk_text: str):
-                    # Add response TextArea
-                    ta_answer = self.utterances[-1]
-                    ta_answer.set_text(llm_request.response_text)
+                    if chunk_text is not None and len(chunk_text) > 0:
+                        ta_answer = self.utterances[-1].text_area
+                        ta_answer.text_buffer.move_point_to_end()
+                        ta_answer.text_buffer.insert(chunk_text)
+                        ta_answer.set_needs_redraw()
 
-                def on_passthrough_response_done(llm_request: LLMRequest):
-                    # Add response TextArea
-                    ta_answer = self.utterances[-1].text_area
-                    ta_answer.set_text(llm_request.response_text)
-                    ta_answer.set_needs_redraw()
+                # def on_passthrough_response_done(llm_request: LLMRequest):
+                #     # Add response TextArea
+                #     ta_answer = self.utterances[-1].text_area
+                #     ta_answer.set_text(llm_request.response_text)
+                #     ta_answer.set_needs_redraw()
 
                 llm_request = LLMRequest(session=self.gui.session,
                                          prompt=self.agent_passhtrough_prompt,
                                          previous_messages=prev_messages,
                                          handlers=[("start", on_passthrough_response_start),
-                                                   ("next", on_passthrough_response_next),
-                                                   ("stop", on_passthrough_response_done)])
+                                                   ("next", on_passthrough_response_next),])
+                                                #    ("stop", on_passthrough_response_done)])
                 llm_request.send_nowait()
 
 
