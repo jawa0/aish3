@@ -33,7 +33,6 @@ from rect_utils import rect_union
 from transcribe_audio import VoiceTranscriber
 import utils
 from voice_out import VoiceOut
-from voice_wakeup import PhraseListener
 from draw import draw_marker_point, draw_text, set_color
 
 
@@ -84,6 +83,9 @@ class GUI:
                  enable_voice_out=False,
                  create_hook: Optional[callable]=None):        
         
+        if enable_voice_in:
+            from voice_wakeup import PhraseListener
+            
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
