@@ -33,7 +33,6 @@ from rect_utils import rect_union
 from transcribe_audio import VoiceTranscriber
 import utils
 from voice_out import VoiceOut
-from voice_wakeup import PhraseListener
 from draw import draw_marker_point, draw_text, set_color
 
 
@@ -52,7 +51,10 @@ class GUI:
 
     @classmethod
     def control_class(cls, class_name):
-        return cls._factories.get(class_name, None)
+        # return cls._factories.get(class_name, None)
+
+        # I want to know if it can't find the class name
+        return cls._factories[class_name]
     
 
     def create_control(self, class_name, **kwargs):
@@ -78,8 +80,11 @@ class GUI:
                  workspace_filename=None, 
                  client_session=None, 
                  enable_voice_in=False, 
-                 enable_voice_out=False):        
+                 enable_voice_out=False):
         
+        if enable_voice_in:
+            from voice_wakeup import PhraseListener
+            
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
@@ -103,6 +108,7 @@ class GUI:
         self._viewport_bookmarks = {}
 
         self.workspace_filename = workspace_filename
+        print(f'GUI.init(): workspace_filename = {self.workspace_filename}')
         if self.workspace_filename is not None:
             self.load()
 
@@ -493,7 +499,7 @@ class GUI:
     
 
 
-    def cmd_new_text_area(self, wx: Optional[int], wy: Optional[int]) -> None:
+    def cmd_new_text_area(self, text: Optional[str]=None, wx: Optional[int]=0, wy: Optional[int]=0) -> "TextArea":
         """Expects wx, and wy to be world (workspace) coordinates."""
 
         logging.info('Command: create new text area')
@@ -505,8 +511,11 @@ class GUI:
         x, y = parent.world_to_local(wx, wy)
         print(f'x, y = {x}, {y}')
         textArea = self.create_control("TextArea", w=240, h=100, x=x, y=y)
+        if text is not None:
+            textArea.set_text(text)
         parent.add_child(textArea)
-        self.set_focus(textArea)
+        # self.set_focus(textArea)
+        return textArea
 
 
     def cmd_new_llm_chat(self, wx: int, wy: int) -> None:
@@ -646,7 +655,7 @@ class GUI:
                 wx, wy = self.view_to_world(vx, vy)
                 print(f'wx, wy = {wx}, {wy}')
                 
-                self.cmd_new_text_area(wx, wy)
+                self.cmd_new_text_area(wx=wx, wy=wy)
                 return True
 
             if keySym == sdl2.SDLK_RETURN:
@@ -901,7 +910,7 @@ class GUI:
         return chain
     
 
-    def local_to_local(self, src_control, dst_control, x_src_local: int, y_src_local: int) -> "tuple[int, int]":
+    def local_to_local(self, src_control: "GUIControl", dst_control: "GUIControl", x_src_local: int, y_src_local: int) -> "tuple[int, int]":
         """
         Convert coordinates local to content area of one control (src_control) into coordinates local to 
         content area of another control (dst_control). If dst_control is None, then the coordinates are
@@ -1006,6 +1015,7 @@ class GUI:
         self.focus_stack = []
 
         logging.info("Loading GUI...")
+        print(f'self.workspace_filename: {self.workspace_filename}')
         try:
             with open(self.workspace_filename, "r") as f:
                 gui_json = json.load(f)

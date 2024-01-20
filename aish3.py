@@ -13,13 +13,14 @@
 # limitations under the License.
 
 
+import argparse
+import logging
+import os
+import time
+
 import sdl2
 import sdl2.ext
 import sdl2.sdlttf as ttf
-import argparse
-import logging
-import time
-import os
 
 import config
 from gui import GUI, FontRegistry
@@ -66,9 +67,16 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
         logging.error("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
         raise Exception("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
 
+    print('__file__:', __file__)
+    app_path = os.path.dirname(os.path.abspath(__file__))
+    print(f'app_path: {app_path}')
+
+    workspace_filepath = os.path.abspath(os.path.join(app_path, workspace_filename))
+    print(f'workspace_filepath: {workspace_filepath}')
+
     gui = GUI(renderer, 
                 font_descriptor, 
-                workspace_filename=workspace_filename, 
+                workspace_filename=workspace_filepath, 
                 client_session=session,
                 enable_voice_in=enable_voice_in,
                 enable_voice_out=False)
@@ -98,6 +106,10 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
 
     fps_smoothed = 0.0
     while running:
+        #
+        # Handle any pending SDL events, to prevent GUI from becoming unresponsive.
+        #
+
         events = sdl2.ext.get_events()
         if events:
             for event in events:

@@ -46,7 +46,7 @@ def font_descriptor_from_json_str(json_string: str) -> FontDescriptor:
 class FontRegistry:
     _instance = None
     _registry: Dict[FontDescriptor, FontManager]
-    _default_path = './res/fonts'
+    _default_path = os.path.abspath(os.path.join(__file__, '../../res/fonts'))
 
 
     def __new__(cls, *args, **kwargs):
@@ -62,8 +62,13 @@ class FontRegistry:
         print(f'FontRegistry.create_fontmanager(): key={key}')
         print(f'fontdescriptor_to_json_string(key)={json_str_from_font_descriptor(key)}')
 
+        print(f'Current Working Directory: {os.getcwd()}')
+        print(f'__file__={__file__}')
+
         if key not in self._instance._registry:
             font_path = os.path.join(self._default_path, filename)
+            print(f'font_path={font_path}')
+
             self._instance._registry[key] = FontManager(font_path, size=size, color=Color(*color))
         return key
 
