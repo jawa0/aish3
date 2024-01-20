@@ -190,9 +190,9 @@ Message:
 
         self.search_template = PromptTemplate(
 """
-You are a conversational AI agent. The following text is a message from a user to you. If you believe
-that this message is a request to search your knowledge base, then generate a JSON function call using 
-the appropriate tool.
+You are a conversational AI agent. The following text is a message from a user to you. Carefully examine
+the message. If it is a request to search or retrieve memories from your memory store, then generate a JSON
+ function call using the tools that have been supplied to you. Return a JSON function call.
 
 Message:
 
@@ -283,7 +283,7 @@ Message:
                         "type": "function",
                         "function": {
                             "name": "retrieve_memories_by_similarity",
-                            "description": "Retrieve stored memories by similarity to a given string.",
+                            "description": "Retrieve stored memories by similarity to the given string. Uses vector similarity search on an embedding of the search string.",
                             "parameters": {
                                 "type": "object",
                                 "properties": {
@@ -298,6 +298,20 @@ Message:
 
                 def on_maybe_retrieve_memory(llm_request: LLMRequest):
                     print(f'** MEMORY SEARCH REQUEST?\n"{llm_request.response_text}"')
+
+                    got_json = True
+                    s = llm_request.response_text.replace('```json', '').replace('```', '').strip()
+                    try:
+                        json_call = json.loads(s)
+                    except json.decoder.JSONDecodeError:
+                        print(f"** NOT JSON: {s}")
+                        got_json = False
+                    
+                    if got_json:
+                        for tu in json_call["tool_uses"]:
+                            print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
+
+
 
 
                 self.search_template.fill(**data)
