@@ -29,6 +29,23 @@ Features:
 
 `python aish3.py`
 
+#### Build a stand-alone macOS application
+
+You can build a standalone application by doing:
+`make macos`
+
+This requires the pyinstaller Python module
+`pip3 install pyinstaller`
+
+This will create a dist folder, with the app in a subfolder, called aish3.
+
+Run it as:
+`./dist/aish3/aish3`
+
+Note that you will have to supply your own .env file with for instance your OpenAI API key. The
+.env file can be placed in the aish3 directory, or any containing directory. To move or distribute the
+app, you copy the dist/aish3 folder somewhere else. Everything required (except .env file) is inside that folder.
+
 #### Command-line parameters/settings:
 
 `python aish3.py --help`
@@ -114,14 +131,3 @@ Python SDL2 libraries for macOS:
 
 PySDL2 Python wrapper
 `pip install pysdl2`
-
-Build a stand-alone macOS application
---
-You can build a standalone application by doing:
-`make macos`
-
-Run it as:
-`./dist/aish3`
-
-This requires the pyinstaller Python module
-`pip3 install pyinstaller`
