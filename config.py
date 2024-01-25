@@ -21,10 +21,13 @@ import os
 import os.path
 from pathlib import Path
 
+print('BEFORE load_dotenv()')
 load_dotenv()   # Load the .env file
+print('AFTER load_dotenv()')
 
 # Set the application path to the current working directory when config is loaded
 app_path = os.getcwd()
+print(f'app_path: {app_path}')
 
 # Ensure app user config dir exists
 app_name = "aish3"

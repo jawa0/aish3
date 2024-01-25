@@ -44,9 +44,13 @@ class Session:
     def __init__(self):
         logging.debug("Client Session.__init__")
 
+        print('BEFORE creating openai_client...')
+        print(f'os.getenv("OPENAI_API_KEY"): {os.getenv("OPENAI_API_KEY")}')
         
         self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) 
                                     # organization=os.getenv("OPENAI_ORGANIZATION"))
+                                    
+        print('AFTER creating openai_client.')
 
         self._running_completions: Dict[chat.completion, List[ChatCompletionHandler]] = {}
         self._tasks = []

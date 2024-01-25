@@ -20,6 +20,7 @@ from sdl2.sdlttf import TTF_FontHeight
 from draw import draw_cursor, draw_text, set_color
 from gui import GUI, GUIControl
 from gui.fonts import FontRegistry
+import os
 from text_edit_buffer import TextEditBuffer
 import queue
 
@@ -87,7 +88,14 @@ class TextArea(GUIControl):
         assert(fm is not None)
         font_size_px = fm.size
 
-        font = FontTTF("./res/fonts/FiraCode-Regular.ttf", font_size_px, (255, 255, 255))
+        print('__file__:', __file__)
+        app_path = os.path.dirname(os.path.abspath(__file__))  # @todo DRY if this file location changes, then we'll need to update computation of app_path
+        print(f'app_path: {app_path}')
+
+        font_filepath = os.path.abspath(os.path.join(app_path, "res/fonts/FiraCode-Regular.ttf"))
+        print(f'font_filepath: {font_filepath}')
+
+        font = FontTTF(font_filepath, font_size_px, (255, 255, 255))
         ttf_font = font.get_ttf_font()
         line_height_px = TTF_FontHeight(ttf_font)
         self.row_spacing = line_height_px

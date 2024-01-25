@@ -85,7 +85,7 @@ class GUI:
         
         if enable_voice_in:
             from voice_wakeup import PhraseListener
-            
+
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
@@ -1038,6 +1038,7 @@ class GUI:
         self.focus_stack = []
 
         logging.info("Loading GUI...")
+        print(f'self.workspace_filename: {self.workspace_filename}')
         try:
             with open(self.workspace_filename, "r") as f:
                 gui_json = json.load(f)

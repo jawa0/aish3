@@ -191,8 +191,11 @@ Message:
         self.search_template = PromptTemplate(
 """
 You are a conversational AI agent. The following text is a message from a user to you. Carefully examine
-the message. If it is a request to search or retrieve memories from your memory store, then generate a JSON
+the message. If it is a request to search or recall or retrieve memories from your memory store, then generate a JSON
  function call using the tools that have been supplied to you. Return a JSON function call.
+
+If the user message is asking you for similarity based on a string, phrase, or sentence, then do not interpret the 
+contents of that string. Instead, pass the search string to the appropriate function in your tools.
 
 Message:
 
