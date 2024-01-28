@@ -395,12 +395,61 @@ Message:
                 print(f"** NOT JSON: {s}")
                 got_json = False
             
-            if got_json:
-                if type(json_call) is str:
-                    print(f"** RESULT: {json_call}")
+            if not got_json or type(json_call) is not dict:
+                print(f"** NOT FNCALL: {s}")
+            else:
+                print(f'** JSON:\n{json_call}')
+
+                # @bug OpenAI? Sometimes returned JSON does not include "tool_uses" list
+                if "tool_uses" in json_call:
+                    tu = json_call["tool_uses"][0]
                 else:
-                    for tu in json_call["tool_uses"]:
-                        print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
+                    tu = json_call
+
+                print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
+
+                if tu["recipient_name"] == "functions.store_info_chunk":
+                    mem_uid = self.agent.memory.store(memory=Memory(text=llm_request.response_text))
+                    data = {"Content": tu["parameters"]["text_info"]}
+
+                    #
+                    # Get keywords
+                    #
+
+                    self.factoid_keywords_prompt_template.fill(**data)
+
+                    rq_keywords = LLMRequest(session=self.gui.session,
+                                                prompt=self.factoid_keywords_prompt_template,
+                                                handlers=[("stop", on_keywords_response_done)],
+                                                respond_with_json=True,
+                                                custom_data={"mem_uid": mem_uid})
+                    
+                    print('** SEND KEYWORDS REQUEST')
+                    task_keyword = rq_keywords.send_nowait()
+
+                    #
+                    # Get summary sentence for embedding
+                    #
+
+                    self.factoid_vss_summary_prompt_template.fill(**data)
+                    rq_vss = LLMRequest(session=self.gui.session,
+                                            prompt=self.factoid_vss_summary_prompt_template,
+                                            handlers=[("stop", on_vss_response_done)],
+                                            custom_data={"mem_uid": mem_uid})
+                    
+                    print('** SEND VSS REQUEST')
+                    task_vss = rq_vss.send_nowait()
+
+                    print('** WAITING FOR KEYWORDS AND VSS')
+                    # tg = asyncio.TaskGroup([task_keyword, task_vss])
+                    # await asyncio.gather(task_keyword, task_vss)
+                    # print('** DONE')
+
+                elif tu["recipient_name"] == "functions.retrieve_memories_by_keywords":
+                    pass
+                elif tu["recipient_name"] == "functions.retrieve_memories_by_similarity":
+                    pass
+        
 
         self.is_function_call_template.fill(**data)
         rq_is_fncall = LLMRequest(session=self.gui.session, 
@@ -410,76 +459,47 @@ Message:
                                  handlers=[("stop", on_fncall_check_done)])
         rq_is_fncall.send_nowait()
 
-    #     def on_got_info_chunk(llm_request: LLMRequest):
-    #         # Store info chunk as a memory. We'll update its keywords and summary
-    #         # sentence later.
-    #         mem_uid = self.agent.memory.store(memory=Memory(text=llm_request.response_text))
 
-    #         #
-    #         # Get keywords
-    #         #
+        def on_keywords_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK KEYWORDS (str): {llm_request.response_text}')
+            kw_json = json.loads(llm_request.response_text)
+            print(f'** INFO CHUNK KEYWORDS (JSON): {kw_json}')
+            keywords = kw_json["keywords"]
 
-    #         data = {"Content": llm_request.response_text}
-    #         self.factoid_keywords_prompt_template.fill(**data)
-
-    #         rq_keywords = LLMRequest(session=self.gui.session,
-    #                                     prompt=self.factoid_keywords_prompt_template,
-    #                                     handlers=[("stop", on_keywords_response_done)],
-    #                                     respond_with_json=True,
-    #                                     custom_data={"mem_uid": mem_uid})
-    #         task_keyword = rq_keywords.send_nowait()
-
-    #         #
-    #         # Get summary sentence for embedding
-    #         #
-
-    #         self.factoid_vss_summary_prompt_template.fill(**data)
-    #         rq_vss = LLMRequest(session=self.gui.session,
-    #                                 prompt=self.factoid_vss_summary_prompt_template,
-    #                                 handlers=[("stop", on_vss_response_done)],
-    #                                 custom_data={"mem_uid": mem_uid})
-    #         task_vss = rq_vss.send_nowait()
-
-    #     def on_keywords_response_done(llm_request: LLMRequest):
-    #         print(f'** INFO CHUNK KEYWORDS (str): {llm_request.response_text}')
-    #         kw_json = json.loads(llm_request.response_text)
-    #         print(f'** INFO CHUNK KEYWORDS (JSON): {kw_json}')
-    #         keywords = kw_json["keywords"]
-
-    #         mem_uid = llm_request.custom_data["mem_uid"]
-    #         assert(mem_uid is not None)
-    #         mem = self.agent.memory.retrieve_by_uid(mem_uid)
-    #         print(f'** UPDATING KEYWORDS for Memory {mem_uid}')
-    #         mem.keywords = keywords
+            mem_uid = llm_request.custom_data["mem_uid"]
+            assert(mem_uid is not None)
+            mem = self.agent.memory.retrieve_by_uid(mem_uid)
+            print(f'** UPDATING KEYWORDS for Memory {mem_uid}')
+            mem.keywords = keywords
 
 
         
-    #     def on_vss_response_done(llm_request: LLMRequest):
-    #         print(f'** INFO CHUNK SUMMARY: {llm_request.response_text}')
+        def on_vss_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK SUMMARY: {llm_request.response_text}')
 
-    #         mem_uid = llm_request.custom_data["mem_uid"]
-    #         assert(mem_uid is not None)
-    #         mem = self.agent.memory.retrieve_by_uid(mem_uid)
-    #         print(f'** UPDATING SUMMARY for Memory {mem_uid}')
-    #         mem.summary_sentence = llm_request.response_text
-
-
-    #     def on_ner_response_done(llm_request: LLMRequest):
-    #         print(f'** INFO CHUNK ENTITIES: {llm_request.response_text}')
-
-    #     # self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
-    #     # self.push_notification(self.notify_detect_info_chunk)
-
-    #     # # Add response TextArea
-    #     # ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
-    #     # self.add_child(ta_answer)
-    #     # self.current_check_is_info_destination = ta_answer
-    #     # self.utterances.append(ta_answer)
+            mem_uid = llm_request.custom_data["mem_uid"]
+            assert(mem_uid is not None)
+            mem = self.agent.memory.retrieve_by_uid(mem_uid)
+            print(f'** UPDATING SUMMARY for Memory {mem_uid}')
+            mem.summary_sentence = llm_request.response_text
 
 
-    # # def on_user_message_response_done(self) -> None:
-    # #     self.notification_container.remove_child(self.notify_user_input)
-    # #     super().on_llm_response_done()
+        def on_ner_response_done(llm_request: LLMRequest):
+            print(f'** INFO CHUNK ENTITIES: {llm_request.response_text}')
+
+        # self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
+        # self.push_notification(self.notify_detect_info_chunk)
+
+        # # Add response TextArea
+        # ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+        # self.add_child(ta_answer)
+        # self.current_check_is_info_destination = ta_answer
+        # self.utterances.append(ta_answer)
+
+
+    # def on_user_message_response_done(self) -> None:
+    #     self.notification_container.remove_child(self.notify_user_input)
+    #     super().on_llm_response_done()
 
 
     @classmethod
