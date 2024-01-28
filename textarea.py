@@ -88,12 +88,12 @@ class TextArea(GUIControl):
         assert(fm is not None)
         font_size_px = fm.size
 
-        print('__file__:', __file__)
+        # print('__file__:', __file__)
         app_path = os.path.dirname(os.path.abspath(__file__))  # @todo DRY if this file location changes, then we'll need to update computation of app_path
-        print(f'app_path: {app_path}')
+        # print(f'app_path: {app_path}')
 
         font_filepath = os.path.abspath(os.path.join(app_path, "res/fonts/FiraCode-Regular.ttf"))
-        print(f'font_filepath: {font_filepath}')
+        # print(f'font_filepath: {font_filepath}')
 
         font = FontTTF(font_filepath, font_size_px, (255, 255, 255))
         ttf_font = font.get_ttf_font()

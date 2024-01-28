@@ -1001,8 +1001,8 @@ class GUI:
     
 
     def save(self):
-        logging.debug("Control positions before saving...")
-        self.debug_dump_control_uids_and_coords()
+        # logging.debug("Control positions before saving...")
+        # self.debug_dump_control_uids_and_coords()
 
         utc_now = datetime.datetime.now(pytz.utc)
         local_timezone = get_localzone()
@@ -1064,8 +1064,8 @@ class GUI:
 
         logging.info("GUI loaded.")
 
-        logging.debug("Control positions after loading...")
-        self.debug_dump_control_uids_and_coords()
+        # logging.debug("Control positions after loading...")
+        # self.debug_dump_control_uids_and_coords()
 
         return True
 

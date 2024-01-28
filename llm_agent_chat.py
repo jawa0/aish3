@@ -57,8 +57,6 @@ class LLMAgentChat(LLMChatContainer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.agent = Agent()
-
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
             self.title.set_text("Agent Chat")
@@ -72,25 +70,9 @@ class LLMAgentChat(LLMChatContainer):
 
         self.notification_container = None
 
-#         self.factoid_prompt_template = \
-# """
-# Factoid:
+        self.agent = Agent()
+        self.agent.start()
 
-# {{ Content }}
-
-# Metadata:
-
-# Source of information (User): {{ User }}
-# Client Software: AISH3 Python GUI client
-# Client System Platform: {{ ClientPlatform }}
-# Client Timezone {{ ClientTimezone }}
-# Client UTC Time {{ ClientUTCTime }}
-# Client Local Time {{ ClientLocalTime }}
-
-# """        
-# # Client Location: {{ClientLocation}}
-# # User Location: {{UserLocation}}
-        
         self.agent_system_prompt = PromptTemplate(
 """
 You are a conversational AI agent and assistant named "AISH".
@@ -556,6 +538,11 @@ Message:
                 return False
 
             return self.parent.handle_event(event)
+
+
+    def _on_quit(self):
+        print('LLMAgentChat: Quit.')
+        self.agent.stop()
 
 
     def on_update(self, dt):

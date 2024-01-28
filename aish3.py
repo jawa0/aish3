@@ -90,7 +90,7 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
         # gui.content().add_child(gui.command_console)
 
     # Need to fixup path so we an work from inside a PyInstaller distribution.
-    print('__file__:', __file__)
+    # print('__file__:', __file__)
     app_path = os.path.dirname(os.path.abspath(__file__))
     print(f'app_path: {app_path}')
 
