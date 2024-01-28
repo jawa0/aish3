@@ -87,7 +87,7 @@ class MemoryStore:
 
             similarity = cos_similarity(query_embedding, memory.summary_embedding)
             print(similarity)
-            if similarity >= 0.01:
+            if similarity >= 0.1:
                 results.append((similarity, memory))
 
         return sorted(results, reverse=True)

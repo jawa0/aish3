@@ -310,56 +310,40 @@ Message:
             }
         ]
 
+    
+        def on_fncall_check_done(llm_request: LLMRequest):
+            print(f'** CHECK FUNCALL ?\n"{llm_request.response_text}"')
 
-        def on_info_check_done(llm_request: LLMRequest):
-            # @todo: sanitize output
-            if "is_info_chunk" in llm_request.response_text:
-                self.extract_info_template.fill(**data)
-                llm_request = LLMRequest(session=self.gui.session, 
-                                         prompt=self.extract_info_template,
-                                         handlers=[("stop", on_got_info_chunk)])
-                llm_request.send_nowait()
-
-            else:
-
-                # Is this a retrieval request?
-
-                def on_maybe_retrieve_memory(llm_request: LLMRequest):
-                    print(f'** MEMORY SEARCH REQUEST?\n"{llm_request.response_text}"')
-
-                    got_json = True
-                    s = llm_request.response_text.replace('```json', '').replace('```', '').strip()
-                    try:
-                        json_call = json.loads(s)
-                    except json.decoder.JSONDecodeError:
-                        print(f"** NOT JSON: {s}")
-                        got_json = False
-                    
-
-                    # @bug OpenAI? Sometimes returned JSON does not include "tool_uses" list
-                    if got_json:
-                        if "tool_uses" in json_call:
-                            tu = json_call["tool_uses"][0]
-                        else:
-                            tu = json_call
-
-                        print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
-
-
-
-
-                self.search_template.fill(**data)
-                print(self.search_template.get_prompt_text())
-                llm_request = LLMRequest(session=self.gui.session,
-                                         prompt=self.search_template,
-                                         tools=tools,
-                                         tool_choice="auto",
-                                         handlers=[("stop", on_maybe_retrieve_memory)])
-                llm_request.send_nowait()
+            got_json = True
+            s = llm_request.response_text.replace('```json', '').replace('```', '').strip()
+            try:
+                json_call = json.loads(s)
+            except json.decoder.JSONDecodeError:
+                print(f"** NOT JSON: {s}")
+                got_json = False
+            
+            if not got_json or type(json_call) is not dict:
+                print(f"** NOT FNCALL: {s}")
 
                 #
                 # Just send user message to the agent...
                 #
+
+                # @hack DRY
+                content = self.utterances[-1].get_text()
+
+                now_utc = datetime.now(pytz.utc)
+                tz_local = get_localzone()
+                now_local = now_utc.astimezone(tz_local)
+                    
+                data = {
+                    "Content": content,
+                    "User": getpass.getuser(),
+                    "ClientPlatform": str(platform.platform()),
+                    "ClientTimezone": str(tz_local),
+                    "ClientUTCTime": str(now_utc),
+                    "ClientLocalTime": str(now_local),
+                }
 
                 self.agent_system_prompt.fill(**data)
                 self.agent_passhtrough_prompt.fill(**data)
@@ -391,20 +375,6 @@ Message:
                                                 #    ("stop", on_passthrough_response_done)])
                 llm_request.send_nowait()
 
-    
-        def on_fncall_check_done(llm_request: LLMRequest):
-            print(f'** CHECK FUNCALL ?\n"{llm_request.response_text}"')
-
-            got_json = True
-            s = llm_request.response_text.replace('```json', '').replace('```', '').strip()
-            try:
-                json_call = json.loads(s)
-            except json.decoder.JSONDecodeError:
-                print(f"** NOT JSON: {s}")
-                got_json = False
-            
-            if not got_json or type(json_call) is not dict:
-                print(f"** NOT FNCALL: {s}")
             else:
                 print(f'** JSON:\n{json_call}')
 
@@ -425,6 +395,12 @@ Message:
                     mem_text = tu["parameters"]["text_info"]
                     mem_uid = self.agent.memory.store(memory=Memory(text=mem_text))
                     data = {"Content": mem_text}
+
+                    # Add response TextArea
+                    cmui_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+                    self.add_child(cmui_answer)
+                    self.utterances.append(cmui_answer)
+                    cmui_answer.text_area.set_text("Stored info chunk with uid: " + str(mem_uid))
 
                     #
                     # Get keywords
