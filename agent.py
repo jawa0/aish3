@@ -33,6 +33,15 @@ class Agent:
 
 
     def stop(self) -> None:
+        event = {
+            "version": 0.1,
+            "type": "SessionEnd",
+            "user": getpass.getuser(),
+            "client_platform": str(platform.platform()),
+            **self._get_time_metadata()
+        }
+        self._event_stream.put(event)
+
         if self._task is not None:
             self._task.cancel()
             self._task = None
@@ -45,6 +54,16 @@ class Agent:
     async def _go(self):
         while True:
             print('Agent._go() ...')
+
+            event = {
+                "version": 0.1,
+                "type": "SessionTime",
+                "user": getpass.getuser(),
+                "client_platform": str(platform.platform()),
+                **self._get_time_metadata()
+            }
+            self._event_stream.put(event)
+
             await asyncio.sleep(2)
 
 
