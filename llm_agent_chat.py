@@ -335,9 +335,15 @@ Message:
                         print(f"** NOT JSON: {s}")
                         got_json = False
                     
+
+                    # @bug OpenAI? Sometimes returned JSON does not include "tool_uses" list
                     if got_json:
-                        for tu in json_call["tool_uses"]:
-                            print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
+                        if "tool_uses" in json_call:
+                            tu = json_call["tool_uses"][0]
+                        else:
+                            tu = json_call
+
+                        print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
 
 
 
@@ -408,11 +414,17 @@ Message:
                 else:
                     tu = json_call
 
-                print(f" CALL {tu['recipient_name']} with {tu['parameters']}")
+                if "recipient_name" in tu:
+                    function_name = tu["recipient_name"]
+                elif "function" in tu:
+                    function_name = tu["function"]
 
-                if tu["recipient_name"] == "functions.store_info_chunk":
-                    mem_uid = self.agent.memory.store(memory=Memory(text=llm_request.response_text))
-                    data = {"Content": tu["parameters"]["text_info"]}
+                print(f" CALL {function_name} with {tu['parameters']}")
+
+                if function_name == "functions.store_info_chunk":
+                    mem_text = tu["parameters"]["text_info"]
+                    mem_uid = self.agent.memory.store(memory=Memory(text=mem_text))
+                    data = {"Content": mem_text}
 
                     #
                     # Get keywords
@@ -447,10 +459,22 @@ Message:
                     # await asyncio.gather(task_keyword, task_vss)
                     # print('** DONE')
 
-                elif tu["recipient_name"] == "functions.retrieve_memories_by_keywords":
+                elif function_name == "functions.retrieve_memories_by_keywords":
                     pass
-                elif tu["recipient_name"] == "functions.retrieve_memories_by_similarity":
-                    pass
+                elif function_name == "functions.retrieve_memories_by_similarity":
+                    results = self.agent.memory.retrieve_by_similarity(text=tu["parameters"]["search_string"])
+
+                    text_result = ""
+                    for similiarity, mem in results:
+                        print(f'** SIMILARITY: {similiarity:0.3f}')
+                        print(f'** MEMORY: {mem.summary_sentence}')
+                        text_result += f"{similiarity:0.3f}: {mem.summary_sentence}\n"
+
+                    # Add response TextArea
+                    cmui_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
+                    self.add_child(cmui_answer)
+                    self.utterances.append(cmui_answer)
+                    cmui_answer.text_area.set_text(text_result)
         
 
         self.is_function_call_template.fill(**data)
@@ -483,25 +507,9 @@ Message:
             assert(mem_uid is not None)
             mem = self.agent.memory.retrieve_by_uid(mem_uid)
             print(f'** UPDATING SUMMARY for Memory {mem_uid}')
+            
             mem.summary_sentence = llm_request.response_text
-
-
-        def on_ner_response_done(llm_request: LLMRequest):
-            print(f'** INFO CHUNK ENTITIES: {llm_request.response_text}')
-
-        # self.notify_detect_info_chunk = self.gui.cmd_new_text_area("Is user input an info chunk? ...", 0, 0)
-        # self.push_notification(self.notify_detect_info_chunk)
-
-        # # Add response TextArea
-        # ta_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
-        # self.add_child(ta_answer)
-        # self.current_check_is_info_destination = ta_answer
-        # self.utterances.append(ta_answer)
-
-
-    # def on_user_message_response_done(self) -> None:
-    #     self.notification_container.remove_child(self.notify_user_input)
-    #     super().on_llm_response_done()
+            mem.summary_embedding = embed(mem.summary_sentence)[0]
 
 
     @classmethod

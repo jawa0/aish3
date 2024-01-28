@@ -13,8 +13,13 @@ print(f'Imported sentence_transformers. Took {end_time - start_time:03} seconds.
 _model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
-def embed(sentences: List[str]) -> np.ndarray:
-    es = _model.encode(sentences)
+def embed(sentences: str | List[str]) -> List[np.ndarray]:
+    if isinstance(sentences, str):
+        lst_sentences = [sentences]
+    elif isinstance(sentences, list):
+        lst_sentences = sentences
+
+    es = _model.encode(lst_sentences)
     for i, e in enumerate(es):
         norm = np.linalg.norm(e)
         es[i] = e / norm
@@ -22,4 +27,8 @@ def embed(sentences: List[str]) -> np.ndarray:
 
 
 def cos_similarity(a: np.ndarray, b: np.ndarray) -> float:
-    return np.dot(a, b)
+    print(a.shape)
+    print(b.shape)
+    d = np.dot(a, b)
+    print(d.shape)
+    return d
