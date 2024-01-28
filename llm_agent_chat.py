@@ -40,6 +40,8 @@ import pystache
 import pytz
 from tzlocal import get_localzone
 
+from embeddings import cos_similarity, embed
+
 
 PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
