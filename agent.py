@@ -57,7 +57,7 @@ class Agent:
 
             event = {
                 "version": 0.1,
-                "type": "SessionTime",
+                "type": "TimeUpdate",
                 "user": getpass.getuser(),
                 "client_platform": str(platform.platform()),
                 **self._get_time_metadata()

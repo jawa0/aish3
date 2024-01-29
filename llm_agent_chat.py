@@ -349,13 +349,36 @@ Message:
                         ta_answer.text_buffer.insert(chunk_text)
                         ta_answer.set_needs_redraw()
 
+
+                def on_passthrough_response_done(llm_request: LLMRequest):
+                    event = {
+                        "version": 0.1,
+                        "type": "AgentResponseText",
+                        "user": getpass.getuser(),
+                        "client_platform": str(platform.platform()),
+                        "message_text": llm_request.response_text,
+                        **self.agent._get_time_metadata()
+                    }
+                    self.agent.put_event(event)
+
+
                 llm_request = LLMRequest(session=self.gui.session,
                                          prompt=self.agent_passhtrough_prompt,
                                          previous_messages=prev_messages,
                                          handlers=[("start", on_passthrough_response_start),
-                                                   ("next", on_passthrough_response_next),])
-                                                #    ("stop", on_passthrough_response_done)])
+                                                   ("next", on_passthrough_response_next),
+                                                    ("stop", on_passthrough_response_done)])
                 llm_request.send_nowait()
+
+                event = {
+                    "version": 0.1,
+                    "type": "UserTextMessage",
+                    "user": getpass.getuser(),
+                    "client_platform": str(platform.platform()),
+                    "message_text": content,
+                    **self.agent._get_time_metadata()
+                }
+                self.agent.put_event(event)
 
             else:
                 print(f'** JSON:\n{json_call}')
