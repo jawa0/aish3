@@ -66,8 +66,8 @@ class Agent:
         self._event_stream.put(event)
 
 
-    def recall_text_by_similarity(self, query: str) -> [Tuple[float, "Memory"]]:
-        results = self.memory.retrieve_by_similarity(text=query)
+    def recall_text_by_similarity(self, text: str) -> [Tuple[float, "Memory"]]:
+        results = self.memory.retrieve_by_similarity(text=text)
         for s, m in results:
             event = {
                 "version": 0.1,
