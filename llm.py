@@ -2,7 +2,7 @@ import asyncio
 from openai import OpenAI, chat
 import os
 from prompt import LiteralPrompt, Prompt
-from session import ChatCompletionHandler, Session
+from session import Session
 from typing import Callable, Dict, List, Literal, Optional, Tuple
 
 

@@ -2,11 +2,12 @@ import asyncio
 from datetime import datetime
 from event_stream import EventStream
 import getpass
-from memory import MemoryStore
+from memory import Memory, MemoryStore
 import platform
-import pystache
 import pytz
+from typing import Tuple
 from tzlocal import get_localzone
+import uuid
 
 
 class Agent:
@@ -50,6 +51,38 @@ class Agent:
     def put_event(self, event: dict) -> None:
         self._event_stream.put(event)
 
+
+    def memorize_text(self, text: str) -> uuid.UUID:
+        mem_uid = self.memory.store(memory=Memory(text=text))
+        event = {
+            "version": 0.1,
+            "type": "MemorizedText",
+            "mem_uid": str(mem_uid),
+            "text": text,
+            "user": getpass.getuser(),
+            "client_platform": str(platform.platform()),
+            **self._get_time_metadata()
+        }
+        self._event_stream.put(event)
+
+
+    def recall_text_by_similarity(self, query: str) -> [Tuple[float, "Memory"]]:
+        results = self.memory.retrieve_by_similarity(text=query)
+        for s, m in results:
+            event = {
+                "version": 0.1,
+                "type": "RememberedText",
+                "mem_uid": str(m.uid),
+                "similarity": s,
+                "summary": m.summary_sentence,
+                "text": m.text,
+                "user": getpass.getuser(),
+                "client_platform": str(platform.platform()),
+                **self._get_time_metadata()
+            }
+            self._event_stream.put(event)
+        return results
+    
 
     async def _go(self):
         while True:

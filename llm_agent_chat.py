@@ -36,11 +36,10 @@ from prompt import LiteralPrompt, PromptTemplate
 
 import getpass
 import platform
-import pystache
 import pytz
 from tzlocal import get_localzone
 
-from embeddings import cos_similarity, embed
+from embeddings import embed
 
 
 PANEL_WIDTH = 600
@@ -383,6 +382,7 @@ Message:
             else:
                 print(f'** JSON:\n{json_call}')
 
+                # @todo move things like this to a sanitize utility
                 # @bug OpenAI? Sometimes returned JSON does not include "tool_uses" list
                 if "tool_uses" in json_call:
                     tu = json_call["tool_uses"][0]
@@ -398,7 +398,19 @@ Message:
 
                 if function_name == "functions.store_info_chunk":
                     mem_text = tu["parameters"]["text_info"]
-                    mem_uid = self.agent.memory.store(memory=Memory(text=mem_text))
+
+                    event = {
+                        "version": 0.1,
+                        "type": "UserMemorizeRequest",
+                        "text": mem_text,
+                        "user": getpass.getuser(),
+                        "client_platform": str(platform.platform()),
+                        **self.agent._get_time_metadata()
+                    }
+                    self.agent.put_event(event)
+
+                    # mem_uid = self.agent.memory.store(memory=Memory(text=mem_text))
+                    mem_uid = self.agent.memorize_text(mem_text)
                     data = {"Content": mem_text}
 
                     # Add response TextArea
@@ -443,7 +455,20 @@ Message:
                 elif function_name == "functions.retrieve_memories_by_keywords":
                     pass
                 elif function_name == "functions.retrieve_memories_by_similarity":
-                    results = self.agent.memory.retrieve_by_similarity(text=tu["parameters"]["search_string"])
+                    query_string = tu["parameters"]["search_string"]
+
+                    event = {
+                        "version": 0.1,
+                        "type": "UserRecallRequest",
+                        "query": query_string,
+                        "user": getpass.getuser(),
+                        "client_platform": str(platform.platform()),
+                        **self.agent._get_time_metadata()
+                    }
+                    self.agent.put_event(event)
+
+                    # results = self.agent.memory.retrieve_by_similarity(text=query_string)
+                    results = self.agent.recall_text_by_similarity(text=query_string)
 
                     text_result = ""
                     for similiarity, mem in results:

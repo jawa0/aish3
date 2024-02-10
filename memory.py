@@ -25,17 +25,17 @@ class Memory:
 
 
     @property
-    def uid(self):
+    def uid(self) -> uuid.UUID:
         return self._uid
 
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self._text
 
 
     @property
-    def keywords(self):
+    def keywords(self) -> List[str]:
         return self._keywords
     
 
@@ -45,7 +45,7 @@ class Memory:
     
 
     @property
-    def summary_sentence(self):
+    def summary_sentence(self) -> str | None:
         return self._summary_sentence
     
     @summary_sentence.setter
