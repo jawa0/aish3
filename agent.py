@@ -10,6 +10,8 @@ from tzlocal import get_localzone
 import uuid
 
 
+TIME_UPDATE_INTERVAL_SECONDS = 5
+
 class Agent:
     def __init__(self) -> None:
         self.memory = MemoryStore()
@@ -64,6 +66,7 @@ class Agent:
             **self._get_time_metadata()
         }
         self._event_stream.put(event)
+        return mem_uid
 
 
     def recall_text_by_similarity(self, text: str) -> [Tuple[float, "Memory"]]:
@@ -97,7 +100,7 @@ class Agent:
             }
             self._event_stream.put(event)
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(TIME_UPDATE_INTERVAL_SECONDS)
 
 
     def _get_time_metadata(self):
