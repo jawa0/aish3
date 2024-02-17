@@ -469,12 +469,14 @@ Message:
 
                     # results = self.agent.memory.retrieve_by_similarity(text=query_string)
                     results = self.agent.recall_text_by_similarity(text=query_string)
-
-                    text_result = ""
-                    for similiarity, mem in results:
-                        print(f'** SIMILARITY: {similiarity:0.3f}')
-                        print(f'** MEMORY: {mem.summary_sentence}')
-                        text_result += f"{similiarity:0.3f}: {mem.summary_sentence}\n"
+                    if len(results) == 0:
+                        text_result = "No memories matched above cutoff similarity threshold."
+                    else:
+                        text_result = ""
+                        for similiarity, mem in results:
+                            print(f'** SIMILARITY: {similiarity:0.3f}')
+                            print(f'** MEMORY: {mem.summary_sentence}')
+                            text_result += f"{similiarity:0.3f}: {mem.summary_sentence}\n"
 
                     # Add response TextArea
                     cmui_answer = self.gui.create_control("ChatMessageUI", role="Answer", text='')
