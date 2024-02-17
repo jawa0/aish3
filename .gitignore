@@ -5,6 +5,11 @@
 .env
 .env.local
 
+*.private.json
+
+*jaba*
+*.bak
+
 # Python
 __pycache__
 *.pyc
