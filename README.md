@@ -13,17 +13,7 @@ _In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common infor
 So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 
 
-Features:
-* Have multiple LLM chats (with ChatGPT)
-    * Save and load workspaces containing everything as JSON files
-* Almost have minimalist Miro-like note-taking
-    * Boxes (done) and arrows (todo. Pan around huge workspace. Zoom in and out (todo)
-* Working towards (optional) full hands-free operation
-    * Voice-in speech-to-text transcription
-    * Voice-out reading of chat results and other text
-    * Voice commands
-* Working towards no-code app building
-    * Define GUI in native app and then deploy to web and mobile (todo). The opposite of Electron.
+## NOTE: The most recent code is on the "agent" branch. Haven't merged to main, because of unrelated git histories.
 
 ### Running it
 
