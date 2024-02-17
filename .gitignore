@@ -5,9 +5,11 @@
 .env
 .env.local
 
+*.private
 *.private.json
 
 *jaba*
+*.bak.*
 *.bak
 
 # Python
