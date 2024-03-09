@@ -173,7 +173,7 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
 
             t1 = time.time()
             elapsed = t1 - t0
-            fps = 1.0 / elapsed
+            fps = 1.0 / elapsed if elapsed > 0 else 30.0
             fps_smoothed = 0.9 * fps_smoothed + 0.1 * fps
             fps_str = f"FPS: {fps_smoothed:.2f}"
             draw_text(renderer, font_descriptor, fps_str, width - 100, 10)
