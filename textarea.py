@@ -121,6 +121,10 @@ class TextArea(GUIControl):
         return super()._change_focus(am_getting_focus)
     
 
+    def get_text(self) -> str:
+        return self.text_buffer.get_text()
+    
+    
     def set_text(self, text: str) -> None:
         self.text_buffer.set_text(text)
 
@@ -160,6 +164,10 @@ class TextArea(GUIControl):
 
 
     def handle_event(self, event):
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+
         current_was_last_event_mousewheel = self._was_last_event_mousewheel
         self._was_last_event_mousewheel = False
 
@@ -192,6 +200,10 @@ class TextArea(GUIControl):
                 return True
             
             elif keySymbol == sdl2.SDLK_RETURN and not cmdPressed:
+                # @todo: add an option to not capture RETURN, so that
+                # we can make specialized text-based controls that do
+                # stuff when you press RETURN.
+                
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()

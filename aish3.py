@@ -78,16 +78,16 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
         gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
         gui.content().add_child(gui.voice_transcript)
 
-        # gui.command_console = CommandConsole(saveable=False,
-        #                                      screen_relative=True,
-        #                                     can_focus=True,
-        #                                     visible=False,
-        #                                     x=10,
-        #                                     y=50,
-        #                                     w=1000,
-        #                                     h=500,
-        #                                     gui=gui)
-        # gui.content().add_child(gui.command_console)
+        gui.command_console = CommandConsole(saveable=False,
+                                             screen_relative=True,
+                                            can_focus=True,
+                                            visible=False,
+                                            x=10,
+                                            y=50,
+                                            w=1000,
+                                            h=500,
+                                            gui=gui)
+        gui.content().add_child(gui.command_console)
 
     # Need to fixup path so we an work from inside a PyInstaller distribution.
     # print('__file__:', __file__)

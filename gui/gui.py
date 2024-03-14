@@ -397,18 +397,18 @@ class GUI:
                 # print(f"self._viewport_pos = {self._viewport_pos}")
                 # print(f"self.command_console.bounding_rect = {self.command_console.bounding_rect}")
 
-                # self.command_console._visible = not self.command_console._visible
+                self.command_console._visible = not self.command_console._visible
 
                 # Gets focus which causes it to handle the upcoming SDL_TEXTINPUT and 
                 # also insert the ~ character into the text buffer. @bug @note
-                # self.set_focus(self.command_console.console_area, self.command_console._visible)
+                self.set_focus(self.command_console.console_area, self.command_console._visible)
                 return True
 
-            # elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
-            #     # Hide the command console if Esc is pressed
-            #     # self.command_console._visible = False
-            #     # self.set_focus(self.command_console.console_area, False)
-            #     return True
+            elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
+                # Hide the command console if Esc is pressed
+                self.command_console._visible = False
+                self.set_focus(self.command_console.console_area, False)
+                return True
 
 
         handled = False

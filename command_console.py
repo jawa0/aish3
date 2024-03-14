@@ -38,10 +38,15 @@ class CommandConsole(GUIContainer):
         self.add_child(self.console_label)
 
         self.console_area = TextArea(w=PANEL_WIDTH, draggable=False, h=60, gui=self.gui)
+        self.console_area.add_pre_event_snoop(self)
         self.add_child(self.console_area)
 
 
     def handle_event(self, event):
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+        
         # Specific event handling for the CommandConsole
         if event.type == sdl2.SDL_KEYDOWN:
             keysym = event.key.keysym.sym

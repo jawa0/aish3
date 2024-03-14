@@ -179,6 +179,10 @@ class LLMChatContainer(GUIContainer):
 
 
     def handle_event(self, event):
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+
         if event.type == sdl2.SDL_KEYDOWN:
             shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))

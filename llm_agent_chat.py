@@ -566,7 +566,11 @@ Message:
 
 
     def handle_event(self, event):
-        handled = super().handle_event(event)
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+
+        handled = super().handle_event(event)  # @todo @bug: should use pre event snoop here?
 
         if handled:
             return True

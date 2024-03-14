@@ -16,6 +16,7 @@
 import sdl2
 from config import GUI_INSET_X, GUI_INSET_Y
 import uuid
+import weakref
 
 
 class GUIControl:
@@ -23,6 +24,8 @@ class GUIControl:
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
 
+        # @todo: Isn't there a built-in way to do this with dicts?
+        # Just saw that recently...
         kwargs = cls._enrich_kwargs(json, **kwargs)            
         instance = cls(**kwargs)
         return instance
@@ -115,6 +118,7 @@ class GUIControl:
         self.set_bounds(x, y, w, h)
         self.pulse_busy = False
         self.editor = None
+        self._pre_event_snoops = []
 
 
     def has_focus(self):
@@ -296,8 +300,23 @@ class GUIControl:
             return False
 
 
+    def add_pre_event_snoop(self, func):
+        self._pre_event_snoops.append(weakref.ref(func))
+
+
     def handle_event(self, event):
-        return self.parent_handle_event(event)
+        return False
+    
+
+    def _pre_handle_event(self, event):
+        if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_RETURN:
+            debug_break = 1
+
+        for weak_snoop in self._pre_event_snoops:
+            snoop = weak_snoop()
+            if snoop and hasattr(snoop, 'handle_event') and snoop.handle_event(event):
+                return True
+        return False
     
 
     def parent_handle_event(self, event):
