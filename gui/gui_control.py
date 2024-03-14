@@ -259,7 +259,10 @@ class GUIControl:
                                                self.bounding_rect.y)
                 
                 avr = most_senior_screen_relative_ancestor.get_view_rect()
-                vr = sdl2.SDL_Rect(x + avr.x, y + avr.y, self.bounding_rect.w, self.bounding_rect.h)
+                vr = sdl2.SDL_Rect(x + avr.x + most_senior_screen_relative_ancestor._inset[0], 
+                                   y + avr.y + most_senior_screen_relative_ancestor._inset[1], 
+                                   self.bounding_rect.w, 
+                                   self.bounding_rect.h)
                 return vr
             else:
                 wr = self.get_world_rect()
@@ -309,8 +312,8 @@ class GUIControl:
     
 
     def _pre_handle_event(self, event):
-        if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_RETURN:
-            debug_break = 1
+        # if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_RETURN:
+        #     debug_break = 1
 
         for weak_snoop in self._pre_event_snoops:
             snoop = weak_snoop()

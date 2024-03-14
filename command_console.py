@@ -29,15 +29,15 @@ class CommandConsole(GUIContainer):
         
         super().__init__(layout=ColumnLayout(), draggable=False, **kwargs)
         self.draw_bounds = True
-        self._inset = (GUI_INSET_X, GUI_INSET_Y)
+        # self._inset = (GUI_INSET_X, GUI_INSET_Y)
 
         self.console_label = Label(text="Command Console",
                                    draggable=False,
-                                   w=PANEL_WIDTH, 
+                                   w=150, 
                                    gui=self.gui)
         self.add_child(self.console_label)
 
-        self.console_area = TextArea(w=PANEL_WIDTH, draggable=False, h=60, gui=self.gui)
+        self.console_area = TextArea(w=PANEL_WIDTH, draggable=False, h=40, gui=self.gui)
         self.console_area.add_pre_event_snoop(self)
         self.add_child(self.console_area)
 
