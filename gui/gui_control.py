@@ -307,11 +307,14 @@ class GUIControl:
         self._pre_event_snoops.append(weakref.ref(func))
 
 
-    def handle_event(self, event):
-        return False
+    def handle_event(self, event) -> bool:
+        # If a derived class of GUIControl does not implement its own event handling, 
+        # then it should just pass the event up the runtime scene hierarchy.
+        
+        return self.parent_handle_event(event)
     
 
-    def _pre_handle_event(self, event):
+    def _pre_handle_event(self, event) -> bool:
         # if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_RETURN:
         #     debug_break = 1
 
@@ -322,7 +325,7 @@ class GUIControl:
         return False
     
 
-    def parent_handle_event(self, event):
+    def parent_handle_event(self, event) -> bool:
         # Pass unhandled events up the runtime child/parent hierarchy.
         if self.parent:
             return self.parent.handle_event(event)
