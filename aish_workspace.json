@@ -1,17 +1,17 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2024-02-17T17:24:28.582313+00:00",
-  "saved_at_local": "2024-02-17T12:24:28.582313-05:00",
+  "saved_at_utc": "2024-03-15T01:26:40.388654+00:00",
+  "saved_at_local": "2024-03-14T21:26:40.388654-04:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "uid": "796502f7-43b0-408f-8a3e-1fcf3093c681",
       "bounding_rect": [
-        13,
-        -67,
-        1239,
-        719
+        -776,
+        -104,
+        3016,
+        756
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -24,8 +24,8 @@
           "class": "Label",
           "uid": "f9b64385-d5f7-456f-b133-625151f9da48",
           "bounding_rect": [
-            1,
-            73,
+            790,
+            110,
             150,
             30
           ],
@@ -36,8 +36,8 @@
           "class": "LLMAgentChat",
           "uid": "44e826ac-8877-4e50-a385-f6b74d4a9e9b",
           "bounding_rect": [
-            0,
-            118,
+            789,
+            155,
             608,
             456
           ],
@@ -189,8 +189,8 @@
           "class": "TextArea",
           "uid": "8f270621-1958-40e1-9d5c-0491ee7542e8",
           "bounding_rect": [
-            185,
-            0,
+            974,
+            37,
             240,
             100
           ],
@@ -200,8 +200,8 @@
           "class": "TextArea",
           "uid": "fb3cf901-16d3-4f32-af53-4e948d25e73e",
           "bounding_rect": [
-            441,
-            1,
+            1230,
+            38,
             240,
             100
           ],
@@ -211,8 +211,8 @@
           "class": "LLMAgentChat",
           "uid": "da7adfad-78f7-4132-be9e-dca75dcc2c36",
           "bounding_rect": [
-            631,
-            119,
+            1420,
+            156,
             608,
             600
           ],
@@ -400,13 +400,519 @@
               ]
             }
           ]
+        },
+        {
+          "class": "Label",
+          "uid": "80c42ab9-6cdf-4d3f-ba3e-529decc6df89",
+          "bounding_rect": [
+            2499,
+            365,
+            270,
+            30
+          ],
+          "text": "Notes on REST APIs",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "5cf4d92d-fa74-4341-ab1b-83bdbd5bae95",
+          "bounding_rect": [
+            2259,
+            117,
+            240,
+            100
+          ],
+          "text": "Flask Restful\nhttps://flask-restful.readthedocs.io/en/latest/quickstart.html\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "c7bc6994-21a3-44df-b906-439dcf5ae574",
+          "bounding_rect": [
+            2260,
+            228,
+            240,
+            100
+          ],
+          "text": "Best practices for REST API design\nhttps://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "3b5fe416-d6a4-4384-8d12-ebe3948f7408",
+          "bounding_rect": [
+            2251,
+            337,
+            240,
+            100
+          ],
+          "text": "Best practices for REST API security:\nAuthentication and authorization\n\nhttps://stackoverflow.blog/2021/10/06/best-practices-for-authentication-and-authorization-for-rest-apis/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "4a3dddfe-d23a-459d-a2ea-1607c64d3f8e",
+          "bounding_rect": [
+            2258,
+            453,
+            240,
+            100
+          ],
+          "text": "What exactly is RESTful programming?\nhttps://stackoverflow.com/questions/671118/what-exactly-is-restful-programming\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "4ac9adc9-1f6d-4e35-b08e-adbb56913944",
+          "bounding_rect": [
+            2256,
+            565,
+            240,
+            100
+          ],
+          "text": "What is a REST API?\nhttps://www.redhat.com/en/topics/api/what-is-a-rest-api\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "93dc1ede-b0e8-4039-8675-a11cc99748dc",
+          "bounding_rect": [
+            2516,
+            119,
+            240,
+            100
+          ],
+          "text": "How did REST Come To Mean The Opposite of REST?\nhttps://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "4f42603a-b75e-4495-a28c-d03d71e3438d",
+          "bounding_rect": [
+            2516,
+            230,
+            240,
+            100
+          ],
+          "text": "Wikipedia: REST\nhttps://en.wikipedia.org/wiki/REST\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "42c1c1da-743c-4deb-aab6-270ab6378b7a",
+          "bounding_rect": [
+            2771,
+            571,
+            240,
+            100
+          ],
+          "text": "Microsoft: api-guidelines\nhttps://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "fd7531ef-bc33-4692-8c9e-94d61d919e39",
+          "bounding_rect": [
+            2515,
+            453,
+            240,
+            100
+          ],
+          "text": "Microsoft REST API Guidelines\n(Deprecated)\nhttps://github.com/microsoft/api-guidelines/blob/vNext/graph/Guidelines-deprecated.md\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "85520bb5-dfe0-4fef-8966-92c6c4814e20",
+          "bounding_rect": [
+            2514,
+            566,
+            240,
+            100
+          ],
+          "text": "Microsoft Azure REST API Guidelines\nhttps://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "08d77b66-af19-438f-b5d8-9c06daebdb8c",
+          "bounding_rect": [
+            2770,
+            120,
+            240,
+            100
+          ],
+          "text": "MS Azure: Considerations for Service Design\nhttps://github.com/microsoft/api-guidelines/blob/vNext/azure/ConsiderationsForServiceDesign.md\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "2143467d-ff2e-4612-b79f-ede578ee93ef",
+          "bounding_rect": [
+            2769,
+            230,
+            240,
+            100
+          ],
+          "text": "Microsoft Graph REST API Guidelines\nhttps://github.com/microsoft/api-guidelines/blob/vNext/graph/GuidelinesGraph.md\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "2cdfa00a-e401-4271-b6dc-dc84b1b8db5b",
+          "bounding_rect": [
+            2776,
+            337,
+            240,
+            100
+          ],
+          "text": "OWASP Rest Security Cheat Sheet\nhttps://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "067ed985-7805-4421-a815-e52845db2956",
+          "bounding_rect": [
+            2771,
+            453,
+            240,
+            100
+          ],
+          "text": "API Security Breaches\nhttps://nordicapis.com/8-significant-api-breaches-of-recent-years/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "5cdcb5fa-5b85-47f6-80b0-3774f4066634",
+          "bounding_rect": [
+            2258,
+            0,
+            240,
+            100
+          ],
+          "text": "Express: minimalist Node.js web framework\nhttps://expressjs.com/\n"
+        },
+        {
+          "class": "Label",
+          "uid": "b18ba975-dc27-4b16-b605-7651d56b2812",
+          "bounding_rect": [
+            3,
+            35,
+            435,
+            30
+          ],
+          "text": "Notes on Decreasing Load Time",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "LLMChatContainer",
+          "uid": "15da6605-e883-4749-8963-c23bfbd4c2c4",
+          "bounding_rect": [
+            0,
+            83,
+            608,
+            672
+          ],
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
+          ],
+          "children": [
+            {
+              "class": "Label",
+              "uid": "646f3690-3054-4e7b-841b-b91f24f3679b",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "b94938df-f115-4d85-b6b7-5f70b43581e5",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "3d82aa31-03af-4e49-960a-9147b792be2e",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "d018a936-4a37-4e65-82a5-eb952cc9d2da",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "023de2b6-4797-4125-826e-f9c7a7e574f6",
+              "bounding_rect": [
+                0,
+                104,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "fbe34bf5-7fc5-4161-bd8a-069c2ee45afe",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "51012956-dc39-4d0b-9819-617538a6acf0",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I'm importing the sentence_transformers python package on startup of my application,\nbut it takes around 15 seconds to load. I don't want the app to be unresponsive for\nthat long. Provide a list of options to reduce the latency that the user experiences.\nThe package isn't immediately necessary to show the first screen of my app and allow\nthe user to start interacting with it."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "6730f1f1-efaa-4064-81cd-8a125fec48aa",
+              "bounding_rect": [
+                0,
+                188,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "352e520c-0909-426a-9d9e-5f4f2ab9869a",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "ddd43451-54f9-46ff-ab19-4d431991f6e2",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "Understood. Here are several strategies to decrease the initial latency caused by \nimporting the `sentence_transformers` package:\n\n1. Lazy Loading:\n   Defer the import until it is absolutely necessary, i.e., load the module only \n   before the functionality requiring it is actually used.\n\n2. Asynchronous Loading:\n   Load `sentence_transformers` asynchronously in a separate thread or with an async \n   workflow (for instance, with `asyncio`), allowing the main application to run without \n   blocking.\n\n3. Application Warm-Up:\n   During application start-up, show a splash screen or an initial view to the user \n   while loading `sentence_transformers` in the background.\n\n4. Preloading:\n   If the application is frequently used, consider implementing a service that \n   preloads the package before the user actually launches the application. This could \n   be done on system startup or as a background service that activates periodically.\n\n5. Package Optimizations:\n   Review the package import chain to determine if all components of the \n   `sentence_transformers` package are necessary or if a lighter-weight version could \n   be constructed or configured.\n\n6. Server-Side Computing:\n   Offload the computation requiring `sentence_transformers` to a server and make API \n   calls from the client application when necessary. This can be done if the usage of \n   the model does not require immediate response times.\n\n7. Multi-Process Architecture:\n   Use a multi-process architecture where the main application process handles the \n   user interface and a separate worker process handles imports and computation. \n   Communicate between them using inter-process communication (IPC).\n\n8. Incremental Feature Loading:\n   Gradually load different features of the app after the main UI has become \n   responsive. You can show basic information first and fill in more complex details, \n   achieved by the `sentence_transformers`, as they become ready.\n\n9. Profiling and Optimization:\n   Profile the import time and initialization of `sentence_transformers` to see if \n   any specific part of the package or its dependencies are responsible for the delay, \n   and target them for optimization.\n\n10. Custom Efficient Loading:\n    If possible, modify the initialization routine of `sentence_transformers` to be \n    more efficient based on your specific use case.\n\n11. Package Patching:\n    Consider modifying the `sentence_transformers` package to support a faster import \n    and initialization sequence if there are identifiable bottlenecks that can be \n    removed or simplified without affecting functionality.\n\nCareful consideration will be needed to choose the right strategy or combination of \nstrategies to meet the specific operational workflow and user experience requirements \nof your application."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "24177265-4f06-4cb6-9ad8-a65180a37c1e",
+              "bounding_rect": [
+                0,
+                272,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "dfc461de-10f1-4132-b422-8798de114270",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "d2507818-0afa-4d71-a8cc-3fc325ac9d77",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I don't want to modify or delve into the package. Give me some more information on\noption 2."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "ce9842c9-7da2-4e31-b3a0-4b3a645c1696",
+              "bounding_rect": [
+                0,
+                356,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "23657a31-8cce-492d-bb08-327aec6f679b",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "313cc70c-6c8d-447a-ada0-33ac9fae5d1d",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "Certainly, option 2 suggests implementing asynchronous loading of the \n`sentence_transformers` package so that your application can remain responsive \nduring the package's loading process. \n\nHere's a more detailed breakdown of how you might go about it:\n\n1. **Async/Await with Threads**:\n   Python generally doesn't truly run things asynchronously due to the Global Interpreter Lock (GIL), but it can execute IO-bound tasks asynchronously, which is typically the case with package imports. For CPU-bound tasks such as model loading that might be part of the `sentence_transformers` initialization, you can use a ThreadPoolExecutor to run things in a separate thread.\n\n   Here's an example of how this could be done using `concurrent.futures`:\n\n   ```python\n   import concurrent.futures\n   \n   def load_transformers():\n       from sentence_transformers import SentenceTransformer\n       return SentenceTransformer('model-name')\n\n   def main():\n       with concurrent.futures.ThreadPoolExecutor() as executor:\n           future = executor.submit(load_transformers)\n           # You can continue doing other things; the model is loading in a separate thread\n           # Do your initial application setup here, showing the first screen, etc.\n           model = future.result()  # This will block until the model is fully loaded.\n           # Now the model is ready, and you can start using it.\n   ```\n\n2. **Asyncio for Cooperative Multitasking**:\n   If your application is already using `asyncio` for other parts, you might prefer \nto stick with it for consistency. While `asyncio` does not inherently support \nasynchronous loading of modules, you can use a library such as `aiorun` to run \nblocking callables in a separate thread and \"await\" their results:\n\n   ```python\n   import asyncio\n   from sentence_transformers import SentenceTransformer\n\n   async def load_transformers():\n       loop = asyncio.get_running_loop()\n       model = await loop.run_in_executor(None, SentenceTransformer, 'model-name')\n       return model\n\n   async def main():\n       # Start the asynchronous loading of transformers\n       model_future = asyncio.ensure_future(load_transformers())\n       # Initialize the rest of your app, show the initial screen, etc.\n       model = await model_future  # This will block until the model is fully loaded.\n       # Now the model is ready, and you can start using it.\n   \n   if __name__ == '__main__':\n       asyncio.run(main())\n   ```\n\n3. **Handling the Loaded Model**:\n   In both examples above, once the model is loaded, you\u2019ll need to share it with the part of your application that requires it. This could be handled with a callback, event, message queue, or shared state, depending on the architecture of your application.\n\nThe main point of these examples is to prevent the blocking behavior of the `sentence_transformers` package load from stalling the main thread, which is responsible for keeping your application responsive and handling user interactions. By using a concurrent approach, your application can perform other initializations and render the UI while the package is being loaded."
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "3ec42bd2-3557-442b-87be-53c16eb4bc7c",
+              "bounding_rect": [
+                0,
+                440,
+                604,
+                84
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "02b4f3ac-b83d-4ffb-af82-b7976cffde9f",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "5cdc033b-46b6-418f-88a3-b4c576b6dc67",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    60
+                  ],
+                  "text": "I would prefer to use asyncio, since I'm already using it in my app. The problem is\nthat the actual \"import sentence_transformers\" statement is the one taking a long\ntime. Like 10-20 seconds. So if I'm going to speed things up, I can't just import it\nnormally.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "76928fa3-bd8a-441b-acac-f7ab17708676",
+              "bounding_rect": [
+                0,
+                524,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "e4dbbbe4-1282-472b-b897-667db538878d",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "Assistant",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "df1c4d2f-5ef1-4d0d-887e-bba88a492e0c",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "If the actual import statement for `sentence_transformers` is the source of the delay, you can use an `asyncio` compatible method\u2014like running the import in a separate thread\u2014to avoid blocking the main event loop. Here's how you can achieve that:\n\n1. **Run the Import in an Executor**:\n   Utilize the `loop.run_in_executor` method to run the import statement in a thread executor. This will allow you to import the module in the background without blocking the main event loop.\n\n2. **Use a Placeholder for Deferred Imports**:\n   Create a wrapper or a placeholder that represents the `sentence_transformers` module, and replace it with the actual module once it is imported.\n\nHere's an example code snippet demonstrating this:\n\n```python\nimport asyncio\n\nasync def load_transformers():\n    # This function will run in a separate thread to avoid blocking the event loop.\n    from sentence_transformers import SentenceTransformer\n    return SentenceTransformer\n\nasync def main():\n    loop = asyncio.get_running_loop()\n    \n    # Schedule the import to run in the background\n    SentenceTransformer = await loop.run_in_executor(None, load_transformers)\n    \n    # The module has been imported, and you can now use SentenceTransformer\n    # Initialize the rest of your app, show the initial screen, etc.\n\n    # Now you can load the actual model when needed\n    model = SentenceTransformer('model-name')\n    # Use the SentenceTransformer model as necessary\n\nif __name__ == '__main__':\n    asyncio.run(main())\n```\n\nWith this approach, the lengthy import happens in the background, and the `main` coroutine continues executing. While the import is processing, your application can perform initial setup and render the UI. Once the import completes, you can then initialize the `SentenceTransformer` and load the desired model. \n\nRemember that while this method allows you to work around the blocking import, it involves multithreading, so you need to ensure that you handle the loaded module in a thread-safe manner when using it later in your application."
+                }
+              ]
+            }
+          ]
         }
       ]
     }
   },
   "viewport_bookmarks": {},
   "viewport_pos": [
-    1,
-    -95
+    -914,
+    77
   ]
 }
