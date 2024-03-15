@@ -72,6 +72,7 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
     def setup_gui(gui: GUI):
         gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
         gui.content().add_child(gui.listening_indicator)
+        gui.listening_indicator._visible = False  # It's annoying me
 
         voice_transcript_height = 60
         gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
@@ -128,11 +129,11 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
                         new_height = event.window.data2
 
                         # @hack
-                        if gui.voice_transcript is not None:
-                            gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
-                                                            new_height - voice_transcript_height - 5, 
-                                                            new_width-5, 
-                                                            voice_transcript_height)
+                        # if gui.voice_transcript is not None:
+                        #     gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
+                        #                                     new_height - voice_transcript_height - 5, 
+                        #                                     new_width-5, 
+                        #                                     voice_transcript_height)
 
                             # gui.command_console.set_bounds(10, 10, new_width-10, 200)
 

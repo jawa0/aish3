@@ -27,7 +27,7 @@ class CommandConsole(GUIContainer):
     def __init__(self, **kwargs):
         PANEL_WIDTH = 1000
         
-        super().__init__(layout=ColumnLayout(), draggable=False, **kwargs)
+        super().__init__(layout=ColumnLayout(), **kwargs)
         self.draw_bounds = True
         # self._inset = (GUI_INSET_X, GUI_INSET_Y)
 
@@ -40,6 +40,8 @@ class CommandConsole(GUIContainer):
         self.console_area = TextArea(w=PANEL_WIDTH, draggable=False, h=40, gui=self.gui)
         self.console_area.add_pre_event_snoop(self)
         self.add_child(self.console_area)
+        
+        self._can_focus = False
 
 
     def handle_event(self, event):

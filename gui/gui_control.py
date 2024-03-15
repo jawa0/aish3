@@ -233,8 +233,14 @@ class GUIControl:
     def get_world_rect(self):
         """Get our bounding rect in 'world' coordinates. I.e. relative to the overall workspace."""
 
-        wx, wy = self.local_to_world(-self._inset[0], -self._inset[1])
-        wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
+        if self.is_screen_relative():
+            wr = sdl2.SDL_Rect(self.bounding_rect.x + self.gui._viewport_pos[0], 
+                               self.bounding_rect.y + self.gui._viewport_pos[1],
+                               self.bounding_rect.w, 
+                               self.bounding_rect.h)
+        else:
+            wx, wy = self.local_to_world(-self._inset[0], -self._inset[1])
+            wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
         return wr
     
     
@@ -310,7 +316,7 @@ class GUIControl:
     def handle_event(self, event) -> bool:
         # If a derived class of GUIControl does not implement its own event handling, 
         # then it should just pass the event up the runtime scene hierarchy.
-        
+
         return self.parent_handle_event(event)
     
 
