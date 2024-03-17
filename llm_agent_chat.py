@@ -24,6 +24,7 @@ import openai
 from typing import Optional
 
 from agent import Agent
+from agent_events import AgentEvents
 from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
@@ -457,14 +458,7 @@ Message:
                 elif function_name == "functions.retrieve_memories_by_similarity":
                     query_string = tu["parameters"]["search_string"]
 
-                    event = {
-                        "version": 0.1,
-                        "type": "UserRecallRequest",
-                        "query": query_string,
-                        "user": getpass.getuser(),
-                        "client_platform": str(platform.platform()),
-                        **self.agent._get_time_metadata()
-                    }
+                    evemt = AgentEvents.create_event("UserRecallRequest", query=query_string)
                     self.agent.put_event(event)
 
                     # results = self.agent.memory.retrieve_by_similarity(text=query_string)
