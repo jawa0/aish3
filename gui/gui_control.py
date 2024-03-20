@@ -121,6 +121,11 @@ class GUIControl:
         self._pre_event_snoops = []
 
 
+    @property
+    def uid(self):
+        return self._uid
+    
+    
     def has_focus(self):
         return self.gui.get_focus() == self
     

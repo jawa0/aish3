@@ -51,6 +51,8 @@ pan_screen_up(number_of_pixels)
 
 open_file(path_string)
 
+get_focused_control
+
 EXAMPLES:
 "stop_listening" -> stop_listening
 "don't stop listening" -> ""
@@ -64,6 +66,8 @@ EXAMPLES:
 "pan screen up 120" -> pan_screen_up(120)
 "open file foo.txt" -> open_file(foo.txt)
 "open file 'my file with spaces.txt'" -> open_file(my file with spaces.txt)
+"get the focused control" -> get_focused_control
+"what control is focused?" -> get_focused_control
 """
 
         user = f"TEXT:\n{command_text}"

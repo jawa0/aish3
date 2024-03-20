@@ -335,7 +335,16 @@ class GUI:
                     wx, wy = self.view_to_world(vx, vy)
                     self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
 
+        elif command == "get_focused_control":
+            # Get the focused control
+            focused_control = self.get_focus()
+            if focused_control:
+                contents = focused_control.uid
+            else:
+                contents = "None"
 
+            wx, wy = self.view_to_world(vx, vy)
+            self.cmd_new_text_area(text=contents, wx=wx, wy=wy)
                     
 
 
