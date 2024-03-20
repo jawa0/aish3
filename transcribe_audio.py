@@ -189,7 +189,8 @@ class VoiceTranscriber:
                 else:
                     logging.debug(f"** PARTIAL text: '{text}'")
                 
-                self.session.publish("transcribed_text", (text, is_final))
+                self.session.publish("transcribed_text", (text, is_final))  # @todo use Blinker named signal instead
+                
                 was_final = is_final
 
         except queue.Empty:

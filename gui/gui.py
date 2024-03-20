@@ -318,6 +318,27 @@ class GUI:
             wx, wy = self.view_to_world(vx, vy)
             self.cmd_new_label(wx, wy, text=text)
 
+        elif command.startswith("open_file("):
+                i_start = len("open_file(")
+                i_end = command.find(")")
+                if i_end > i_start:
+                    path_string = command[i_start:i_end].strip()
+                    if not os.path.exists(path_string):
+                        contents = f"File '{path_string}' not found."
+                    else:
+                        try:
+                            with open(path_string, 'r') as f:
+                                contents = f.read()
+                        except:
+                            contents = f"Unknown error opening file '{path_string}'."
+
+                    wx, wy = self.view_to_world(vx, vy)
+                    self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+
+
+                    
+
+
         else:
             pan_screen_prefix = "pan_screen_"
             if command.startswith(pan_screen_prefix):
@@ -361,6 +382,7 @@ class GUI:
 
                 wx, wy = self.get_view_pos()
                 self.set_view_pos(wx + dx_pixels, wy + dy_pixels)
+
 
 
     def handle_event(self, event):

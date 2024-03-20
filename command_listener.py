@@ -49,6 +49,8 @@ pan_screen_right(number_of_pixels)
 pan_screen_down(number_of_pixels)
 pan_screen_up(number_of_pixels)
 
+open_file(path_string)
+
 EXAMPLES:
 "stop_listening" -> stop_listening
 "don't stop listening" -> ""
@@ -60,6 +62,8 @@ EXAMPLES:
 "pan screen right 40 pixels" -> pan_screen_right(40)
 "pan screen down 300 pixels" -> pan_screen_down(300)
 "pan screen up 120" -> pan_screen_up(120)
+"open file foo.txt" -> open_file(foo.txt)
+"open file 'my file with spaces.txt'" -> open_file(my file with spaces.txt)
 """
 
         user = f"TEXT:\n{command_text}"
