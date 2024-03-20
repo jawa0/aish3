@@ -161,7 +161,6 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
             #
 
             await asyncio.sleep(0.0001)
-            await session.update()
 
             #
             # Update our app GUI and draw scene

@@ -29,7 +29,6 @@ from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
-from session import ChatCompletionHandler
 from llm import LLMRequest
 from llm_chat_container import LLMChatContainer
 from memory import Memory
