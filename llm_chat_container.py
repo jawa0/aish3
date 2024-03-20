@@ -24,15 +24,14 @@ from gui import GUI, GUIContainer
 from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
-from session import ChatCompletionHandler
+from llm import LLMRequest
+from prompt import LiteralPrompt
 
 
 PANEL_WIDTH = 600
 PANEL_HEIGHT = 120
 
-
 class LLMChatContainer(GUIContainer):
-
     class ChatMessageUI(GUIContainer):
         @classmethod
         def from_json(cls, json, **kwargs):
@@ -100,35 +99,27 @@ class LLMChatContainer(GUIContainer):
     @classmethod
     def create(cls, **kwargs):
         return cls(**kwargs)
-    
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.draw_bounds = True
-        
         self.set_layout(ColumnLayout())
         self.system = None
         self.utterances = []
-
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
-            self.title = Label(text="LLM Chat [gpt-4]", 
-                               w=PANEL_WIDTH, h=20, 
-                               draggable=False,
-                               editable=False,
-                               **kwargs)
-            
+            self.title = Label(text="LLM Chat [gpt-4]",
+                                w=PANEL_WIDTH, h=20,
+                                draggable=False,
+                                editable=False,
+                                **kwargs)
             self.add_child(self.title)
-
             text: str = os.getenv("DEFAULT_SYSTEM_PROMPT", "")
             self.system = self.ChatMessageUI(role="System", text=text, **kwargs)
-
             self.utterances = [self.system, self.ChatMessageUI(role="User", **kwargs)]
             for utterance in self.utterances:
                 self.add_child(utterance)
-
         self.accumulated_response_text = None
-
         self.busy_colormap = matplotlib.colormaps['summer']
         self._t_busy = 0.0
 
@@ -282,36 +273,32 @@ class LLMChatContainer(GUIContainer):
 
 
     def send(self):
-        messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances]
-
-        handler = ChatCompletionHandler(start_handler=self.on_llm_response_start,
-                                        chunk_handler=self.on_llm_response_chunk,
-                                        done_handler=self.on_llm_response_done)
+        previous_messages = [{"role": u.get_role().lower(), "content": u.get_text()} for u in self.utterances[:-1]]
+        prompt = LiteralPrompt(self.utterances[-1].get_text())
 
         self.pulse_busy = True
         self._t_busy = 0.0
-
         model = 'gpt-4-1106-preview'
         # model = 'gpt-4'
-
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
-
         # Shrink previous messages
         for u in self.utterances:
             u.text_area.set_size(PANEL_WIDTH, 60)
         self.utterances.append(answer)
         self.updateLayout()
-
         self.add_child(answer)
-        self.gui.session.llm_send_streaming_chat_request(model, messages, handlers=[handler])
 
+        llm_request = LLMRequest(session=self.gui.session,
+                                 prompt=prompt,
+                                 previous_messages=previous_messages,
+                                 handlers=[("start", self.on_llm_response_start),
+                                           ("next", self.on_llm_response_chunk),
+                                           ("stop", self.on_llm_response_done)])
+        llm_request.send_nowait()
 
-
-
-    def on_llm_response_start(self) -> None:
+    def on_llm_response_start(self, llm_request: LLMRequest) -> None:
         self.accumulated_response_text = ""
-
         if not hasattr(self, "current_response_destination") or self.current_response_destination is None:
             assert(len(self.utterances) > 0)
             answer = self.utterances[-1]
@@ -319,20 +306,16 @@ class LLMChatContainer(GUIContainer):
             assert(isinstance(answer, self.ChatMessageUI) and role == "Assistant")
             self.current_response_destination = answer
 
-
-    def on_llm_response_chunk(self, chunk_text: Optional[str]) -> None:
+    def on_llm_response_chunk(self, llm_request: LLMRequest, chunk_text: Optional[str]) -> None:
         if chunk_text is not None:
             answer_text_area = self.current_response_destination.text_area
             answer_text_area.text_buffer.move_point_to_end()
             answer_text_area.text_buffer.insert(chunk_text)
             answer_text_area.set_needs_redraw()
-
             self.accumulated_response_text += chunk_text
 
-
-    def on_llm_response_done(self) -> None:
+    def on_llm_response_done(self, llm_request: LLMRequest) -> None:
         self.current_response_destination = None
-
         self.pulse_busy = False
         self._t_busy = 0.0
 
