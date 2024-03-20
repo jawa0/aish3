@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ from session import Session
 from label import Label
 from textarea import TextArea
 from llm_agent_chat import LLMAgentChat
+from agent import Agent
 
 
 async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
@@ -83,9 +84,9 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
                                              screen_relative=True,
                                             can_focus=True,
                                             visible=False,
-                                            x=10,
-                                            y=50,
-                                            w=1000,
+                                            x=20,
+                                            y=20,
+                                            w=1200,
                                             h=500,
                                             gui=gui)
         gui.content().add_child(gui.command_console)
@@ -108,6 +109,9 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
     
     running = True
     t_prev_update = time.time()
+
+    agent = Agent()
+    agent.start()
 
     fps_smoothed = 0.0
     while running:

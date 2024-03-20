@@ -9,6 +9,7 @@ import pytz
 from typing import Tuple
 from tzlocal import get_localzone
 import uuid
+from event_queue import EventQueue
 
 
 TIME_UPDATE_INTERVAL_SECONDS = 5
@@ -19,13 +20,14 @@ class Agent:
         self.memory = MemoryStore()
         self.memory.load('memory.json')
 
-        self._event_stream = EventStream()
+        self._percepts = EventStream()
+        self._future_events = EventQueue()
         self._task = None
 
 
     def start(self) -> None:
         event = AgentEvents.create_event("SessionStart")
-        self._event_stream.put(event)
+        self._percepts.put(event)
 
         loop = asyncio.get_running_loop()
         self._task = loop.create_task(self._go())
@@ -33,7 +35,7 @@ class Agent:
 
     def stop(self) -> None:
         event = AgentEvents.create_event("SessionEnd")
-        self._event_stream.put(event)
+        self._percepts.put(event)
 
         if self._task is not None:
             self._task.cancel()
@@ -41,13 +43,13 @@ class Agent:
 
 
     def put_event(self, event: dict) -> None:
-        self._event_stream.put(event)
+        self._percepts.put(event)
 
 
     def memorize_text(self, text: str) -> uuid.UUID:
         mem_uid = self.memory.store(memory=Memory(text=text))
         event = AgentEvents.create_event("MemorizedText", mem_uid=str(mem_uid), text=text)
-        self._event_stream.put(event)
+        self._percepts.put(event)
         return mem_uid
 
 
@@ -61,15 +63,16 @@ class Agent:
                 summary=m.summary_sentence,
                 text=m.text
             )
-            self._event_stream.put(event)
+            self._percepts.put(event)
         return results
 
 
     async def _go(self):
         while True:
-            print('Agent._go() ...')
+            # print('Agent._go() ...')
 
             event = AgentEvents.create_event("TimeUpdate")
             self._event_stream.put(event)
 
+            # await asyncio.sleep(1.0 / 120)
             await asyncio.sleep(TIME_UPDATE_INTERVAL_SECONDS)

@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2024-03-15T01:26:40.388654+00:00",
-  "saved_at_local": "2024-03-14T21:26:40.388654-04:00",
+  "saved_at_utc": "2024-03-18T13:44:33.349133+00:00",
+  "saved_at_local": "2024-03-18T09:44:33.349133-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -11,7 +11,7 @@
         -776,
         -104,
         3016,
-        756
+        1025
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -906,13 +906,58 @@
               ]
             }
           ]
+        },
+        {
+          "class": "Label",
+          "uid": "585992d6-aaa0-4aa9-9b68-304f24535b99",
+          "bounding_rect": [
+            2258,
+            729,
+            165,
+            30
+          ],
+          "text": "Motor Stuff",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "99be3673-a1a6-4acc-a2d0-02035feae8e3",
+          "bounding_rect": [
+            2256,
+            772,
+            240,
+            100
+          ],
+          "text": "RobotShop Brushed Motor Controllers\nhttps://ca.robotshop.com/collections/brushed-motor-controllers?pf_p_price=3.47%3A100&pf_st_stock_status=true\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "8d20e4ca-03b3-4743-87c6-5e3dd5394620",
+          "bounding_rect": [
+            2522,
+            773,
+            240,
+            100
+          ],
+          "text": "Testing Unknown Motors\nhttps://www.google.com/search?q=how+to+test+an+unknown+dc+brushed+motor&rlz=1C5CHFA_enCA790CA790&oq=how+to+test+an+unknown+dc+brushed+motor&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRigATIHCAIQIRifBTIHCAMQIRifBdIBCDc0NjBqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8\nhttps://forum.arduino.cc/t/unknown-motor-measure-power-from-resistance/460370\nhttps://electronics.stackexchange.com/questions/132720/how-do-i-find-the-voltage-range-for-an-unknown-dc-motor\nhttps://www.societyofrobots.com/robotforum/index.php?topic=11583.0\nhttps://www.planetanalog.com/tips-and-tricks-for-testing-debugging-brushed-dc-motors/\nhttps://www.chiefdelphi.com/t/characterizing-an-unmarked-motor/395410\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "ff0fe375-6323-48b4-99ba-360aef7549ce",
+          "bounding_rect": [
+            2255,
+            887,
+            240,
+            100
+          ],
+          "text": "Dynamometer\nhttps://circuitcellar.com/research-design-hub/projects/build-a-motor-dynamometer/\n"
         }
       ]
     }
   },
   "viewport_bookmarks": {},
   "viewport_pos": [
-    -914,
-    77
+    1046,
+    459
   ]
 }

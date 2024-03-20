@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from textarea import TextArea
 
 class CommandConsole(GUIContainer):
     def __init__(self, **kwargs):
-        PANEL_WIDTH = 1000
+        PANEL_WIDTH = 1200
         
         super().__init__(layout=ColumnLayout(), **kwargs)
         self.draw_bounds = True
