@@ -11,7 +11,7 @@ class AgentEvents:
         event = {
             "version": 0.1,
             "type": event_type,
-            **AgentEvents._get_time_metadata(),
+            **AgentEvents.get_time_metadata(),
             **AgentEvents._get_user_metadata(),
             **kwargs
         }
@@ -19,7 +19,7 @@ class AgentEvents:
 
 
     @staticmethod
-    def _get_time_metadata():
+    def get_time_metadata():
         now_utc = datetime.now(pytz.utc)
         tz_local = get_localzone()
         now_local = now_utc.astimezone(tz_local)

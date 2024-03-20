@@ -72,7 +72,7 @@ class Agent:
             # print('Agent._go() ...')
 
             event = AgentEvents.create_event("TimeUpdate")
-            self._event_stream.put(event)
+            self._percepts.put(event)
 
             # await asyncio.sleep(1.0 / 120)
             await asyncio.sleep(TIME_UPDATE_INTERVAL_SECONDS)

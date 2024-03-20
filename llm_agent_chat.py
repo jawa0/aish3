@@ -356,7 +356,7 @@ Message:
                         "user": getpass.getuser(),
                         "client_platform": str(platform.platform()),
                         "message_text": llm_request.response_text,
-                        **self.agent._get_time_metadata()
+                        **AgentEvents.get_time_metadata()
                     }
                     self.agent.put_event(event)
 
@@ -375,7 +375,7 @@ Message:
                     "user": getpass.getuser(),
                     "client_platform": str(platform.platform()),
                     "message_text": content,
-                    **self.agent._get_time_metadata()
+                    **AgentEvents.get_time_metadata()
                 }
                 self.agent.put_event(event)
 
@@ -405,7 +405,7 @@ Message:
                         "text": mem_text,
                         "user": getpass.getuser(),
                         "client_platform": str(platform.platform()),
-                        **self.agent._get_time_metadata()
+                        **AgentEvents.get_time_metadata()
                     }
                     self.agent.put_event(event)
 
