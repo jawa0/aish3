@@ -14,6 +14,7 @@
 
 
 from collections import deque
+from command_listener import CommandListener
 import ctypes
 import datetime
 import json
@@ -26,7 +27,6 @@ from tzlocal import get_localzone
 import weakref
 import os
 
-from command_listener import VoiceCommandListener
 from .fonts import FontRegistry
 from .gui_container import GUIContainer
 from rect_utils import rect_union
@@ -89,6 +89,7 @@ class GUI:
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
+        self.session.command_listener = CommandListener(self.session, self._on_command)
 
         self.renderer = renderer
         self.font_descriptor = font_descriptor
@@ -259,8 +260,8 @@ class GUI:
 
                 self._voice_in.start_recording()
 
-                if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
 
             # If we were waiting for the wakeup phrase, then go back to doing that
             elif len(self._next_texts_to_say) == 0 and \
@@ -280,13 +281,12 @@ class GUI:
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
 
-        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+        # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+        #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
 
 
-    def _on_voice_command(self, command: str) -> None:
-        logging.info(f'GUI._on_voice_command({command})')
-        assert(self.voice_in_enabled)
+    def _on_command(self, command: str) -> None:
+        logging.info(f'GUI._on_command({command})')
 
         # @todo make sanitization routines
         command = command.replace('"', "")
@@ -304,7 +304,7 @@ class GUI:
 
         elif command == "create_new_text_area":                        
             wx, wy = self.view_to_world(vx, vy)
-            self.cmd_new_text_area(wx, wy)
+            self.cmd_new_text_area(wx=wx, wy=wy)    # @todo: how to specify initial text @bug
 
         elif command.startswith("create_new_label"):
             # Get the optional text
@@ -700,8 +700,8 @@ class GUI:
                         logging.info(f'Starting active listening.')
                         self._voice_in.start_recording()
 
-                        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-                            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                        # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                        #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
                         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
 
                     elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:

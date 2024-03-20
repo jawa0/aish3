@@ -2,12 +2,11 @@ import asyncio
 from openai import OpenAI, chat
 import os
 from prompt import LiteralPrompt, Prompt
-from session import Session
 from typing import Callable, Dict, List, Literal, Optional, Tuple
 
 
 class LLMRequest:
-    def __init__(self, session: Session, 
+    def __init__(self, session: "Session", 
                  prompt: Prompt = LiteralPrompt(""), 
                  previous_messages: List[Dict[str, str]] = [],
                  tools: Optional[List[Dict]] = [],

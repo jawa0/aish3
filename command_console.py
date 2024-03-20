@@ -18,12 +18,14 @@ import sdl2
 from gui import GUI, GUIContainer
 from gui_layout import ColumnLayout
 
+from blinker import signal
 from config import GUI_INSET_X, GUI_INSET_Y
 from label import Label
 from textarea import TextArea
 
 
 class CommandConsole(GUIContainer):
+
     def __init__(self, **kwargs):
         PANEL_WIDTH = 1200
         
@@ -64,6 +66,8 @@ class CommandConsole(GUIContainer):
     def process_command(self, command):
         # Placeholder for the command processing logic
         print(f'Command Entered: {command}')
+        signal('channel_user_command').send(command)
+
         # Clear the TextArea for new input
         self.console_area.set_text('')
 

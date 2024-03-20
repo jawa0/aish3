@@ -1,3 +1,4 @@
+from blinker import signal
 import logging
 
 from openai import OpenAI, chat
@@ -11,6 +12,8 @@ from audio_service import AudioService
 class Session:
     def __init__(self):
         logging.debug("Client Session.__init__")
+
+        self._user_command_channel = signal('channel_user_command')
 
         print('BEFORE creating openai_client...')
         print(f'os.getenv("OPENAI_API_KEY"): {os.getenv("OPENAI_API_KEY")}')
