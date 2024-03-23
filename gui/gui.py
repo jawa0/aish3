@@ -333,7 +333,8 @@ class GUI:
                             contents = f"Unknown error opening file '{path_string}'."
 
                     wx, wy = self.view_to_world(vx, vy)
-                    self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+                    ta = self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+                    ta.set_size(700, 600)
 
         elif command == "get_focused_control":
             # Get the focused control
