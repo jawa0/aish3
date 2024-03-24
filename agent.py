@@ -1,28 +1,35 @@
-from agent_events import AgentEvents
 import asyncio
-from datetime import datetime
-from event_stream import EventStream
 import getpass
-from memory import Memory, MemoryStore
+import json
 import platform
-import pytz
-from typing import Tuple
-from tzlocal import get_localzone
 import uuid
+import weakref
+from datetime import datetime
+from typing import List, Tuple
+
+from blinker import signal
+import pytz
+from tzlocal import get_localzone
+
+from agent_events import AgentEvents
 from event_queue import EventQueue
+from event_stream import EventStream
+from memory import Memory, MemoryStore
 
 
 TIME_UPDATE_INTERVAL_SECONDS = 5
 
 
 class Agent:
-    def __init__(self) -> None:
+    def __init__(self, gui=None) -> None:
         self.memory = MemoryStore()
         self.memory.load('memory.json')
 
         self._percepts = EventStream()
         self._future_events = EventQueue()
         self._task = None
+        self._gui = weakref.ref(gui) if gui else None
+        signal('channel_command').connect(self._on_cmd_show_logged_percepts)
 
 
     def start(self) -> None:
@@ -53,7 +60,7 @@ class Agent:
         return mem_uid
 
 
-    def recall_text_by_similarity(self, text: str) -> [Tuple[float, "Memory"]]:
+    def recall_text_by_similarity(self, text: str) -> List[Tuple[float, "Memory"]]:
         results = self.memory.retrieve_by_similarity(text=text)
         for s, m in results:
             event = AgentEvents.create_event(
@@ -76,3 +83,29 @@ class Agent:
 
             # await asyncio.sleep(1.0 / 120)
             await asyncio.sleep(TIME_UPDATE_INTERVAL_SECONDS)
+
+
+    def percept_history(self) -> List[dict]:
+        return self._percepts.get_events()
+
+    
+    def _on_cmd_show_logged_percepts(self, command_text: str) -> None:
+        print(f'** Received channel command: {command_text}')
+        if command_text != "show_logged_percepts":
+            return
+        
+        if not self._gui or not self._gui():   # Could be not set, or weakref could be gone
+            return
+        
+        try:
+            contents = json.dumps(self.percept_history(), indent=2)
+        except json.JSONDecodeError:
+            contents = "Error serializing percept history to JSON"
+
+        # Create a new TextArea to show the results
+        gui = self._gui()
+        vx, vy = gui.get_mouse_position()
+        wx, wy = gui.view_to_world(vx, vy)
+        ta = gui.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+        ta.set_size(580, 600)
+        

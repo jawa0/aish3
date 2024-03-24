@@ -13,7 +13,7 @@ class Session:
     def __init__(self):
         logging.debug("Client Session.__init__")
 
-        self._user_command_channel = signal('channel_user_command')
+        self._user_command_channel = signal('channel_raw_user_command')
 
         print('BEFORE creating openai_client...')
         print(f'os.getenv("OPENAI_API_KEY"): {os.getenv("OPENAI_API_KEY")}')

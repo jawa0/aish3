@@ -20,16 +20,15 @@ from llm import LLMRequest
 from prompt import LiteralPrompt
 
 class CommandListener:
-    def __init__(self, session: "Session", on_command: Callable[[str], None]):
+    def __init__(self, session: "Session"):
         self.session = session
-        self.on_command = on_command
         self.detected_command = None
         self._completion_text = None
         
-        # Connect to the "channel_user_command" signal
-        signal("channel_user_command").connect(self.handle_user_command)
+        # Connect to the "channel_raw_user_command" signal
+        signal("channel_raw_user_command").connect(self.parse_user_command)
 
-    def handle_user_command(self, command_text: str):
+    def parse_user_command(self, command_text: str):
         system = """
 You are monitoring user input TEXT that has been transcribed from voice audio by a speech to text system.
 You also know a set of COMMANDS that you can execute. Carefully examine the TEXT below, and determine
@@ -53,6 +52,8 @@ open_file(path_string)
 
 get_focused_control
 
+show_logged_percepts
+
 EXAMPLES:
 "stop_listening" -> stop_listening
 "don't stop listening" -> ""
@@ -68,6 +69,8 @@ EXAMPLES:
 "open file 'my file with spaces.txt'" -> open_file(my file with spaces.txt)
 "get the focused control" -> get_focused_control
 "what control is focused?" -> get_focused_control
+"show logged percepts" -> show_logged_percepts
+"show percepts" -> show_logged_percepts
 """
 
         user = f"TEXT:\n{command_text}"
@@ -87,7 +90,7 @@ EXAMPLES:
             self.detected_command = self._completion_text.strip()
             self._completion_text = None
             if len(self.detected_command) > 0:
-                self.on_command(self.detected_command)
+                signal('channel_command').send(self.detected_command)
 
         llm_request = LLMRequest(session=self.session,
                                  prompt=LiteralPrompt(system + "\n" + user),  # @todo make template

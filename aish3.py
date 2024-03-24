@@ -110,7 +110,7 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
     running = True
     t_prev_update = time.time()
 
-    agent = Agent()
+    agent = Agent(gui=gui)
     agent.start()
 
     fps_smoothed = 0.0

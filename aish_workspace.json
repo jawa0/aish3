@@ -1,7 +1,7 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2024-03-18T13:44:33.349133+00:00",
-  "saved_at_local": "2024-03-18T09:44:33.349133-04:00",
+  "saved_at_utc": "2024-03-24T17:48:36.840410+00:00",
+  "saved_at_local": "2024-03-24T13:48:36.840410-04:00",
   "gui": {
     "class": "GUI",
     "content": {
@@ -11,7 +11,7 @@
         -776,
         -104,
         3016,
-        1025
+        987
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -951,13 +951,24 @@
             100
           ],
           "text": "Dynamometer\nhttps://circuitcellar.com/research-design-hub/projects/build-a-motor-dynamometer/\n"
+        },
+        {
+          "class": "TextArea",
+          "uid": "c4b60ed8-701f-4555-839a-169a273490a9",
+          "bounding_rect": [
+            2515,
+            1,
+            240,
+            100
+          ],
+          "text": "Postman"
         }
       ]
     }
   },
   "viewport_bookmarks": {},
   "viewport_pos": [
-    1046,
-    459
+    1125,
+    -142
   ]
 }

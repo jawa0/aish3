@@ -65,8 +65,8 @@ class CommandConsole(GUIContainer):
 
     def process_command(self, command):
         # Placeholder for the command processing logic
-        print(f'Command Entered: {command}')
-        signal('channel_user_command').send(command)
+        print(f'User entered command: """{command}"""')
+        signal('channel_raw_user_command').send(command)
 
         # Clear the TextArea for new input
         self.console_area.set_text('')

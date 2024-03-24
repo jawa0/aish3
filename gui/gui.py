@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from blinker import signal
 from collections import deque
 from command_listener import CommandListener
 import ctypes
@@ -89,7 +89,9 @@ class GUI:
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
-        self.session.command_listener = CommandListener(self.session, self._on_command)
+        
+        self.session.command_listener = CommandListener(self.session)
+        signal("channel_command").connect(self._on_command)
 
         self.renderer = renderer
         self.font_descriptor = font_descriptor
@@ -332,6 +334,7 @@ class GUI:
                         except:
                             contents = f"Unknown error opening file '{path_string}'."
 
+                    # Create a new TextArea to show the results
                     wx, wy = self.view_to_world(vx, vy)
                     ta = self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
                     ta.set_size(700, 600)
@@ -347,8 +350,6 @@ class GUI:
             wx, wy = self.view_to_world(vx, vy)
             self.cmd_new_text_area(text=contents, wx=wx, wy=wy)
                     
-
-
         else:
             pan_screen_prefix = "pan_screen_"
             if command.startswith(pan_screen_prefix):
