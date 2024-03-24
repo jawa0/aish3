@@ -13,13 +13,12 @@
 # limitations under the License.
 
 
+from blinker import signal
 import sdl2
 
+from config import GUI_INSET_X, GUI_INSET_Y
 from gui import GUI, GUIContainer
 from gui_layout import ColumnLayout
-
-from blinker import signal
-from config import GUI_INSET_X, GUI_INSET_Y
 from label import Label
 from textarea import TextArea
 

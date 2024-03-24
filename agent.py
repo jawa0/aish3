@@ -29,6 +29,9 @@ class Agent:
         self._future_events = EventQueue()
         self._task = None
         self._gui = weakref.ref(gui) if gui else None
+
+        signal('channel_raw_user_command').connect(self._log_raw_user_command)
+        signal('channel_command').connect(self._log_parsed_user_command)
         signal('channel_command').connect(self._on_cmd_show_logged_percepts)
 
 
@@ -89,8 +92,15 @@ class Agent:
         return self._percepts.get_events()
 
     
+    def _log_raw_user_command(self, command_text: str) -> None:
+        self.put_event(AgentEvents.create_event("UserEnteredCommand", user_text=command_text))
+
+
+    def _log_parsed_user_command(self, command: dict) -> None:
+        self.put_event(AgentEvents.create_event("ParsedUserCommand", command_text=command))
+
+
     def _on_cmd_show_logged_percepts(self, command_text: str) -> None:
-        print(f'** Received channel command: {command_text}')
         if command_text != "show_logged_percepts":
             return
         
