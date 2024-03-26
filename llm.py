@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, Literal, Optional, Tuple
 
 
 class LLMRequest:
-    def __init__(self, session: "Session", 
+    def __init__(self,
                  prompt: Prompt = LiteralPrompt(""), 
                  previous_messages: List[Dict[str, str]] = [],
                  tools: Optional[List[Dict]] = [],
@@ -16,7 +16,6 @@ class LLMRequest:
                  custom_data: Dict = {}):
         
         self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self._session = session
         self._completion: chat.completion = None
         self._task = None
         self._s_response = ""

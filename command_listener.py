@@ -37,7 +37,6 @@ the command only. No other characters. If the user is not asking you to perform 
 the empty string. You must also respond with the empty string if you are not sure whether the user is asking
 you to perform a command.
 --------
-
 COMMANDS:
 stop_listening
 create_new_chat_with_llm
@@ -47,12 +46,10 @@ pan_screen_left(number_of_pixels)
 pan_screen_right(number_of_pixels)
 pan_screen_down(number_of_pixels)
 pan_screen_up(number_of_pixels)
-
 open_file(path_string)
-
 get_focused_control
-
 show_logged_percepts
+memorize_text(text)
 
 EXAMPLES:
 "stop_listening" -> stop_listening
@@ -71,6 +68,8 @@ EXAMPLES:
 "what control is focused?" -> get_focused_control
 "show logged percepts" -> show_logged_percepts
 "show percepts" -> show_logged_percepts
+"memorize this: the quick brown fox" -> memorize_text(the quick brown fox)
+"remember this text: hello world" -> memorize_text(hello world)
 """
 
         user = f"TEXT:\n{command_text}"
@@ -92,9 +91,9 @@ EXAMPLES:
             if len(self.detected_command) > 0:
                 signal('channel_command').send(self.detected_command)
 
-        llm_request = LLMRequest(session=self.session,
-                                 prompt=LiteralPrompt(system + "\n" + user),  # @todo make template
+        llm_request = LLMRequest(prompt=LiteralPrompt(system + "\n" + user),  # @todo make template
                                  handlers=[("start", on_completion_start),
                                            ("next", on_completion_next),
                                            ("stop", on_completion_done)])
         llm_request.send_nowait()
+        

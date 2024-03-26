@@ -289,8 +289,7 @@ class LLMChatContainer(GUIContainer):
         self.updateLayout()
         self.add_child(answer)
 
-        llm_request = LLMRequest(session=self.gui.session,
-                                 prompt=prompt,
+        llm_request = LLMRequest(prompt=prompt,
                                  previous_messages=previous_messages,
                                  handlers=[("start", self.on_llm_response_start),
                                            ("next", self.on_llm_response_chunk),

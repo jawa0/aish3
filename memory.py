@@ -1,6 +1,9 @@
+import asyncio
 from embeddings import cos_similarity, embed
 import json
+from llm import LLMRequest
 import numpy as np
+from prompt import PromptTemplate
 from typing import List, Optional, Tuple
 import uuid
 
@@ -22,6 +25,42 @@ class Memory:
         self._summary_sentence = summary_sentence
         self._summary_embedding = summary_embedding
         self._keywords = keywords
+
+        self.summary_prompt_template = PromptTemplate(
+"""
+You are a conversational AI agent. You are being asked to memorize some TEXT and store it as a memory.
+Considering the content of the TEXT, generate a sentence that paraphrases and summarizes it. This summary
+will be used to generate an embedding for this summary sentence that can later be used with vector similarity
+search to retrieve the TEXT memory. If there is a key point to the TEXT, make sure the summary includes that 
+key point. Respond with a single sentence. Do not emit any other text or punctuation. Do not include text like "Summary:"
+
+TEXT:
+
+{{ Content }}
+""")
+
+        if not self.summary_sentence:
+            # Get summary sentence for embedding
+            data = {"Content": text}
+            self.summary_prompt_template.fill(**data)
+            rq_vss = LLMRequest(prompt=self.summary_prompt_template,
+                                    handlers=[("stop", self._on_summary_ready)],
+                                    custom_data={"mem_uid": self._uid})
+            
+            print('** SEND SUMMARY REQUEST')
+            loop = asyncio.get_running_loop()
+            loop.run_until_complete(rq_vss._go())  # @hack
+
+    def _on_summary_ready(self, llm_request: LLMRequest):
+        print(f'** RECEIVED MEMORY SUMMARY: {llm_request.response_text}')
+
+        mem_uid = llm_request.custom_data["mem_uid"]
+        assert(mem_uid is not None)
+        mem = self.memory.retrieve_by_uid(mem_uid)
+        print(f'** UPDATING SUMMARY for Memory {mem_uid}')
+        
+        mem.summary_sentence = llm_request.response_text
+        mem.summary_embedding = embed(mem.summary_sentence)[0]
 
 
     @property

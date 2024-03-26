@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from agent import Agent
 from blinker import signal
 from collections import deque
+from command_console import CommandConsole
 from command_listener import CommandListener
 import ctypes
 import datetime
@@ -29,6 +31,7 @@ import os
 
 from .fonts import FontRegistry
 from .gui_container import GUIContainer
+from .gui_control import GUIControl
 from rect_utils import rect_union
 from transcribe_audio import VoiceTranscriber
 import utils
@@ -77,11 +80,11 @@ class GUI:
 
 
     def __init__(self, renderer, font_descriptor, 
-                 workspace_filename=None, 
-                 client_session=None, 
-                 enable_voice_in=False, 
-                 enable_voice_out=False,
-                 create_hook: Optional[callable]=None):        
+                workspace_filename=None, 
+                client_session=None, 
+                enable_voice_in=False, 
+                enable_voice_out=False,
+                create_hook: Optional[callable]=None):        
         
         if enable_voice_in:
             from voice_wakeup import PhraseListener
@@ -133,6 +136,7 @@ class GUI:
         self._should_stop_voice_in = False
 
         self.command_listener = None
+        self.agent: Agent = None
 
         # Do we have access to an LLM? Need to know for voice commands. Uses LLM to interpret transcribed text.
         if not os.getenv("OPENAI_API_KEY"):
@@ -145,6 +149,9 @@ class GUI:
 
         self._content._inset = (0, 0)
 
+        self.listening_indicator: GUIControl = None  
+        self.command_console: CommandConsole = None
+
         # @todo runtime feature flag
         # DEBUG_DRAW
         # self._content.draw_bounds = True
@@ -153,6 +160,7 @@ class GUI:
             create_hook(self)
 
         self.content().sizeToChildren()
+
 
 
     class ClickContext:
@@ -803,18 +811,18 @@ class GUI:
             #
             
             # Update visibility of voice transcript window...
-            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-                if self.voice_transcript is not None and \
-                    not self.voice_transcript._visible:
+            # if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+            #     if self.voice_transcript is not None and \
+            #         not self.voice_transcript._visible:
 
-                    self.voice_transcript.text_buffer.set_text("")  # @hack
-                    self.voice_transcript._visible = True
+            #         self.voice_transcript.text_buffer.set_text("")  # @hack
+            #         self.voice_transcript._visible = True
             
-            elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
-                self.voice_transcript is not None and \
-                self.voice_transcript._visible:
+            # elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            #     self.voice_transcript is not None and \
+            #     self.voice_transcript._visible:
 
-                self.voice_transcript._visible = False
+            #     self.voice_transcript._visible = False
 
 
         # Do we have queued text to say?
@@ -1062,6 +1070,10 @@ class GUI:
                 "viewport_pos": self._viewport_pos
             }
             json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
+
+        if self.agent:
+            self.agent.save_memories()
+
         logging.info("GUI saved.")
 
 

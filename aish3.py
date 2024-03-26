@@ -75,10 +75,10 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
         gui.content().add_child(gui.listening_indicator)
         gui.listening_indicator._visible = False  # It's annoying me
 
-        voice_transcript_height = 60
-        gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
-        gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
-        gui.content().add_child(gui.voice_transcript)
+        # voice_transcript_height = 60
+        # gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
+        # gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
+        # gui.content().add_child(gui.voice_transcript)
 
         gui.command_console = CommandConsole(saveable=False,
                                              screen_relative=True,
@@ -110,7 +110,8 @@ async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: 
     running = True
     t_prev_update = time.time()
 
-    agent = Agent(gui=gui)
+    agent = Agent(gui=gui, memory_filename="agent_memory.json")
+    gui.agent = agent
     agent.start()
 
     fps_smoothed = 0.0

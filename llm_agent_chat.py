@@ -361,8 +361,7 @@ Message:
                     self.agent.put_event(event)
 
 
-                llm_request = LLMRequest(session=self.gui.session,
-                                         prompt=self.agent_passhtrough_prompt,
+                llm_request = LLMRequest(prompt=self.agent_passhtrough_prompt,
                                          previous_messages=prev_messages,
                                          handlers=[("start", on_passthrough_response_start),
                                                    ("next", on_passthrough_response_next),
@@ -425,8 +424,7 @@ Message:
 
                     self.factoid_keywords_prompt_template.fill(**data)
 
-                    rq_keywords = LLMRequest(session=self.gui.session,
-                                                prompt=self.factoid_keywords_prompt_template,
+                    rq_keywords = LLMRequest(prompt=self.factoid_keywords_prompt_template,
                                                 handlers=[("stop", on_keywords_response_done)],
                                                 respond_with_json=True,
                                                 custom_data={"mem_uid": mem_uid})
@@ -439,8 +437,7 @@ Message:
                     #
 
                     self.factoid_vss_summary_prompt_template.fill(**data)
-                    rq_vss = LLMRequest(session=self.gui.session,
-                                            prompt=self.factoid_vss_summary_prompt_template,
+                    rq_vss = LLMRequest(prompt=self.factoid_vss_summary_prompt_template,
                                             handlers=[("stop", on_vss_response_done)],
                                             custom_data={"mem_uid": mem_uid})
                     
@@ -479,8 +476,7 @@ Message:
         
 
         self.is_function_call_template.fill(**data)
-        rq_is_fncall = LLMRequest(session=self.gui.session, 
-                                 prompt=self.is_function_call_template,
+        rq_is_fncall = LLMRequest(prompt=self.is_function_call_template,
                                  tools=tools,
                                  tool_choice="auto",
                                  handlers=[("stop", on_fncall_check_done)])

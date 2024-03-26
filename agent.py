@@ -21,9 +21,8 @@ TIME_UPDATE_INTERVAL_SECONDS = 5
 
 
 class Agent:
-    def __init__(self, gui=None) -> None:
+    def __init__(self, memory_filename="memory.json", gui=None) -> None:
         self.memory = MemoryStore()
-        self.memory.load('memory.json')
 
         self._percepts = EventStream()
         self._future_events = EventQueue()
@@ -31,8 +30,16 @@ class Agent:
         self._gui = weakref.ref(gui) if gui else None
 
         signal('channel_raw_user_command').connect(self._log_raw_user_command)
+
+        # @todo instead of connecting different functions, connect one on_command function
+        # and route to the correct member function from there.
+        
         signal('channel_command').connect(self._log_parsed_user_command)
         signal('channel_command').connect(self._on_cmd_show_logged_percepts)
+        signal('channel_command').connect(self._on_cmd_memorize_text)
+
+        self._memory_filename = memory_filename
+        self.memory.load(self._memory_filename)
 
 
     def start(self) -> None:
@@ -57,7 +64,19 @@ class Agent:
 
 
     def memorize_text(self, text: str) -> uuid.UUID:
-        mem_uid = self.memory.store(memory=Memory(text=text))
+        print(f'*** Memorizing text: {text}')
+
+        mem = Memory(text=text)
+        mem_uid = self.memory.store(memory=mem)
+        
+        # @note When creating a memory using store(), as above, the summary embedding
+        # is create asynchronously and so won't be available yet, so we shouldn't
+        # save yet.
+        # Instead, I'm going to expose the save workspace command listen for it. And only
+        # save when we get the save workspace command.
+
+        # self.memory.save(self._memory_filename)
+
         event = AgentEvents.create_event("MemorizedText", mem_uid=str(mem_uid), text=text)
         self._percepts.put(event)
         return mem_uid
@@ -75,6 +94,10 @@ class Agent:
             )
             self._percepts.put(event)
         return results
+
+
+    def save_memories(self) -> None:
+        self.memory.save(self._memory_filename)
 
 
     async def _go(self):
@@ -118,4 +141,22 @@ class Agent:
         wx, wy = gui.view_to_world(vx, vy)
         ta = gui.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
         ta.set_size(580, 600)
+
+
+    def _on_cmd_memorize_text(self, command_text: str) -> None:
+        print(f'*** _on_cmd_memorize_text: {command_text}')
+        if not command_text.startswith('memorize_text('):
+            return
         
+        text_to_memorize = self._extract_parameter(command_text)
+        if text_to_memorize:
+            self.memorize_text(text_to_memorize)
+
+
+    # @todo if this works, then use it in gui.py command handlers as well...
+    def _extract_parameter(self, command: str) -> str | None:
+        prefix, suffix = command.split("(", 1)
+        if suffix.endswith(")"):
+            return suffix[:-1].strip()
+        else:
+            return None
