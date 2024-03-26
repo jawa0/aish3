@@ -37,6 +37,7 @@ class Agent:
         signal('channel_command').connect(self._log_parsed_user_command)
         signal('channel_command').connect(self._on_cmd_show_logged_percepts)
         signal('channel_command').connect(self._on_cmd_memorize_text)
+        signal('channel_command').connect(self._on_cmd_retrieve_memory)
 
         self._memory_filename = memory_filename
         self.memory.load(self._memory_filename)
@@ -143,6 +144,28 @@ class Agent:
         text_to_memorize = self._extract_parameter(command_text)
         if text_to_memorize:
             self.memorize_text(text_to_memorize)
+
+
+    def _on_cmd_retrieve_memory(self, command_text: str) -> None:
+        print(f'*** _on_cmd_retrieve_memory: {command_text}')
+        if not command_text.startswith('recall_memory('):
+            return
+        
+        search_text = self._extract_parameter(command_text)
+        if search_text:
+            results = self.recall_text_by_similarity(search_text)
+
+            contents = f"Recalled memories similar to '{search_text}':\n"
+            for s, m in results:
+                if s > 0:
+                    contents += f"Similarity: {s}  Summary: {m.summary_sentence}\n"
+
+            # Create a new TextArea to show the results
+            gui = self._gui()
+            vx, vy = gui.get_mouse_position()
+            wx, wy = gui.view_to_world(vx, vy)
+            ta = gui.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+            ta.set_size(1200, 200)
 
 
     # @todo if this works, then use it in gui.py command handlers as well...

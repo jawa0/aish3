@@ -50,6 +50,7 @@ open_file(path_string)
 get_focused_control
 show_logged_percepts
 memorize_text(text)
+recall_memory(search_text)
 
 EXAMPLES:
 "stop_listening" -> stop_listening
@@ -70,6 +71,8 @@ EXAMPLES:
 "show percepts" -> show_logged_percepts
 "memorize this: the quick brown fox" -> memorize_text(the quick brown fox)
 "remember this text: hello world" -> memorize_text(hello world)
+"retrieve memories similar to 'quick brown'" -> recall_memory(quick brown)
+"recall memories similar to 'function call'" -> recall_memory(function call)
 """
 
         user = f"TEXT:\n{command_text}"
