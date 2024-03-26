@@ -15,7 +15,7 @@
 from agent import Agent
 from blinker import signal
 from collections import deque
-from command_console import CommandConsole
+# from command_console import CommandConsole  # circular ref
 from command_listener import CommandListener
 import ctypes
 import datetime
@@ -31,7 +31,7 @@ import os
 
 from .fonts import FontRegistry
 from .gui_container import GUIContainer
-from .gui_control import GUIControl
+# from .gui_control import GUIControl  # circular ref
 from rect_utils import rect_union
 from transcribe_audio import VoiceTranscriber
 import utils
@@ -149,8 +149,8 @@ class GUI:
 
         self._content._inset = (0, 0)
 
-        self.listening_indicator: GUIControl = None  
-        self.command_console: CommandConsole = None
+        self.listening_indicator: "GUIControl" = None  
+        self.command_console: "CommandConsole" = None
 
         # @todo runtime feature flag
         # DEBUG_DRAW

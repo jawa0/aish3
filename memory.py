@@ -22,10 +22,10 @@ class Memory:
             self._uid = uuid.uuid4()
             
         self._text = text
-        self._summary_sentence = summary_sentence
         self._summary_embedding = summary_embedding
         self._keywords = keywords
 
+        self._summary_task_done = False
         self.summary_prompt_template = PromptTemplate(
 """
 You are a conversational AI agent. You are being asked to memorize some TEXT and store it as a memory.
@@ -39,28 +39,26 @@ TEXT:
 {{ Content }}
 """)
 
-        if not self.summary_sentence:
+        if summary_sentence:
+            self._summary_sentence = summary_sentence
+        else:
             # Get summary sentence for embedding
             data = {"Content": text}
             self.summary_prompt_template.fill(**data)
-            rq_vss = LLMRequest(prompt=self.summary_prompt_template,
+            rq_summary = LLMRequest(prompt=self.summary_prompt_template,
                                     handlers=[("stop", self._on_summary_ready)],
                                     custom_data={"mem_uid": self._uid})
             
             print('** SEND SUMMARY REQUEST')
-            loop = asyncio.get_running_loop()
-            loop.run_until_complete(rq_vss._go())  # @hack
+            rq_summary.send_nowait()
 
-    def _on_summary_ready(self, llm_request: LLMRequest):
+
+    def _on_summary_ready(self, llm_request: LLMRequest) -> str:
         print(f'** RECEIVED MEMORY SUMMARY: {llm_request.response_text}')
-
-        mem_uid = llm_request.custom_data["mem_uid"]
-        assert(mem_uid is not None)
-        mem = self.memory.retrieve_by_uid(mem_uid)
-        print(f'** UPDATING SUMMARY for Memory {mem_uid}')
+        print(f'** UPDATING SUMMARY for Memory {self._uid}')
         
-        mem.summary_sentence = llm_request.response_text
-        mem.summary_embedding = embed(mem.summary_sentence)[0]
+        self._summary_sentence = llm_request.response_text
+        self._summary_embedding = embed(self._summary_sentence)[0]
 
 
     @property

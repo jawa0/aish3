@@ -69,14 +69,6 @@ class Agent:
         mem = Memory(text=text)
         mem_uid = self.memory.store(memory=mem)
         
-        # @note When creating a memory using store(), as above, the summary embedding
-        # is create asynchronously and so won't be available yet, so we shouldn't
-        # save yet.
-        # Instead, I'm going to expose the save workspace command listen for it. And only
-        # save when we get the save workspace command.
-
-        # self.memory.save(self._memory_filename)
-
         event = AgentEvents.create_event("MemorizedText", mem_uid=str(mem_uid), text=text)
         self._percepts.put(event)
         return mem_uid
