@@ -1,0 +1,61 @@
+## Installing on Windows 11
+
+git clone git@github.com:jawa0/aish3.git
+
+python -m venv <env-name>
+
+PowerShell: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\<env-name>\Scripts\activate
+
+SDL2
+https://github.com/libsdl-org/SDL/releases
+
+SDL_ttf
+https://github.com/libsdl-org/SDL_ttf/releases
+
+pip install ...
+PySDL2
+python-dotenv
+openai
+pytz
+tzlocal
+pyaudio
+assemblyai
+webrtcvad
+
+  Building wheel for webrtcvad (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+
+  × Building wheel for webrtcvad (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [9 lines of output]
+      running bdist_wheel
+      running build
+      running build_py
+      creating build
+      creating build\lib.win-amd64-cpython-312
+      copying webrtcvad.py -> build\lib.win-amd64-cpython-312
+      running build_ext
+      building '_webrtcvad' extension
+      error: Microsoft Visual C++ 14.0 or greater is required. Get it with "Microsoft C++ Build Tools": https://visualstudio.microsoft.com/visual-cpp-build-tools/
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for webrtcvad
+Failed to build webrtcvad
+
+https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+pip install --upgrade setuptools
+
+google-cloud-texttospeech
+pydub
+matplotlib
+
+agent branch:
+
+blinker
+sentence-transformers
+- downloads models the first time it runs
+
+pystache
