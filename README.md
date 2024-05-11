@@ -1,4 +1,4 @@
-AISH(3) -- AI Shell 
+AISH (AI Shell) -- AI Agent with Memories 
 ==
 
 ![Screenshot showing a black screen with blue-bordered text areas, white labels, and LLM chat controls](./res/img/aish3-screenshot.png)
@@ -19,7 +19,7 @@ So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 |Mac|Windows|Description|
 |-------|-----|-----------|
 |Cmd+Q|Alt+F4|Quit|
-|Cmd+S|Ctrl+S|Save workspace to file named by --workspace command-line param (default aish_workspace.json)|
+|Cmd+S|Ctrl+S|Save workspace to file named by --workspace command-line param (default aish_workspace.json). Saving the workspace also saves agent memories to agent_memories.json, and saves the agent's perception of past events to agent_percepts.json|
 |Cmd+L|Ctrl+L|Load workspace from file named by --workspace command-line param (default aish_workspace.json)
 |Cmd+B|Ctrl+B|Add a new Label at the current cursor position|
 |Cmd+G|Ctrl+G|Send messages to GPT-4 for chat completion when you have an LLM Chat control focused|
