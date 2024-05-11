@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -162,6 +162,10 @@ class LabelEditor(TextArea):
 
 
     def handle_event(self, event):
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+
         if event.type == sdl2.SDL_KEYDOWN:
             cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
             keySymbol = event.key.keysym.sym

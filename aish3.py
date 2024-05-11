@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 
 import argparse
+import asyncio
 import logging
 import os
 import time
@@ -31,9 +32,11 @@ from draw import draw_text
 from session import Session
 from label import Label
 from textarea import TextArea
+from llm_agent_chat import LLMAgentChat
+from agent import Agent
 
 
-def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
+async def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, enable_voice_in: bool):
     logging.info('App start.')
 
     # sdl2.ext.init()
@@ -67,7 +70,29 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
         logging.error("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
         raise Exception("ASSEMBLYAI_API_KEY is not set. Cannot enable voice input. Either set the environment variable, or disable voice input.")
 
-    print('__file__:', __file__)
+    def setup_gui(gui: GUI):
+        gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
+        gui.content().add_child(gui.listening_indicator)
+        gui.listening_indicator._visible = False  # It's annoying me
+
+        # voice_transcript_height = 60
+        # gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
+        # gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
+        # gui.content().add_child(gui.voice_transcript)
+
+        gui.command_console = CommandConsole(saveable=False,
+                                             screen_relative=True,
+                                            can_focus=True,
+                                            visible=False,
+                                            x=20,
+                                            y=20,
+                                            w=1200,
+                                            h=500,
+                                            gui=gui)
+        gui.content().add_child(gui.command_console)
+
+    # Need to fixup path so we an work from inside a PyInstaller distribution.
+    # print('__file__:', __file__)
     app_path = os.path.dirname(os.path.abspath(__file__))
     print(f'app_path: {app_path}')
 
@@ -79,30 +104,15 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
                 workspace_filename=workspace_filepath, 
                 client_session=session,
                 enable_voice_in=enable_voice_in,
-                enable_voice_out=False)
+                enable_voice_out=False,
+                create_hook=setup_gui)
     
-    # @hack
-    gui.listening_indicator = Label(saveable=False, screen_relative=True, x=5, y=5, w=200, gui=gui)
-    gui.content().add_child(gui.listening_indicator)
-
-    voice_transcript_height = 60
-    gui.voice_transcript = TextArea(saveable=False, screen_relative=True, can_focus=False, visible=False, x=5, y= height - voice_transcript_height - 5, w=width-5, h=voice_transcript_height, gui=gui)
-    gui.voice_transcript.input_q = gui.session.subscribe('transcribed_text')
-    gui.content().add_child(gui.voice_transcript)
-
-    # gui.command_console = CommandConsole(saveable=False,
-    #                                      screen_relative=True,
-    #                                     can_focus=True,
-    #                                     visible=False,
-    #                                     x=10,
-    #                                     y=50,
-    #                                     w=1000,
-    #                                     h=500,
-    #                                     gui=gui)
-    # gui.content().add_child(gui.command_console)
-
     running = True
     t_prev_update = time.time()
+
+    agent = Agent(gui=gui, memory_filename="agent_memory.json")
+    gui.agent = agent
+    agent.start()
 
     fps_smoothed = 0.0
     while running:
@@ -124,11 +134,11 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
                         new_height = event.window.data2
 
                         # @hack
-                        if gui.voice_transcript is not None:
-                            gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
-                                                            new_height - voice_transcript_height - 5, 
-                                                            new_width-5, 
-                                                            voice_transcript_height)
+                        # if gui.voice_transcript is not None:
+                        #     gui.voice_transcript.set_bounds(gui.voice_transcript.bounding_rect.x,
+                        #                                     new_height - voice_transcript_height - 5, 
+                        #                                     new_width-5, 
+                        #                                     voice_transcript_height)
 
                             # gui.command_console.set_bounds(10, 10, new_width-10, 200)
 
@@ -147,7 +157,15 @@ def run(*, fullscreen: bool, width: int, height: int, workspace_filename: str, e
                     gui.handle_event(event)
 
         else:
-            session.update()
+            #
+            # Give a chance for the asyncio event loop to do some work...
+            #
+
+            await asyncio.sleep(0.0001)
+
+            #
+            # Update our app GUI and draw scene
+            #
 
             t_update = time.time()
             dt = t_update - t_prev_update
@@ -184,8 +202,10 @@ if __name__ == "__main__":
     parser.add_argument('--workspace', default='aish_workspace.json', help='workspace file (default: aish_workspace.json)')
     args = parser.parse_args()
 
-    run(fullscreen=args.fullscreen, 
-        width=args.width, 
-        height=args.height, 
-        workspace_filename=args.workspace, 
-        enable_voice_in=args.voice_in)
+    asyncio.run(
+        run(fullscreen=args.fullscreen, 
+            width=args.width, 
+            height=args.height, 
+            workspace_filename=args.workspace, 
+            enable_voice_in=args.voice_in)
+    )

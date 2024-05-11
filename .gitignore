@@ -5,6 +5,13 @@
 .env
 .env.local
 
+*.private
+*.private.json
+
+*jaba*
+*.bak.*
+*.bak
+
 # Python
 __pycache__
 *.pyc
@@ -23,5 +30,9 @@ results.txt
 # AISH workspace automatic backups
 *_?.json
 *_??.json
+*_???.json
+
+# Cosine
+.cosine/**
 
 

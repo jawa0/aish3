@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
 APPNAME = aish3
 
 macos:
-	pyinstaller -y --onedir --name aish3 --console --add-data "./res:res" --add-data "./aish_workspace.json:." aish3.py
+	@echo "Generating executable for $(APPNAME)..."
+	pyinstaller --onefile $(APPNAME).py
+	@echo "Modifying spec file..."
+	sed -i '' 's|pathex=\[\]|pathex=\["'$(shell pwd)'"\]|g' $(APPNAME).spec
+	@echo "Rebuilding with modified spec file..."
+	pyinstaller $(APPNAME).spec
 
 tests:
 	@echo "Running tests..."

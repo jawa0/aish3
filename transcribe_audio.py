@@ -1,7 +1,7 @@
 """This file should be imported from your main application script to make sure
 that the app configuration is loaded, before it's needed."""
 
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -189,7 +189,8 @@ class VoiceTranscriber:
                 else:
                     logging.debug(f"** PARTIAL text: '{text}'")
                 
-                self.session.publish("transcribed_text", (text, is_final))
+                self.session.publish("transcribed_text", (text, is_final))  # @todo use Blinker named signal instead
+                
                 was_final = is_final
 
         except queue.Empty:

@@ -1,17 +1,17 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2023-12-21T01:05:47.604115+00:00",
-  "saved_at_local": "2023-12-20T20:05:47.604115-05:00",
+  "saved_at_utc": "2024-05-11T19:15:54.756611+00:00",
+  "saved_at_local": "2024-05-11T15:15:54.756611-04:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
-      "uid": "ae51569e-a962-438b-aa3e-8bb8f35023ee",
+      "uid": "ee1f2fce-c07c-4c6c-8fec-82bae118f9d2",
       "bounding_rect": [
-        0,
-        76,
-        3307,
-        2375
+        19,
+        105,
+        1357,
+        674
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -21,787 +21,47 @@
       ],
       "children": [
         {
-          "class": "LLMChatContainer",
-          "uid": "1e6c3f66-1ac7-434d-bdab-cd89a1efd9aa",
+          "class": "Label",
+          "uid": "86da028e-81c7-400d-95bb-09b7f0a6f1bb",
+          "bounding_rect": [
+            4,
+            0,
+            240,
+            30
+          ],
+          "text": "Welcome to AISH!",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "uid": "d77904dc-0530-4462-9610-34fdae7d5901",
           "bounding_rect": [
             0,
-            169,
-            608,
-            336
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "76d2b998-fcbc-4b56-a608-2bb9a628d15c",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "7436d312-f6d9-4eb2-840b-34096f018abc",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "f2cac20c-247d-46f6-80ea-a5577784f140",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "d4ce4cb8-fd84-4082-9af2-9bfa24f302cb",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "765449cc-061f-4818-a731-4b122b164ff7",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "531e8897-80c4-47b1-b990-f6bb87d89a40",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "f34cfa74-ce20-48a5-9928-0fb1d85795e3",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "I want to display custom information when printing an instance of one of my own\nclasses. It should print the same info as the default print, but additionally it\nshould print the first 12 chars of the text property if the object has a text \nproperty."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "d79e9ea1-bb54-49fa-b248-21f3a06ba748",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "367494b6-fe4f-4e3c-92d3-cb84e6201378",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "8cb7a767-6313-4eae-9b7b-4436d2319cab",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "To achieve this functionality, you can override the `__str__` method in your class definition. This method is called when you use the `print` function on an instance of your class. Here's an example of how you might implement this:\n\n```python\nclass YourClass:\n    def __init__(self, text_property=None, *args, **kwargs):\n        self.text_property = text_property\n        # Initialize other properties here\n\n    def __str__(self):\n        default_str = super(YourClass, self).__str__()\n        if hasattr(self, 'text_property') and self.text_property:\n            text_summary = self.text_property[:12]\n            return f\"{default_str}, text: {text_summary}\"\n        else:\n            return default_str\n\n# Example usage:\ninstance = YourClass(text_property=\"Hello, World! This is an example text.\")\nprint(instance)\n```\n\nIn this implementation, the `__str__` method first calls the parent class's `__str__` implementation to get the default string representation. Then it checks if the `text_property` attribute exists and is not empty. If so, it slices the first 12 characters and appends it to the default string. If the object does not have a `text_property`, it simply returns the default string representation."
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "class": "Label",
-          "uid": "8d359e0a-fc4f-4a7b-9fd2-a71cc18b4b39",
-          "bounding_rect": [
-            2611,
-            1242,
-            450,
+            40,
+            1230,
             30
           ],
-          "text": "Double-click to set label text",
+          "text": "Press the backtick/tilde (`/~) key to open command console to chat with AISH Agent",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
           "class": "Label",
-          "uid": "4ddbe3cc-d9fb-4ada-b40d-4efe1ae31adc",
+          "uid": "94ff03f6-cf19-47a6-ae50-e79d2d4dacef",
           "bounding_rect": [
-            2610,
-            1293,
-            600,
+            0,
+            73,
+            645,
             30
           ],
-          "text": "Cmd+Del while editing a label deletes it",
+          "text": "Press it again to close the command console",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
           "class": "LLMChatContainer",
-          "uid": "eba48632-548f-430f-9182-8963e4f3f0d4",
+          "uid": "4dbc54f0-3f97-461a-943b-c14d092d3b37",
           "bounding_rect": [
-            2457,
-            1955,
-            608,
-            336
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "3b736772-34a3-4020-a6a6-d64c76fc3446",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "6a8b8bfb-625d-4fa8-90d0-c24f62cc6a60",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "7c31375c-8cb0-40cd-beb2-c8e8eba6f040",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "99bfa0e3-4da4-416f-9d01-ebde80c67446",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "9caef857-f060-4402-8deb-2534d8046287",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "54a06ca7-ec2e-4df5-862d-612e12d02a23",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "28e83225-0bde-4146-9da7-db327f6cde8e",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "How can I distinguish between mac os and raspberry pi in Python 3? I want a code \nsnippet that executes at runtime and allows me to take separate branches if I'm on\nMac vs. if I'm running on Rasperry Pi."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "76e50249-0ad6-4291-99ee-8995d945f172",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "2b253f32-b7e5-4e7a-80cb-0d3bdfa516f2",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "29d03c06-a382-4ac9-9013-25e5ee8f8493",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "To distinguish between macOS and Raspberry Pi OS at runtime in Python 3, you can use \nthe `platform` module, which allows you to access underlying platform\u2019s data, such \nas its identifier, OS name, and version. Since Raspberry Pi OS is a Debian-based \nsystem, you can look for identifiers that are unique to it and macOS.\n\nHere is an example of how you might use the `platform` module to determine the \noperating system and take separate branches accordingly:\n\n```python\nimport platform\nimport os\n\ndef running_on_raspberry_pi():\n    # Raspberry Pi OS can return 'armv7l' or 'armv6l' on `platform.machine()`\n    # for Raspberry Pi 2/3/4, and 'aarch64' on a 64-bit OS variations for Pi 3/4.\n    # Adjust as necessary for your specific context.\n    return platform.machine().startswith(\"arm\") and \"raspbian\" in platform.uname().system.lower()\n\nif running_on_raspberry_pi():\n    # We're running on Raspberry Pi, take the Pi-related branch.\n    print(\"This is a Raspberry Pi.\")\n    # Raspberry Pi specific code goes here\nelse:\n    # We're not running on Raspberry Pi, check if it's macOS or something else.\n    if platform.system() == \"Darwin\":\n        # We're running on macOS, take the macOS-related branch.\n        print(\"This is macOS.\")\n        # macOS specific code goes here\n    else:\n        # We're running on a different system, handle that case accordingly.\n        print(\"This is an unsupported platform.\")\n        # Code for other platforms or a generic handler goes here\n```\n\nThe `running_on_raspberry_pi()` function uses `platform.machine()` to get the architecture and to check if it's an ARM CPU typically used by Raspberry Pi devices. The extra check with `platform.uname().system` is very simplistic and intended to account for Raspbian/Raspberry Pi OS systems, but keep in mind this is not foolproof; the robustness of this check would need to be enhanced for a production environment, possibly with additional checks depending on the variety of Raspberry Pi OS distributions you expect to encounter.\n\nRemember to modify and enhance these checks as needed based on the specific requirements and operating system configurations you are working with."
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "class": "LLMChatContainer",
-          "uid": "81f8cc73-9e4a-4d99-b4de-1dd3ef6804b5",
-          "bounding_rect": [
-            1135,
-            1535,
-            608,
-            840
-          ],
-          "layout": "ColumnLayout",
-          "name": "",
-          "inset": [
-            2,
-            2
-          ],
-          "children": [
-            {
-              "class": "Label",
-              "uid": "739ad924-76b5-4a4a-8471-903689b5029a",
-              "bounding_rect": [
-                0,
-                0,
-                600,
-                20
-              ],
-              "text": "LLM Chat [gpt-4]",
-              "font_descriptor": "{\"font_descriptor\": \"default\"}"
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "57910dfd-5307-41ab-acb6-03cb020e3ab7",
-              "bounding_rect": [
-                0,
-                20,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "cb6122a0-c4e1-410d-95b8-bc61b7fe4eb6",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "System",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "674c2bce-e298-4c27-be3c-81066dbe7d7e",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "70154784-c6cf-4dfe-b0f2-34d9bf4bcb12",
-              "bounding_rect": [
-                0,
-                104,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "42215c38-7c70-4b77-876c-7bb51abcaaf0",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "6dac95ae-bb33-48e6-9586-52bd110e5411",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "I want a textual unique identifier that I can use to identify Python objects. Do they\nhave an id field? I remember something about the native pointer being used? In any\ncase, a numeric id is fine, as long as I can convert it to text."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "2e007292-48f4-47d5-9fac-9c949f8e2fac",
-              "bounding_rect": [
-                0,
-                188,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "94bfa63e-a7bf-4b6e-8f4f-37577e72e5d7",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "2fd397b1-eb30-4cb6-a977-59b9033196cf",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "In Python, every object has a built-in identifier which is unique to the object \nduring its lifetime. This identifier is the address of the object in memory, and it \ncan be obtained using the `id()` function. The `id()` function returns a numeric \nvalue which is guaranteed to be unique for different objects (between their creation \ntime until they are destroyed).\n\nIf you need a textual representation of this identifier, you can convert the result \nof the `id()` function to a string using the `str()` function or format it as a \nhexadecimal string using the `hex()` function. Here are some examples:\n\n```python\n# Using the id() function to get the unique identifier of an object\nsome_object = object()\nobject_id = id(some_object)\n\n# Converting the numeric ID to a string\ntextual_id = str(object_id)\n\n# Alternatively, converting the numeric ID to a hexadecimal string\nhex_id = hex(object_id)\n\n# Now, both `textual_id` and `hex_id` are textual representations of the object's ID\n```\n\nDo note that the `id()` function provides a unique identifier only during the \nobject's lifetime. After an object is destroyed, its `id()` may be reused for another \nobject. This is typically not an issue unless you're storing and comparing IDs across \nthe lifecycle of your program where objects may be created and destroyed."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "9dd6bb0d-6bef-4374-b3a4-2a7a08033f77",
-              "bounding_rect": [
-                0,
-                272,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "e6fad01e-8603-4061-8ebd-2115df11935d",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "0ac43773-14e1-43a3-9a79-b8b50bb9d896",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "When I refer to \"that\" object, or \"this\" object -- what is that part of speech called\ngrammatically?\n"
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "27a60a01-f5c4-4abb-894b-3bc7e920cbbe",
-              "bounding_rect": [
-                0,
-                356,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "2df00518-3791-4143-8d9e-ca5a21d66f6c",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "1eb5b9d8-e79e-4c6c-bab1-d4cb467da57d",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "In the context of grammar, \"that\" and \"this\" are referred to as demonstrative \npronouns. Demonstrative pronouns are used to point to specific things in a discourse \ncontext. \"This\" is used for singular or uncountable items that are physically or \nconceptually near to the speaker, while \"that\" is used for pointing to singular or \nuncountable items that are physically or conceptually more distant. They can also be \nused as demonstrative adjectives when they modify nouns instead of replacing them."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "8519bd8c-0e0a-4a98-b4e4-33b1027a18e7",
-              "bounding_rect": [
-                0,
-                440,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "b97bec0c-1ce8-4f6b-93d4-9653a35bc7b3",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "38ac333d-2ecc-4d8b-afb2-aad8af2e82ae",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "I have an LLM-based GUI application. There's a hierarchy of GUIControl objects.\nA GUIContainer is a GUIControl that has a list of children GUIControl objects. The\noverall gui is managed by a GUI object that has a content() GUIContainer.\n\nI want to be able to give the LLM information about the scene. Essentially make it\naware of its own GUI layout. One reason to do this would be to support user commands\nlike \"move that TextArea we just created over to the right\". Or \"select the chat \ncontrol on the left\""
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "0d2490a5-e9c6-412b-8f8d-bebf7607e4bd",
-              "bounding_rect": [
-                0,
-                524,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "b59f3881-615e-437b-b18d-31dd08196903",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "053d0a2f-574f-4db6-899f-4b849469f632",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "To make an LLM aware of the GUI layout, you would need to represent the hierarchy and \nproperties of GUIControl objects in a format that the LLM can understand and process. \nHere's a high-level overview of how you might approach this:\n\n1. **Serialization of GUI Layout**: Develop a system to serialize the hierarchy and \nattributes of all `GUIControl` objects into a structured, queryable format. This \ncould be a nested dictionary, JSON, XML, or any other structured data format that can \nbe easily read and interpreted.\n\n2. **Scene Description Protocol**: Define a protocol or schema that includes all the \nnecessary information to describe the GUI controls, their properties, locations, \nrelationships, and any other attributes relevant to the tasks you will be asking the \nLLM to support.\n\n3. **Interpretation Engine**: Build an engine between the LLM and your application \nthat can interpret commands, access the structured layout information, and identify \nthe corresponding `GUIControl` elements based on the given criteria (e.g., \"the \nTextArea we just created,\" \"the chat control on the left\").\n\n4. **Unique Identifiers**: Assign unique identifiers to each GUI control that can be \nused to reference them in conversation with the LLM. This can be their `id()` \nconverted to a string, or you can generate a custom ID that might carry more semantic \nmeaning within the context of your GUI.\n\n5. **State Synchronization**: Ensure that there is synchronization between the GUI's \nstate and the data that the LLM has. This means updating the structured layout \ninformation whenever a change occurs in the GUI so that the LLM's data is always \nup-to-date.\n\n6. **Command Parsing and Execution**: Implement a system to parse the commands from \nthe LLM, map them to the actions that need to be taken on the GUI, and then execute \nthe corresponding methods or functions on the relevant GUI objects.\n\nHere's a conceptual example of how you might serialize a simple layout:\n\n```json\n{\n  \"controls\": {\n    \"gui_1\": {\n      \"type\": \"GUIContainer\",\n      \"properties\": {\n        \"orientation\": \"vertical\",\n        \"position\": {\"x\": 0, \"y\": 0}\n      },\n      \"children\": {\n        \"textarea_1\": {\n          \"type\": \"TextArea\",\n          \"properties\": {\n            \"text\": \"Sample text\",\n            \"position\": {\"x\": 10, \"y\": 20},\n            \"size\": {\"width\": 100, \"height\": 200},\n            \"created\": \"2023-03-20T14:20:00Z\"\n          }\n        },\n        \"chatcontrol_1\": {\n          \"type\": \"ChatControl\",\n          \"properties\": {\n            \"position\": {\"x\": 10, \"y\": 230},\n            \"size\": {\"width\": 100, \"height\": 300},\n            \"side\": \"left\"\n          }\n        }\n      }\n    }\n  }\n}\n```\n\nWith this structure in place, when you receive a command like \"move that TextArea we \njust created over to the right,\" the Interpretation Engine would:\n\n1. Parse the command and determine it's referring to a `TextArea` control.\n2. Look up the most recently created `TextArea` using a timestamp or creation order.\n3. Change its `position` property as required (e.g., increase the `x` value).\n4. Reflect that change in the actual GUI.\n\nFor a command like \"select the chat control on the left,\" the engine would:\n\n1. Parse the command and identify that it's referring to a `ChatControl` control with \na property indicating it's on the \"left.\"\n2. Find the relevant `ChatControl` in the serialized representation.\n3. Trigger the selection action on that control in the GUI."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "20fbc6e6-bda1-47ef-b5e3-1922f70c9137",
-              "bounding_rect": [
-                0,
-                608,
-                604,
-                84
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "5b1f7969-7055-421f-b66b-e9afe48a7f9b",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "User",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "578fea3a-7a25-4163-a933-12f5300e257c",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    60
-                  ],
-                  "text": "I'm glad you mentioned timestamps for object creation. But that got me thinking -- do\nI want both this and also some kind of record of gui events. Both by the app and by\nthe user. Talk to me more about clickstreams, and what I've described."
-                }
-              ]
-            },
-            {
-              "class": "ChatMessageUI",
-              "uid": "f6663748-5b0e-4c3e-816b-bb72b86c4c61",
-              "bounding_rect": [
-                0,
-                692,
-                604,
-                144
-              ],
-              "layout": "ColumnLayout",
-              "name": "",
-              "inset": [
-                2,
-                2
-              ],
-              "children": [
-                {
-                  "class": "Label",
-                  "uid": "10c1069c-c087-4106-b574-dd237b1c8d21",
-                  "bounding_rect": [
-                    0,
-                    0,
-                    600,
-                    20
-                  ],
-                  "text": "Assistant",
-                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
-                },
-                {
-                  "class": "TextArea",
-                  "uid": "7fa0aa09-9242-439c-aca3-2efece423efc",
-                  "bounding_rect": [
-                    0,
-                    20,
-                    600,
-                    120
-                  ],
-                  "text": "Certainly, the concept you are alluding to is related to event logging and \nclickstream data collection. In the context of GUI applications, a clickstream would \nbe a record of all GUI events triggered by the user, such as mouse movements, clicks, \nselections, and keyboard inputs. Additionally, events generated by the application \nitself, such as updates to the layout, addition or removal of controls, or feedback \nmessages displayed to the user, are also valuable data points.\n\nHere's how you might think about integrating both object creation timestamps and event logging within your application:\n\n1. **Object Creation Timestamps**:\n   - Assign a timestamp at the moment of each GUIControl's instantiation.\n   - Use these timestamps to query the most recently created objects or to establish \nan order of creation which is useful for contextual commands.\n\n2. **GUI Event Logging (Clickstreams)**:\n   - Implement event listeners for all interactive GUIControls to capture and store user interactions, like button clicks, text entry, menu selections, and more.\n   - Create a standardized format for logging these interactions, which could include the timestamp of the event, the type of the event, the ID of the GUIControl involved, and any relevant parameters or properties.\n\n3. **Application Events**: \n   - Similarly, log events initiated by the application, such as the creation of new controls, changes in layout, pop-up dialogs, error messages, and so on.\n   - Ensure that each log entry has enough contextual information to reconstruct what actions took place and the GUI's state changes over time.\n\n4. **Event Stream Analysis**:\n   - Use the collected event log data to analyze user behavior, troubleshoot issues, and inform design improvements for the GUI.\n   - Set up mechanisms to query this data effectively, enabling the LLM or other analytic tools to extract meaningful insights or respond to user commands with context-aware actions.\n\n5. **Log Storage and Management**:\n   - Design a log storage solution that can handle the volume of data generated, with options for filtering, search, and retrieval.\n   - Decide on a retention policy based on your application's needs and possible privacy or regulatory requirements.\n\n6. **Privacy Considerations**:\n   - Keep in mind the privacy implications of logging user interactions. Notify users if their actions are being logged, and ensure compliance with privacy laws and best practices.\n\nBy integrating object creation timestamps with a comprehensive event logging system, you can provide a rich dataset that captures both the static structure of the GUI at any moment in time (through the serialization of the GUI hierarchy and object attributes) and the dynamic interactions that occur within it.\n\nSuch an integrated approach would allow for complex queries like, \"Undo the last action in the text area I was working on,\" using timestamped object data to find the correct text area, and the event log to determine the last action taken on that object and how to reverse it."
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "class": "Label",
-          "uid": "b709a8a2-9957-43a5-9061-2a1e43021634",
-          "bounding_rect": [
-            1112,
-            1349,
-            450,
-            30
-          ],
-          "text": "GUI Reflection / Introspection",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "Label",
-          "uid": "e973dda4-c13b-4a88-89a4-0da215b2400a",
-          "bounding_rect": [
-            1799,
-            1319,
-            285,
-            30
-          ],
-          "text": "Selection vs. Focus",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "20f3d6ce-b5c1-40c8-841e-14457bce0f88",
-          "bounding_rect": [
-            1801,
-            1358,
-            240,
-            100
-          ],
-          "text": "- Need to distinguish between the\ntwo for e.g. multi-select"
-        },
-        {
-          "class": "Label",
-          "uid": "dd6c44a5-799e-4ee5-8e06-cb0ee715a8eb",
-          "bounding_rect": [
-            1803,
-            1496,
-            135,
-            30
-          ],
-          "text": "FocusRing",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "LLMChatContainer",
-          "uid": "e960c02c-0920-49f8-afab-a09b0bca35c2",
-          "bounding_rect": [
-            1799,
-            2016,
+            698,
+            362,
             608,
             312
           ],
@@ -814,7 +74,7 @@
           "children": [
             {
               "class": "Label",
-              "uid": "9dca2be4-8596-426a-91bb-470f53c1c5d0",
+              "uid": "3b9a3613-b1c6-4c5d-9b50-500970e13242",
               "bounding_rect": [
                 0,
                 0,
@@ -826,7 +86,7 @@
             },
             {
               "class": "ChatMessageUI",
-              "uid": "573478cc-815b-4e78-afea-e469cb4b6ea3",
+              "uid": "0da03a6d-d893-4c22-84ca-3959aa465c52",
               "bounding_rect": [
                 0,
                 20,
@@ -842,7 +102,7 @@
               "children": [
                 {
                   "class": "Label",
-                  "uid": "9f10d916-ec55-4e7b-b3b9-dedbcd378db0",
+                  "uid": "b85c403f-b9ea-426a-818e-3ad51caf3db8",
                   "bounding_rect": [
                     0,
                     0,
@@ -854,7 +114,7 @@
                 },
                 {
                   "class": "TextArea",
-                  "uid": "83b17590-6d1e-44ec-a7a8-572ca1c02385",
+                  "uid": "5e388e76-943f-4ffd-ad2c-36f153198ace",
                   "bounding_rect": [
                     0,
                     20,
@@ -867,7 +127,7 @@
             },
             {
               "class": "ChatMessageUI",
-              "uid": "d79fbd7c-d4c6-4f68-8674-6cc10efe3a55",
+              "uid": "b8fa98ec-329e-410d-9f08-52cf15f8ab4c",
               "bounding_rect": [
                 0,
                 164,
@@ -883,7 +143,7 @@
               "children": [
                 {
                   "class": "Label",
-                  "uid": "383cfb51-bb90-4bb1-9baa-d8110d7b6a1b",
+                  "uid": "477c9bb3-11b3-44c2-b130-52ef19a5948a",
                   "bounding_rect": [
                     0,
                     0,
@@ -895,865 +155,185 @@
                 },
                 {
                   "class": "TextArea",
-                  "uid": "06fcb109-14dd-4f81-b28b-6dce0dbb6be3",
+                  "uid": "7e654629-be70-4bf6-a326-2f0abcd653e0",
                   "bounding_rect": [
                     0,
                     20,
                     600,
                     120
                   ],
-                  "text": "A FocusRing is meant to store a list of references to controls that the GUI can set\nfocus on.. The idea is that there is also a hierarchy of focus rings and focusing a\ncontrol that has child controls can push a new focus ring on the stack"
+                  "text": "Give me a list of five foods"
                 }
               ]
             }
           ]
         },
         {
-          "class": "TextArea",
-          "uid": "a6342ecc-d073-4f6d-8dd9-d8f9637b5bbc",
+          "class": "LLMChatContainer",
+          "uid": "2e95ff92-65ad-4272-8c8f-0a55ef132025",
           "bounding_rect": [
-            1804,
-            1636,
-            240,
-            100
+            9,
+            254,
+            608,
+            312
           ],
-          "text": "A FocusRing is meant to store a \nlist of references to controls \nthat the GUI can set focus on.. \nThe idea is that there is also a \nhierarchy of focus rings and \nfocusing a control that has child \ncontrols can push a new focus ring \non the stack"
-        },
-        {
-          "class": "TextArea",
-          "uid": "6b033c5e-74a7-4e92-90c0-dd202b6c43af",
-          "bounding_rect": [
-            1805,
-            1744,
-            240,
-            100
+          "layout": "ColumnLayout",
+          "name": "",
+          "inset": [
+            2,
+            2
           ],
-          "text": "- Every GUIContainer has a\nself.focusRing\n- GUI has a stack of FocusRings\n- pushed and popped on handle of RETURN/Esc in main GUI\n- also recently added handling in \n  GUI.set_focus to unwind / push stack when selecting a control different from the current one.\n- Have a problem with conceptual clarity. Two\n  different concepts are competing, causin oscillation back and forth between two approaches.\n  - FocusRing stack as hierarchy to traverse\n    vs. scene graph parent/child hierarchy\n"
-        },
-        {
-          "class": "Label",
-          "uid": "7740257d-83a3-43c1-9ee9-0033ba3d0105",
-          "bounding_rect": [
-            2084,
-            1489,
-            330,
-            30
-          ],
-          "text": "Programming Assistants",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e9005ec4-9b5e-46c0-9efb-080bcfca8788",
-          "bounding_rect": [
-            2082,
-            1526,
-            240,
-            100
-          ],
-          "text": "AISH3\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "1cba6dbb-1f97-4a67-9b90-fb4d2463dff9",
-          "bounding_rect": [
-            2081,
-            1631,
-            240,
-            100
-          ],
-          "text": "Mentat - AbanteAI\nBioBootloader"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e5218913-da75-4318-9279-abdf45f33e0b",
-          "bounding_rect": [
-            2081,
-            1737,
-            240,
-            100
-          ],
-          "text": "Cosine"
-        },
-        {
-          "class": "TextArea",
-          "uid": "71a525ce-b5cd-48dc-8752-ed18863b149f",
-          "bounding_rect": [
-            2080,
-            1845,
-            240,
-            100
-          ],
-          "text": "Cody - SourceGraph\nSteve Yegge"
-        },
-        {
-          "class": "TextArea",
-          "uid": "28052360-0f0a-4984-8a7d-d2fbc4d84b4c",
-          "bounding_rect": [
-            1804,
-            1852,
-            240,
-            100
-          ],
-          "text": "One weird exception causes conceptual\nand refactoring problems if you don't \nknow about it. Child controls not always\nadded to parent Container's FocusRing.\nIn the case of LLMChatContainer / ChatMessageUI / TextArea,\nthe TextArea's are adeed to *grandparent's* FocusRing\nhas caused a lot of annoyance."
-        },
-        {
-          "class": "TextArea",
-          "uid": "d2cd8da1-d041-47fb-9e1d-9205de71e1f7",
-          "bounding_rect": [
-            1804,
-            1529,
-            240,
-            100
-          ],
-          "text": "Did major cleanup on 2023-12-12\nThe \"Great FocusRing F**kery of 12/12\"\nStill not perfect, but much improved.\n"
-        },
-        {
-          "class": "Label",
-          "uid": "e4773681-225b-4d26-a796-fa1eba3bed43",
-          "bounding_rect": [
-            1806,
-            1109,
-            315,
-            30
-          ],
-          "text": "Multi-Select Controls",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "5a8b629d-6787-45c0-a679-717016f4ee41",
-          "bounding_rect": [
-            1806,
-            1143,
-            240,
-            100
-          ],
-          "text": "- Left-drag seems obvious for rect\nselection area.\n- BUT currently assigned to pan\nworkspace\n- CHANGE? pan to Ctrl or Cmd L drag?\n  - also right mousewheel?\n  - Q: interaction with mouse-wheel scroll of TextArea"
+          "children": [
+            {
+              "class": "Label",
+              "uid": "cc3e905f-3c86-4d28-b2bd-a0bb0bcaad8b",
+              "bounding_rect": [
+                0,
+                0,
+                600,
+                20
+              ],
+              "text": "LLM Chat [gpt-4]",
+              "font_descriptor": "{\"font_descriptor\": \"default\"}"
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "8b34c950-b039-4d3a-a611-7c681c5cd5bd",
+              "bounding_rect": [
+                0,
+                20,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "96815b92-01f4-4e80-b920-9fd6b50f5097",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "System",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "49810a98-1f75-4c11-94b5-27527347a6ca",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "You are an AI assistant with expert software engineering, software \ndevelopment, software architecture, computer science, and product \ndevelopment skills. You and I will be designing, analyzing,  \nimplementing, and modifying software, together.\n\nWe're going to have a conversation about the software we're building \ntogether. When I give you information, I don't want you to immediately \nsuggest what to do, unless I ask you for suggestions. \n\nWhen communicating with me, assume the following. I am a widely read \nmature student. I studied four years of computer engineering. I also \nstudied four years of physics, with a minor in biology.\n\nIf I critique your responses, don't apologize; simply acknowledge \nunderstanding, or ask for more clarification, and then act on the \ncritique. If you are providing program, script, markup, or any other \nkind of code, carefully check that it is syntactically and semantically \ncorrect.\n"
+                }
+              ]
+            },
+            {
+              "class": "ChatMessageUI",
+              "uid": "1d039cd6-289a-4cf1-b395-71e294604258",
+              "bounding_rect": [
+                0,
+                164,
+                604,
+                144
+              ],
+              "layout": "ColumnLayout",
+              "name": "",
+              "inset": [
+                2,
+                2
+              ],
+              "children": [
+                {
+                  "class": "Label",
+                  "uid": "010acf1d-cd44-4f0b-9762-79db9d45992b",
+                  "bounding_rect": [
+                    0,
+                    0,
+                    600,
+                    20
+                  ],
+                  "text": "User",
+                  "font_descriptor": "{\"font_descriptor\": \"default\"}"
+                },
+                {
+                  "class": "TextArea",
+                  "uid": "fdfc91b6-213f-4a95-8a59-4852e86c4071",
+                  "bounding_rect": [
+                    0,
+                    20,
+                    600,
+                    120
+                  ],
+                  "text": "Give me a list of five animals"
+                }
+              ]
+            }
+          ]
         },
         {
           "class": "Label",
-          "uid": "846a0571-43ae-4729-b378-611ed02e8ef3",
+          "uid": "646c7f07-ee30-4e1d-9b03-6aac28065d93",
           "bounding_rect": [
-            2209,
-            1103,
-            135,
+            7,
+            173,
+            570,
             30
           ],
-          "text": "Annoying!",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "1e499710-6a7b-406c-9090-28f33159f989",
-          "bounding_rect": [
-            2208,
-            1137,
-            240,
-            100
-          ],
-          "text": "When focusing TextArea, cursor\njumps to the end. There was some\nreason for this, to do with appending\neither LLM or transcribed text? \nbut most of the time now it's \nannoying. GitHub Issue #71"
-        },
-        {
-          "class": "TextArea",
-          "uid": "5130d775-72c2-4f99-873a-b95140100dc7",
-          "bounding_rect": [
-            1788,
-            706,
-            240,
-            100
-          ],
-          "text": "#72: Add ability to set and jump \nto bookmarks, with voice"
-        },
-        {
-          "class": "Label",
-          "uid": "bc342785-4f36-4933-b67b-3497b359d868",
-          "bounding_rect": [
-            1792,
-            659,
-            135,
-            30
-          ],
-          "text": "Bookmarks",
+          "text": "This is a stand-alone LLM conversation",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
           "class": "Label",
-          "uid": "2dcdbd87-b972-4a70-b074-09b0088bef25",
+          "uid": "0afdc52f-96f4-476d-a1b7-9c6a45702e32",
           "bounding_rect": [
-            885,
-            924,
-            555,
+            11,
+            211,
+            930,
             30
           ],
-          "text": "Make it easier for people to try AISH",
+          "text": "It's just a basic chat with no agent functionality or memories",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "50b9a295-b3e0-47ce-be88-49f27e644a9e",
-          "bounding_rect": [
-            884,
-            969,
-            240,
-            100
-          ],
-          "text": "Improve install docs and provide\nvideo walk-through"
-        },
-        {
-          "class": "TextArea",
-          "uid": "9b50a89c-56e3-45b0-b377-fcbc8c312ed2",
-          "bounding_rect": [
-            885,
-            1080,
-            240,
-            100
-          ],
-          "text": "Pre-built binaries for PC, mac,\nLinux, RaspberryPi/Raspian"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e4e444d9-618a-430b-bcbc-8c8ba6cb3dbf",
-          "bounding_rect": [
-            1142,
-            970,
-            240,
-            100
-          ],
-          "text": "Docker container?\n- Can SDL work from container?"
-        },
-        {
-          "class": "TextArea",
-          "uid": "65d18f43-8b6d-46da-9f89-25392fe92512",
-          "bounding_rect": [
-            1141,
-            1080,
-            240,
-            100
-          ],
-          "text": "Web / Canvas version?"
         },
         {
           "class": "Label",
-          "uid": "eb3ddad0-f4e8-47d8-bdc0-a2b4f554a530",
+          "uid": "a4f70f41-9a17-4fb1-8463-a0a6945e72a0",
           "bounding_rect": [
-            1935,
-            861,
-            450,
+            698,
+            289,
+            390,
             30
           ],
-          "text": "Re-enable / fix CommandConsole",
+          "text": "You can have more than one",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "04a29fb9-ad02-4384-86c0-95ee2e2f259a",
-          "bounding_rect": [
-            1939,
-            901,
-            240,
-            100
-          ],
-          "text": "- Show / hide\n- layout \n- modal"
-        },
-        {
-          "class": "TextArea",
-          "uid": "b5558c9e-ac57-4477-b80a-dcc4f24abfb0",
-          "bounding_rect": [
-            2188,
-            900,
-            240,
-            100
-          ],
-          "text": "Should be able to type all \nsupported commands instead of\nvoice"
         },
         {
           "class": "Label",
-          "uid": "825fbb7b-53bc-4e21-9bbe-09433e1a8e2d",
+          "uid": "f167dfed-b2d3-42c8-b6a2-41de9b8d2569",
           "bounding_rect": [
-            1273,
-            621,
-            420,
+            697,
+            322,
+            660,
             30
           ],
-          "text": "Integrate with GitHub issues",
+          "text": "Ctrl+N (Windows) or Cmd+N (Mac) to make more",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "553071e4-e5a0-4a80-ae8f-f7800cd392d4",
-          "bounding_rect": [
-            1275,
-            668,
-            240,
-            100
-          ],
-          "text": "- Generate Github issue from note\n- sync?"
-        },
-        {
-          "class": "Label",
-          "uid": "048fc80a-06da-4797-b827-aeb2630ddbe4",
-          "bounding_rect": [
-            1560,
-            862,
-            330,
-            30
-          ],
-          "text": "Open and Display Files",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "7c514a53-918b-4fa0-bd56-acc01ee42003",
-          "bounding_rect": [
-            1564,
-            901,
-            240,
-            100
-          ],
-          "text": "- text / source files\n- images\n- ability to confirm a command\n- PDFs\n- !Security"
-        },
-        {
-          "class": "Label",
-          "uid": "795d4041-44cb-4ccf-ba72-c6ec8f41abb2",
-          "bounding_rect": [
-            869,
-            624,
-            255,
-            30
-          ],
-          "text": "Command Input Map",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "9eaab2fa-dcaa-4a6a-a009-97e86fd7287b",
-          "bounding_rect": [
-            871,
-            661,
-            240,
-            100
-          ],
-          "text": "- Instead of event-handling if or\nswitch statements\n- declarative\n- push / pop\n- find conflicts"
-        },
-        {
-          "class": "Label",
-          "uid": "a995748e-be57-4fbe-afca-51195a751339",
-          "bounding_rect": [
-            1426,
-            1195,
-            90,
-            30
-          ],
-          "text": "Search",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "fefe23e0-2d30-4706-90db-33db6c5837b2",
-          "bounding_rect": [
-            1427,
-            1231,
-            240,
-            100
-          ],
-          "text": "- text search\n- go to the note with text \"...\"\n"
-        },
-        {
-          "class": "Label",
-          "uid": "06bd536a-f6e1-4d89-8e92-e152469d025b",
-          "bounding_rect": [
-            2366,
-            539,
-            195,
-            30
-          ],
-          "text": "Ingest Videos",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "143c01b9-cf35-414f-af22-4977eacda6de",
-          "bounding_rect": [
-            2366,
-            577,
-            240,
-            100
-          ],
-          "text": "String Theory gets Competition: A New Attempt to Solve Physics' Biggest Mystery\nhttps://www.youtube.com/watch?v=-HHv3T4UHec&ab_channel=SabineHossenfelder\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "525071be-1164-4944-be71-5145e446b7ce",
-          "bounding_rect": [
-            2368,
-            685,
-            240,
-            100
-          ],
-          "text": "Black Hole Singularities \"Faith, not science!\" Prominent Physicist Claims\nhttps://www.youtube.com/watch?v=nz55jONtFAU&t=3s&ab_channel=SabineHossenfelder\n"
-        },
-        {
-          "class": "Label",
-          "uid": "b32760e9-beb5-48c7-917a-389a933f6e10",
-          "bounding_rect": [
-            2672,
-            805,
-            465,
-            30
-          ],
-          "text": "Agent Questions / Introspection",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "7fc345fe-0fba-4f6a-8432-ae5e65b51cba",
-          "bounding_rect": [
-            2677,
-            852,
-            240,
-            100
-          ],
-          "text": "- Where are all the places this function is called from?\n- Where is the definition of this function?\n- Is this code ever called?\n- Is this called from somewhere we don't expect?\n- Is this called at times or more or fewer times than we expect?"
-        },
-        {
-          "class": "TextArea",
-          "uid": "32bfb2f1-0d20-4025-8cbb-30a501273ae4",
-          "bounding_rect": [
-            2674,
-            962,
-            240,
-            100
-          ],
-          "text": "- What are all the things I need \n  to deliver, for an excellent code change?\n\t- code\n\t- tests\n\t- updated comments\n    - docstring\n\t- updated documentation\n    - type hints"
-        },
-        {
-          "class": "Label",
-          "uid": "9dbb2101-a517-4383-8182-5a9a964e7c32",
-          "bounding_rect": [
-            1134,
-            1495,
-            465,
-            30
-          ],
-          "text": "Scene Graph / Control Hierarchy",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "06b957f2-0168-4a12-8953-f212227e3839",
-          "bounding_rect": [
-            1127,
-            1388,
-            240,
-            100
-          ],
-          "text": "- current time\n- assumed user\n- verified user? How?\n- location?\n- screen and window sizes\n- platform info"
-        },
-        {
-          "class": "TextArea",
-          "uid": "32080f32-2426-4aa5-9861-62b2070af7df",
-          "bounding_rect": [
-            1378,
-            1388,
-            240,
-            100
-          ],
-          "text": "- clickstream\n- event stream"
-        },
-        {
-          "class": "TextArea",
-          "uid": "57b3f06f-37e5-4065-a56c-3abf5973e9b1",
-          "bounding_rect": [
-            2583,
-            1537,
-            240,
-            100
-          ],
-          "text": "VSCode is open source\nhttps://github.com/Microsoft/vscode\n\nVSCodium\nhttps://vscodium.com/#:~:text=Microsoft's%20vscode%20source%20code%20is,license%20and%20contains%20telemetry%2Ftracking.\n"
-        },
-        {
-          "class": "Label",
-          "uid": "9700151c-46fc-484a-9879-e8c16678d9af",
-          "bounding_rect": [
-            2584,
-            1490,
-            420,
-            30
-          ],
-          "text": "Programming IDEs Source Code",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "8e5d2b74-68fb-4d34-b7f4-8fefff69fd35",
-          "bounding_rect": [
-            2584,
-            1647,
-            240,
-            100
-          ],
-          "text": "- Emacs\n- Vim\n- Notepad++\n- Sublime Text\n- Code Blocks?\n- Scintilla\n- Web JS code editors\n- Ubuntu Text Editor"
-        },
-        {
-          "class": "TextArea",
-          "uid": "1f65d94f-3245-404c-baa0-003e6cb68975",
-          "bounding_rect": [
-            884,
-            1189,
-            240,
-            100
-          ],
-          "text": "- Enter their own API keys\n- What about ppl who don't have\naccess to GPT4?"
-        },
-        {
-          "class": "Label",
-          "uid": "fa54d11e-b859-4dd1-b331-e196ade0b7ee",
-          "bounding_rect": [
-            717,
-            1349,
-            270,
-            30
-          ],
-          "text": "Click/Event Stream",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e635261c-395b-420d-8a05-992496125961",
-          "bounding_rect": [
-            721,
-            1383,
-            240,
-            100
-          ],
-          "text": "- what to include?\n- how to present it to LLM?\n- can logging help with this?\n  - custom Logger?"
-        },
-        {
-          "class": "Label",
-          "uid": "46af551d-bb07-445b-97da-bd5a7090a69d",
-          "bounding_rect": [
-            1425,
-            1049,
-            285,
-            30
-          ],
-          "text": "Multiple Workspaces",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "f1e10479-4e94-4f0f-8aff-cdb5126cf164",
-          "bounding_rect": [
-            1427,
-            1089,
-            240,
-            100
-          ],
-          "text": "- how to copy elements from one\nworkspace/board to another?"
-        },
-        {
-          "class": "Label",
-          "uid": "b1035d92-8a08-4bed-bf86-7ee85e98753b",
-          "bounding_rect": [
-            3213,
-            169,
-            90,
-            30
-          ],
-          "text": "Agents",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "ffb39cdf-f271-4037-82c9-3d50731a2a2e",
-          "bounding_rect": [
-            3067,
-            217,
-            240,
-            100
-          ],
-          "text": "- nested / composable?\n  - other collaboration patterns?\n- Rocky's Boots 2\n"
-        },
-        {
-          "class": "Label",
-          "uid": "0e1c50c3-d3bc-46a1-95aa-4e3e1adf33ec",
-          "bounding_rect": [
-            1503,
-            405,
-            225,
-            30
-          ],
-          "text": "AISH - Calendar",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "ce0028bd-0961-49a7-a9ec-b469c54593d7",
-          "bounding_rect": [
-            1506,
-            441,
-            240,
-            100
-          ],
-          "text": "- start managing my calendar through AISH\n- how?\n- integrations"
-        },
-        {
-          "class": "Label",
-          "uid": "fd0260c6-70ce-4951-abec-73053abe8852",
-          "bounding_rect": [
-            1911,
-            142,
-            255,
-            30
-          ],
-          "text": "RAG - Ingest PDFs",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "868a3da5-be96-415a-86e7-362f7ca28a30",
-          "bounding_rect": [
-            1913,
-            183,
-            240,
-            100
-          ],
-          "text": "llama_index\n* PDF Loader - https://llamahub.ai/l/file-pdf\n"
-        },
-        {
-          "class": "Label",
-          "uid": "081add78-a043-492f-ac76-e881912095e0",
-          "bounding_rect": [
-            1924,
-            293,
-            90,
-            30
-          ],
-          "text": "PyPDF2",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "70f80de8-318f-42da-b5b9-37bb72f92d55",
-          "bounding_rect": [
-            1924,
-            329,
-            240,
-            100
-          ],
-          "text": "* PyPI page - https://pypi.org/project/PyPDF2/\n* PyPDF2 Docs - https://pypdf2.readthedocs.io/en/3.0.0/\n* PyPDF2 Tutorial - https://nanonets.com/blog/pypdf2-library-working-with-pdf-files-in-python/\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "c12be807-127f-4908-8e2c-6b886b100010",
-          "bounding_rect": [
-            1925,
-            438,
-            240,
-            100
-          ],
-          "text": "* Books / Documentation of PDF format?\n?"
-        },
-        {
-          "class": "Label",
-          "uid": "5ba67c8d-cd8e-4c63-b7c0-f7c21d4c90cc",
-          "bounding_rect": [
-            2198,
-            182,
-            165,
-            30
-          ],
-          "text": "Render PDF?",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "ddd5bafc-bd00-4a7f-b6eb-dc707235329b",
-          "bounding_rect": [
-            2199,
-            219,
-            240,
-            100
-          ],
-          "text": "* PyMuPDF - https://github.com/pymupdf/PyMuPDF?tab=readme-ov-file#pymupdf-optional-features\n* pypdfium2 - https://github.com/pypdfium2-team/pypdfium2\n* pdfium - https://pdfium.googlesource.com/pdfium/+/refs/heads/main\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e6a44d0d-7dd9-469c-a104-7ea263a1e8a7",
-          "bounding_rect": [
-            2209,
-            330,
-            240,
-            100
-          ],
-          "text": "PyMuPDF\n* PyPI - https://pypi.org/project/PyMuPDF/\n* Docs - https://pymupdf.readthedocs.io/en/latest/\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "f40f1e3f-276a-4ad7-b0ca-c7c68bf18ff3",
-          "bounding_rect": [
-            2210,
-            436,
-            240,
-            100
-          ],
-          "text": "COSTS\n* Cost of gpt4v on e.g. 708 page PDF\n* Cost of MathPix OCR\n* Tesseract OCR?"
-        },
-        {
-          "class": "TextArea",
-          "uid": "e55a4717-9501-4d11-b1b4-6dbe48634b60",
-          "bounding_rect": [
-            2460,
-            437,
-            240,
-            100
-          ],
-          "text": "OCR\n* gpt4v\n* MathPix\n* Tesseract OCR"
-        },
-        {
-          "class": "Label",
-          "uid": "22292ea8-0de5-4936-b0fa-18074115a14d",
-          "bounding_rect": [
-            779,
-            1,
-            210,
-            30
-          ],
-          "text": "Dimensionality",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "bdb7cdc7-373c-43d3-809b-4ebbdb643304",
-          "bounding_rect": [
-            780,
-            48,
-            240,
-            100
-          ],
-          "text": "Why the simplest explanation isn't always the best\nhttps://www.pnas.org/doi/10.1073/pnas.2319169120\n- PCA\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "a9a774f5-cf6a-4d09-ba88-409103506f1d",
-          "bounding_rect": [
-            781,
-            423,
-            240,
-            100
-          ],
-          "text": "DANCo\n\nDANCo: Dimensionality from Angle and Norm Concentration\nhttps://arxiv.org/abs/1206.3881\n\nDANCo: An intrinsic dimensionality estimator exploiting angle and norm concentration\nhttps://doi.org/10.1016/j.patcog.2014.02.013\n\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "ccedb7f3-16d7-498d-9249-fac72d8a4055",
-          "bounding_rect": [
-            1096,
-            37,
-            240,
-            100
-          ],
-          "text": "Scientific American\nHow to Make a Consciousness Meter\nhttps://www.scientificamerican.com/article/how-to-make-a-consciousness-meter/\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "40857572-a714-403c-9e9f-08197111ee09",
-          "bounding_rect": [
-            1096,
-            146,
-            240,
-            100
-          ],
-          "text": "Zap and Zip paper seems to be:\nQuantifying Cortical EEG Responses to TMS in (Un)consciousness\nhttps://journals.sagepub.com/doi/10.1177/1550059413513723\n"
-        },
-        {
-          "class": "Label",
-          "uid": "def0d71e-f33a-4289-8f2e-f024c849b155",
-          "bounding_rect": [
-            1093,
-            0,
-            165,
-            30
-          ],
-          "text": "Zap and Zip",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "d3d5752b-3cee-4654-9d8b-bfd167e8f54e",
-          "bounding_rect": [
-            1035,
-            424,
-            240,
-            100
-          ],
-          "text": "What is dimensionality of MNIST\n- for different digits?\n- stays same for shifted digits?\n- what is set of shifts valid for\nall digits?\n"
-        },
-        {
-          "class": "Label",
-          "uid": "d041c847-db2c-4512-adfa-b70fb6656298",
-          "bounding_rect": [
-            778,
-            276,
-            360,
-            30
-          ],
-          "text": "Intrinsic Dimension (id)",
-          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
-        },
-        {
-          "class": "TextArea",
-          "uid": "69482c9c-660a-4264-af5a-751fcdb41876",
-          "bounding_rect": [
-            782,
-            313,
-            240,
-            100
-          ],
-          "text": "Intrinsic Dimension\nhttps://en.wikipedia.org/wiki/Intrinsic_dimension\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "735d36dd-f03b-4df8-adcc-2e0e7ca8dfbf",
-          "bounding_rect": [
-            780,
-            159,
-            240,
-            100
-          ],
-          "text": "Dimensionality Reduction\nhttps://en.wikipedia.org/wiki/Dimensionality_reduction\n\nNonlinear dimensionality reduction\nhttps://en.wikipedia.org/wiki/Nonlinear_dimensionality_reduction\n"
-        },
-        {
-          "class": "TextArea",
-          "uid": "6c096d04-56b9-4609-8273-f88c2b54e6ae",
-          "bounding_rect": [
-            1033,
-            312,
-            240,
-            100
-          ],
-          "text": "Isomap\nhttps://en.wikipedia.org/wiki/Isomap#:~:text=Isomap%20is%20one%20representative%20of,imposed%20by%20a%20weighted%20graph.\n"
         }
       ]
     }
   },
-  "viewport_bookmarks": {
-    "1": [
-      1147,
-      472
-    ],
-    "2": [
-      2625,
-      242
-    ],
-    "9": [
-      960,
-      399
-    ]
-  },
+  "viewport_bookmarks": {},
   "viewport_pos": [
-    363,
-    7
+    6,
+    12
   ]
 }

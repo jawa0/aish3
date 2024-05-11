@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class TextArea(GUIControl):
 
         instance = gui.create_control(json["class"], **kwargs)
         instance.set_bounds(*json["bounding_rect"])
-        instance.text_buffer.set_text(json["text"])
+        instance.set_text(json["text"])
         return instance
 
 
@@ -89,7 +89,7 @@ class TextArea(GUIControl):
         font_size_px = fm.size
 
         # print('__file__:', __file__)
-        app_path = os.path.dirname(os.path.abspath(__file__))
+        app_path = os.path.dirname(os.path.abspath(__file__))  # @todo DRY if this file location changes, then we'll need to update computation of app_path
         # print(f'app_path: {app_path}')
 
         font_filepath = os.path.abspath(os.path.join(app_path, "res/fonts/FiraCode-Regular.ttf"))
@@ -121,6 +121,14 @@ class TextArea(GUIControl):
         return super()._change_focus(am_getting_focus)
     
 
+    def get_text(self) -> str:
+        return self.text_buffer.get_text()
+    
+    
+    def set_text(self, text: str) -> None:
+        self.text_buffer.set_text(text)
+
+
     def on_update(self, dt):
         if self.input_q is not None:
             try:
@@ -129,7 +137,7 @@ class TextArea(GUIControl):
                     if len(text) == 0:
                         continue
 
-                    # self.text_buffer.set_text(text)
+                    # self.set_text(text)
 
                     # Don't just overwrite text, but insert it at the current cursor position
                     # However, delete any current selection. We'll use this as a way to 
@@ -156,6 +164,10 @@ class TextArea(GUIControl):
 
 
     def handle_event(self, event):
+        # @note: I don't like that each derived class has to remember to do this
+        if self._pre_handle_event(event):
+            return True
+
         current_was_last_event_mousewheel = self._was_last_event_mousewheel
         self._was_last_event_mousewheel = False
 
@@ -188,6 +200,10 @@ class TextArea(GUIControl):
                 return True
             
             elif keySymbol == sdl2.SDLK_RETURN and not cmdPressed:
+                # @todo: add an option to not capture RETURN, so that
+                # we can make specialized text-based controls that do
+                # stuff when you press RETURN.
+                
                 if self.text_buffer.get_selection() is not None:
                     self.text_buffer.delete_selection()
                 self.text_buffer.insert()
@@ -339,7 +355,7 @@ class TextArea(GUIControl):
 
                     # If we're cutting, then delete all the text
                     if keySymbol == sdl2.SDLK_x:
-                        self.text_buffer.set_text('')
+                        self.set_text('')
 
                 # Set the clipboard text
                 sdl2.SDL_SetClipboardText(text.encode('utf-8'))

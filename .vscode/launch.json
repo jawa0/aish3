@@ -11,6 +11,16 @@
             "program": "aish3.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: AISH3 Agent",
+            "type": "python",
+            "request": "launch",
+            "program": "aish3.py",
+            "args": ["--workspace", "agent.json"],
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
+
     ]
 }

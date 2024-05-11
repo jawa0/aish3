@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 import sdl2
 from config import GUI_INSET_X, GUI_INSET_Y
 import uuid
+import weakref
 
 
 class GUIControl:
@@ -23,6 +24,8 @@ class GUIControl:
     def from_json(cls, json, **kwargs):
         assert(json["class"] == cls.__name__)
 
+        # @todo: Isn't there a built-in way to do this with dicts?
+        # Just saw that recently...
         kwargs = cls._enrich_kwargs(json, **kwargs)            
         instance = cls(**kwargs)
         return instance
@@ -115,8 +118,14 @@ class GUIControl:
         self.set_bounds(x, y, w, h)
         self.pulse_busy = False
         self.editor = None
+        self._pre_event_snoops = []
 
 
+    @property
+    def uid(self):
+        return self._uid
+    
+    
     def has_focus(self):
         return self.gui.get_focus() == self
     
@@ -229,8 +238,14 @@ class GUIControl:
     def get_world_rect(self):
         """Get our bounding rect in 'world' coordinates. I.e. relative to the overall workspace."""
 
-        wx, wy = self.local_to_world(-self._inset[0], -self._inset[1])
-        wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
+        if self.is_screen_relative():
+            wr = sdl2.SDL_Rect(self.bounding_rect.x + self.gui._viewport_pos[0], 
+                               self.bounding_rect.y + self.gui._viewport_pos[1],
+                               self.bounding_rect.w, 
+                               self.bounding_rect.h)
+        else:
+            wx, wy = self.local_to_world(-self._inset[0], -self._inset[1])
+            wr = sdl2.SDL_Rect(wx, wy, self.bounding_rect.w, self.bounding_rect.h)
         return wr
     
     
@@ -255,7 +270,10 @@ class GUIControl:
                                                self.bounding_rect.y)
                 
                 avr = most_senior_screen_relative_ancestor.get_view_rect()
-                vr = sdl2.SDL_Rect(x + avr.x, y + avr.y, self.bounding_rect.w, self.bounding_rect.h)
+                vr = sdl2.SDL_Rect(x + avr.x + most_senior_screen_relative_ancestor._inset[0], 
+                                   y + avr.y + most_senior_screen_relative_ancestor._inset[1], 
+                                   self.bounding_rect.w, 
+                                   self.bounding_rect.h)
                 return vr
             else:
                 wr = self.get_world_rect()
@@ -296,11 +314,29 @@ class GUIControl:
             return False
 
 
-    def handle_event(self, event):
+    def add_pre_event_snoop(self, func):
+        self._pre_event_snoops.append(weakref.ref(func))
+
+
+    def handle_event(self, event) -> bool:
+        # If a derived class of GUIControl does not implement its own event handling, 
+        # then it should just pass the event up the runtime scene hierarchy.
+
         return self.parent_handle_event(event)
     
 
-    def parent_handle_event(self, event):
+    def _pre_handle_event(self, event) -> bool:
+        # if event.type == sdl2.SDL_KEYDOWN and event.key.keysym.sym == sdl2.SDLK_RETURN:
+        #     debug_break = 1
+
+        for weak_snoop in self._pre_event_snoops:
+            snoop = weak_snoop()
+            if snoop and hasattr(snoop, 'handle_event') and snoop.handle_event(event):
+                return True
+        return False
+    
+
+    def parent_handle_event(self, event) -> bool:
         # Pass unhandled events up the runtime child/parent hierarchy.
         if self.parent:
             return self.parent.handle_event(event)

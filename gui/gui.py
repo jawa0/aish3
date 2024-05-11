@@ -1,4 +1,4 @@
-# Copyright 2023 Jabavu W. Adams
+# Copyright 2023-2024 Jabavu W. Adams
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from agent import Agent
+from agent_events import AgentEvents
+from blinker import signal
 from collections import deque
+# from command_console import CommandConsole  # circular ref
+from command_listener import CommandListener
 import ctypes
 import datetime
 import json
@@ -26,14 +30,15 @@ from tzlocal import get_localzone
 import weakref
 import os
 
-from command_listener import VoiceCommandListener
 from .fonts import FontRegistry
 from .gui_container import GUIContainer
+# from .gui_control import GUIControl  # circular ref
 from rect_utils import rect_union
 from transcribe_audio import VoiceTranscriber
 import utils
 from voice_out import VoiceOut
 from draw import draw_marker_point, draw_text, set_color
+from platform_utils import is_cmd_pressed
 
 
 class GUI:
@@ -77,17 +82,21 @@ class GUI:
 
 
     def __init__(self, renderer, font_descriptor, 
-                 workspace_filename=None, 
-                 client_session=None, 
-                 enable_voice_in=False, 
-                 enable_voice_out=False):
+                workspace_filename=None, 
+                client_session=None, 
+                enable_voice_in=False, 
+                enable_voice_out=False,
+                create_hook: Optional[callable]=None):        
         
         if enable_voice_in:
             from voice_wakeup import PhraseListener
-            
+
         assert(client_session is not None)
         self.session = client_session
         self.session.gui = weakref.ref(self)
+        
+        self.session.command_listener = CommandListener(self.session)
+        signal("channel_command").connect(self._on_command)
 
         self.renderer = renderer
         self.font_descriptor = font_descriptor
@@ -108,7 +117,6 @@ class GUI:
         self._viewport_bookmarks = {}
 
         self.workspace_filename = workspace_filename
-        print(f'GUI.init(): workspace_filename = {self.workspace_filename}')
         if self.workspace_filename is not None:
             self.load()
 
@@ -130,6 +138,7 @@ class GUI:
         self._should_stop_voice_in = False
 
         self.command_listener = None
+        self.agent: Agent = None
 
         # Do we have access to an LLM? Need to know for voice commands. Uses LLM to interpret transcribed text.
         if not os.getenv("OPENAI_API_KEY"):
@@ -142,11 +151,18 @@ class GUI:
 
         self._content._inset = (0, 0)
 
+        self.listening_indicator: "GUIControl" = None  
+        self.command_console: "CommandConsole" = None
+
         # @todo runtime feature flag
         # DEBUG_DRAW
         # self._content.draw_bounds = True
 
+        if create_hook is not None:
+            create_hook(self)
+
         self.content().sizeToChildren()
+
 
 
     class ClickContext:
@@ -240,7 +256,9 @@ class GUI:
                     self._voice_wakeup.stop()
                     self._voice_wakeup = None
 
-            self._voice_out.say(text)
+            # if self._voice_out:
+            #     self._voice_out.say(text)
+
         else:
             self._next_texts_to_say.append(text)
 
@@ -256,8 +274,8 @@ class GUI:
 
                 self._voice_in.start_recording()
 
-                if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-                    self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
 
             # If we were waiting for the wakeup phrase, then go back to doing that
             elif len(self._next_texts_to_say) == 0 and \
@@ -277,13 +295,12 @@ class GUI:
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
         self._voice_in.start_recording()
 
-        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+        # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+        #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
 
 
-    def _on_voice_command(self, command: str) -> None:
-        logging.info(f'GUI._on_voice_command({command})')
-        assert(self.voice_in_enabled)
+    def _on_command(self, command: str) -> None:
+        logging.info(f'GUI._on_command({command})')
 
         # @todo make sanitization routines
         command = command.replace('"', "")
@@ -301,7 +318,7 @@ class GUI:
 
         elif command == "create_new_text_area":                        
             wx, wy = self.view_to_world(vx, vy)
-            self.cmd_new_text_area(wx, wy)
+            self.cmd_new_text_area(wx=wx, wy=wy)    # @todo: how to specify initial text @bug
 
         elif command.startswith("create_new_label"):
             # Get the optional text
@@ -315,6 +332,40 @@ class GUI:
             wx, wy = self.view_to_world(vx, vy)
             self.cmd_new_label(wx, wy, text=text)
 
+        elif command.startswith("open_file("):
+                i_start = len("open_file(")
+                i_end = command.find(")")
+                if i_end > i_start:
+                    path_string = command[i_start:i_end].strip()
+                    if not os.path.exists(path_string):
+                        contents = f"File '{path_string}' not found."
+                    else:
+                        # @todo: move this into agent
+                        try:
+                            with open(path_string, 'r') as f:
+                                contents = f.read()
+                                if self.agent:
+                                    self.agent.put_event(AgentEvents.create_event("OpenedFile", path=path_string, contents=contents))
+                                    self.agent._files.append({'object_type': 'file', 'path': path_string, 'contents': contents})
+                        except:
+                            contents = f"Unknown error opening file '{path_string}'."
+
+                    # Create a new TextArea to show the results
+                    wx, wy = self.view_to_world(vx, vy)
+                    ta = self.cmd_new_text_area(text=contents, wx=wx, wy=wy) 
+                    ta.set_size(700, 600)
+
+        elif command == "get_focused_control":
+            # Get the focused control
+            focused_control = self.get_focus()
+            if focused_control:
+                contents = focused_control.uid
+            else:
+                contents = "None"
+
+            wx, wy = self.view_to_world(vx, vy)
+            self.cmd_new_text_area(text=contents, wx=wx, wy=wy)
+                    
         else:
             pan_screen_prefix = "pan_screen_"
             if command.startswith(pan_screen_prefix):
@@ -360,6 +411,7 @@ class GUI:
                 self.set_view_pos(wx + dx_pixels, wy + dy_pixels)
 
 
+
     def handle_event(self, event):
         is_double_click = False
         if event.type == sdl2.SDL_MOUSEBUTTONDOWN:
@@ -394,18 +446,16 @@ class GUI:
                 # print(f"self._viewport_pos = {self._viewport_pos}")
                 # print(f"self.command_console.bounding_rect = {self.command_console.bounding_rect}")
 
-                # self.command_console._visible = not self.command_console._visible
+                self.command_console._visible = not self.command_console._visible
 
                 # Gets focus which causes it to handle the upcoming SDL_TEXTINPUT and 
                 # also insert the ~ character into the text buffer. @bug @note
-                # self.set_focus(self.command_console.console_area, self.command_console._visible)
+                self.set_focus(self.command_console.console_area, self.command_console._visible)
                 return True
 
-            # elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
-            #     # Hide the command console if Esc is pressed
-            #     # self.command_console._visible = False
-            #     # self.set_focus(self.command_console.console_area, False)
-            #     return True
+            elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
+                self.command_console.hide()
+                return True
 
 
         handled = False
@@ -532,6 +582,20 @@ class GUI:
         self.content().add_child(chat)
 
 
+    def cmd_new_agent_chat(self, wx: int, wy: int) -> None:
+        """Expects wx, and wy to be world (workspace) coordinates."""
+
+        logging.info('Command: create new Agent chat')
+        print(f'wx, wy = {wx}, {wy}')
+
+        assert(wx is not None and wy is not None)
+
+        parent = self.content()
+        x, y = parent.world_to_local(wx, wy)
+        chat = self.create_control("LLMAgentChat", x=x, y=y)
+        self.content().add_child(chat)
+
+
     def cmd_new_label(self, wx: int, wy: int, text: str="New Label") -> None:
         """Expects wx, and wy to be world (workspace) coordinates."""
 
@@ -576,10 +640,9 @@ class GUI:
         vr = self.content().get_view_rect()
 
         keySym = event.key.keysym.sym
-        cmdPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
+        cmdPressed: bool = is_cmd_pressed(event)
         shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
         altPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LALT | sdl2.KMOD_RALT)
-        ctrlPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL)
 
         # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
@@ -594,7 +657,7 @@ class GUI:
             # print('**********************************')
 
             # Shift+Cmd+[1-9] sets viewport bookmark
-            if shiftPressed and not altPressed and not ctrlPressed and \
+            if shiftPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
                 i_bookmark: int = int(keySym - sdl2.SDLK_0)
@@ -602,7 +665,7 @@ class GUI:
                 return True
             
             # Cmd+[0-9] goes to viewport bookmark
-            if not shiftPressed and not altPressed and not ctrlPressed and \
+            if not shiftPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
                 i_bookmark: int = int(keySym - sdl2.SDLK_0)
@@ -619,6 +682,12 @@ class GUI:
                     return True
                 
                 self.cmd_goto_viewport_bookmark(i_bookmark)
+                return True
+            
+            # Cmd+A creates a new Agent chat
+            if keySym == sdl2.SDLK_a:
+                wx, wy = self.view_to_world(vx, vy)
+                self.cmd_new_agent_chat(wx, wy)
                 return True
             
             # Cmd+B creates a new Label
@@ -677,8 +746,8 @@ class GUI:
                         logging.info(f'Starting active listening.')
                         self._voice_in.start_recording()
 
-                        if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
-                            self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_voice_command)
+                        # if self.llm_available:  # Need LLM to interpret transcribed text for voice commands.
+                        #     self.command_listener = VoiceCommandListener(session=self.session, on_command=self._on_command)
                         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH
 
                     elif self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
@@ -747,18 +816,18 @@ class GUI:
             #
             
             # Update visibility of voice transcript window...
-            if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
-                if self.voice_transcript is not None and \
-                    not self.voice_transcript._visible:
+            # if self._voice_in_state == GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH:
+            #     if self.voice_transcript is not None and \
+            #         not self.voice_transcript._visible:
 
-                    self.voice_transcript.text_buffer.set_text("")  # @hack
-                    self.voice_transcript._visible = True
+            #         self.voice_transcript.text_buffer.set_text("")  # @hack
+            #         self.voice_transcript._visible = True
             
-            elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
-                self.voice_transcript is not None and \
-                self.voice_transcript._visible:
+            # elif self._voice_in_state != GUI.VOICE_IN_STATE_LISTENING_FOR_SPEECH and \
+            #     self.voice_transcript is not None and \
+            #     self.voice_transcript._visible:
 
-                self.voice_transcript._visible = False
+            #     self.voice_transcript._visible = False
 
 
         # Do we have queued text to say?
@@ -814,6 +883,39 @@ class GUI:
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
                 sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+
+        # Draw Agent memory stats. @todo should this code be here?
+        if self.agent:
+            lines: List[str] = []
+            n_memories = len(self.agent.memory._memories)
+            lines.append('Memory Stats:')
+            lines.append(f'  # memories: {n_memories}')
+
+            n_memories_without_summary = 0
+
+            if n_memories > 0:
+                max_summary_length = 0
+                max_contents_length = 0
+                total_contents_length = 0
+                for _, memory in self.agent.memory._memories.items():
+                    contents_length = len(memory.text)
+                    total_contents_length += contents_length
+
+                    max_contents_length = max(max_contents_length, contents_length)
+                    summary = memory.summary_sentence
+                    if summary is not None:
+                        max_summary_length = max(max_summary_length, len(summary))
+                    else:
+                        n_memories_without_summary += 1
+
+                lines.append(f'  # memories without summary: {n_memories_without_summary}')
+                lines.append(f'  MAX summary length: {max_summary_length}')
+                lines.append(f'  MAX contents length: {max_contents_length}')
+                lines.append(f'  AVG contents length: {total_contents_length / n_memories:.2f}')
+
+            MEM_DBG_LINE_SPACING = 16
+            for i, line in enumerate(lines):
+                draw_text(self.renderer, self.font_descriptor, line, 1400 - 240, 100 + i * MEM_DBG_LINE_SPACING)
 
         # @debug @todo runtime feature flag
         # DEBUG_DRAW
@@ -978,8 +1080,8 @@ class GUI:
     
 
     def save(self):
-        logging.debug("Control positions before saving...")
-        self.debug_dump_control_uids_and_coords()
+        # logging.debug("Control positions before saving...")
+        # self.debug_dump_control_uids_and_coords()
 
         utc_now = datetime.datetime.now(pytz.utc)
         local_timezone = get_localzone()
@@ -1006,6 +1108,10 @@ class GUI:
                 "viewport_pos": self._viewport_pos
             }
             json.dump(gui_json, f, indent=2, cls=GUI.JSONEncoder)
+
+        if self.agent:
+            self.agent.save_memories()
+
         logging.info("GUI saved.")
 
 
@@ -1041,8 +1147,8 @@ class GUI:
 
         logging.info("GUI loaded.")
 
-        logging.debug("Control positions after loading...")
-        self.debug_dump_control_uids_and_coords()
+        # logging.debug("Control positions after loading...")
+        # self.debug_dump_control_uids_and_coords()
 
         return True
 
