@@ -38,6 +38,7 @@ from transcribe_audio import VoiceTranscriber
 import utils
 from voice_out import VoiceOut
 from draw import draw_marker_point, draw_text, set_color
+from platform_utils import is_cmd_pressed
 
 
 class GUI:
@@ -639,10 +640,9 @@ class GUI:
         vr = self.content().get_view_rect()
 
         keySym = event.key.keysym.sym
-        cmdPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI)
+        cmdPressed: bool = is_cmd_pressed(event)
         shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
         altPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LALT | sdl2.KMOD_RALT)
-        ctrlPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL)
 
         # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
@@ -657,7 +657,7 @@ class GUI:
             # print('**********************************')
 
             # Shift+Cmd+[1-9] sets viewport bookmark
-            if shiftPressed and not altPressed and not ctrlPressed and \
+            if shiftPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
                 i_bookmark: int = int(keySym - sdl2.SDLK_0)
@@ -665,7 +665,7 @@ class GUI:
                 return True
             
             # Cmd+[0-9] goes to viewport bookmark
-            if not shiftPressed and not altPressed and not ctrlPressed and \
+            if not shiftPressed and \
                 keySym >= sdl2.SDLK_0 and keySym <= sdl2.SDLK_9:
 
                 i_bookmark: int = int(keySym - sdl2.SDLK_0)

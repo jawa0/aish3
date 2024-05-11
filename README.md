@@ -3,27 +3,51 @@ AISH(3) -- AI Shell
 
 ![Screenshot showing a black screen with blue-bordered text areas, white labels, and LLM chat controls](./res/img/aish3-screenshot.png)
 
-This is a Python GUI (SDL) application. The goal is to have a portable hands-free AI assistant and playground.
+This is a Python GUI (SDL) application. You can chat with AISH, an AI agent with memory.
+You can also open multiple basic LLM chats, or create text notes. All of this is on a
+scrollable infinite canvas.
 
 _Aish (אֵשׁ): The Hebrew word "Aish" translates to "fire, light, or flame" in English._
-
 
 _In Korean, "Aish (아이씨)" or sometimes just "Ai (아이)" is a common informal exclamation often used to express frustration, annoyance, or mild surprise, somewhat equivalent to "Oh no!", "Darn!", or "Ugh!" in English._
 
 So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 
+### Keyboard Commands
 
-Features:
-* Have multiple LLM chats (with ChatGPT)
-    * Save and load workspaces containing everything as JSON files
-* Almost have minimalist Miro-like note-taking
-    * Boxes (done) and arrows (todo. Pan around huge workspace. Zoom in and out (todo)
-* Working towards (optional) full hands-free operation
-    * Voice-in speech-to-text transcription
-    * Voice-out reading of chat results and other text
-    * Voice commands
-* Working towards no-code app building
-    * Define GUI in native app and then deploy to web and mobile (todo). The opposite of Electron.
+#### Verified on macOS and Windows
+|Mac|Windows|Description|
+|-------|-----|-----------|
+|Cmd+Q|Alt+F4|Quit|
+|Cmd+S|Ctrl+S|Save workspace to file named by --workspace command-line param (default aish_workspace.json)|
+|Cmd+L|Ctrl+L|Load workspace from file named by --workspace command-line param (default aish_workspace.json)
+|Cmd+B|Ctrl+B|Add a new Label at the current cursor position|
+|Cmd+G|Ctrl+G|Send messages to GPT-4 for chat completion when you have an LLM Chat control focused|
+|Cmd+N|Ctrl+N|Create a new GPT-4 chat|
+|Cmd+T|Ctrl+V|Create a new TextArea (use it like a post-it note)|
+
+#### Verified only on macOS
+|Mac|Windows|Description|
+|-------|-----|-----------|
+|Cmd+U| |Add another "user" message text field|
+|Cmd+Delete| |Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
+|Cmd+R| |Use Voice out to say some sample text|
+|Cmd+Enter| |Toggle active listening mode (speech to text transcription)|
+|Cmd+V| |Paste text from clipboard into focused TextArea|
+|TAB| |Focus next control|
+|Shift+TAB| |Focus previous control|
+|Enter| |Move focus down into children of currently focused control|
+|Esc| |If the currently focused control has selected text, then clear the selection. Otherwise, move focus up to parent container|
+|Ctrl+TAB| |Insert TAB char into currently focused TextArea|
+|Arrow L/R/U/D| |Move within TextArea|
+|Option/Alt+Arrow L/R| |Move to start of previous / next word|
+|Cmd+L/R Arrow| |Move to beginning/end of current line.|
+|Mouse Wheel Up/Down| |Scroll focused TextArea|
+|Cmd+Up| |Move to beginning of focused TextArea|
+|Cmd+Down| |Move to end of focused TextArea|
+|Shift+Movement Command| |Extend selection within TextArea|
+|Delete| |Remove previous char in TextArea|
+|Other keys| |Insert text char into focused TextArea|
 
 ### Running it
 
@@ -70,37 +94,6 @@ If you get tired of entering System prompt text into LLM chats, you can set
 a default system prompt using:
 
     DEFAULT_SYSTEM_PROMPT="..."
-
-### Keyboard Commands
-
-|Command|Description|
-|-------|-----------|
-|Cmd+Q|Quit|
-|Cmd+N|Create a new GPT-4 chat|
-|Cmd+G|Send messages to GPT-4 for chat completion|
-|Cmd+U|Add another "user" message text field|
-|Cmd+Delete|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
-|Cmd+B|Add a new Label at the current cursor position|
-|Cmd+R|Use Voice out to say some sample text|
-|Cmd+Enter|Toggle active listening mode (speech to text transcription)|
-|Cmd+T|Create a new TextArea (use it like a post-it note)|
-|Cmd+S|Save workspace to aish_workspace.json|
-|Cmd+L|Load workspace from aish_workspace.json
-|Cmd+V|Paste text from clipboard into focused TextArea|
-|TAB|Focus next control|
-|Shift+TAB|Focus previous control|
-|Enter|Move focus down into children of currently focused control|
-|Esc|If the currently focused control has selected text, then clear the selection. Otherwise, move focus up to parent container|
-|Ctrl+TAB|Insert TAB char into currently focused TextArea|
-|Arrow L/R/U/D|Move within TextArea|
-|Option/Alt+Arrow L/R|Move to start of previous / next word|
-|Cmd+L/R Arrow|Move to beginning/end of current line.|
-|Mouse Wheel Up/Down|Scroll focused TextArea|
-|Cmd+Up|Move to beginning of focused TextArea|
-|Cmd+Down|Move to end of focused TextArea|
-|Shift+Movement Command|Extend selection within TextArea|
-|Delete|Remove previous char in TextArea|
-|Other keys|Insert text char into focused TextArea|
 
 NOTES:
 
