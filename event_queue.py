@@ -21,18 +21,20 @@ class EventQueue:
         """Get the next current or future event."""
         return self.events[0][1] if self.events else None
 
-# Example usage
-event_queue = EventQueue()
-event_queue.add_event({'name': 'Event 1', 'time': datetime(2024, 3, 20, 15, 0)})
-event_queue.add_event({'name': 'Event 2', 'time': datetime(2024, 3, 21, 18, 30)})
-event_queue.add_event({'name': 'Event 3', 'time': datetime(2024, 3, 22, 12, 45)})
 
-current_time = datetime.utcnow()
+if __name__=='__main__':
+    # Example usage
+    event_queue = EventQueue()
+    event_queue.add_event({'name': 'Event 1', 'time': datetime(2024, 3, 20, 15, 0)})
+    event_queue.add_event({'name': 'Event 2', 'time': datetime(2024, 3, 21, 18, 30)})
+    event_queue.add_event({'name': 'Event 3', 'time': datetime(2024, 3, 22, 12, 45)})
 
-# Get all past events
-past_events = event_queue.get_past_events(current_time)
-print("Past events:", past_events)
+    current_time = datetime.utcnow()
 
-# Get the next current or future event
-next_event = event_queue.get_next_event()
-print("Next event:", next_event)
+    # Get all past events
+    past_events = event_queue.get_past_events(current_time)
+    print("Past events:", past_events)
+
+    # Get the next current or future event
+    next_event = event_queue.get_next_event()
+    print("Next event:", next_event)

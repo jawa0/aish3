@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from agent import Agent
+from agent_events import AgentEvents
 from blinker import signal
 from collections import deque
 # from command_console import CommandConsole  # circular ref
@@ -254,7 +255,9 @@ class GUI:
                     self._voice_wakeup.stop()
                     self._voice_wakeup = None
 
-            self._voice_out.say(text)
+            # if self._voice_out:
+            #     self._voice_out.say(text)
+
         else:
             self._next_texts_to_say.append(text)
 
@@ -336,9 +339,13 @@ class GUI:
                     if not os.path.exists(path_string):
                         contents = f"File '{path_string}' not found."
                     else:
+                        # @todo: move this into agent
                         try:
                             with open(path_string, 'r') as f:
                                 contents = f.read()
+                                if self.agent:
+                                    self.agent.put_event(AgentEvents.create_event("OpenedFile", path=path_string, contents=contents))
+                                    self.agent._files.append({'object_type': 'file', 'path': path_string, 'contents': contents})
                         except:
                             contents = f"Unknown error opening file '{path_string}'."
 
@@ -446,9 +453,7 @@ class GUI:
                 return True
 
             elif keySym == sdl2.SDLK_ESCAPE and self.command_console._visible:
-                # Hide the command console if Esc is pressed
-                self.command_console._visible = False
-                self.set_focus(self.command_console.console_area, False)
+                self.command_console.hide()
                 return True
 
 
@@ -878,6 +883,39 @@ class GUI:
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 255, 0, 0, 255)
                 sdl2.SDL_RenderDrawLines(self.renderer.sdlrenderer, point_array, len(points))
                 sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, 0, 0, 0, 255)
+
+        # Draw Agent memory stats. @todo should this code be here?
+        if self.agent:
+            lines: List[str] = []
+            n_memories = len(self.agent.memory._memories)
+            lines.append('Memory Stats:')
+            lines.append(f'  # memories: {n_memories}')
+
+            n_memories_without_summary = 0
+
+            if n_memories > 0:
+                max_summary_length = 0
+                max_contents_length = 0
+                total_contents_length = 0
+                for _, memory in self.agent.memory._memories.items():
+                    contents_length = len(memory.text)
+                    total_contents_length += contents_length
+
+                    max_contents_length = max(max_contents_length, contents_length)
+                    summary = memory.summary_sentence
+                    if summary is not None:
+                        max_summary_length = max(max_summary_length, len(summary))
+                    else:
+                        n_memories_without_summary += 1
+
+                lines.append(f'  # memories without summary: {n_memories_without_summary}')
+                lines.append(f'  MAX summary length: {max_summary_length}')
+                lines.append(f'  MAX contents length: {max_contents_length}')
+                lines.append(f'  AVG contents length: {total_contents_length / n_memories:.2f}')
+
+            MEM_DBG_LINE_SPACING = 16
+            for i, line in enumerate(lines):
+                draw_text(self.renderer, self.font_descriptor, line, 1400 - 240, 100 + i * MEM_DBG_LINE_SPACING)
 
         # @debug @todo runtime feature flag
         # DEBUG_DRAW

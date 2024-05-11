@@ -83,6 +83,8 @@ TEXT:
 
     @property
     def summary_sentence(self) -> str | None:
+        if not hasattr(self, '_summary_sentence'):
+            return None
         return self._summary_sentence
     
     @summary_sentence.setter
@@ -92,6 +94,8 @@ TEXT:
 
     @property
     def summary_embedding(self) -> np.ndarray | None:
+        if not hasattr(self, '_summary_embedding'):
+            return None
         return self._summary_embedding
     
 
@@ -115,19 +119,27 @@ class MemoryStore:
         return self._memories.get(uid, None)
 
 
-    def retrieve_by_similarity(self, text: str) -> [Tuple[float, Memory]]:
+    def retrieve_by_similarity(self, text: str) -> List[Tuple[float, Memory]]:
         results = []
         query_embedding = embed(text)[0]
         for uid, memory in self._memories.items():
             if memory.summary_embedding is None:
                 continue
-
             similarity = cos_similarity(query_embedding, memory.summary_embedding)
             print(similarity)
             if similarity >= 0.1:
                 results.append((similarity, memory))
-
-        return sorted(results, reverse=True)
+        try:
+            sorted_results = sorted(results, key=lambda x: x[0], reverse=True)
+        except:
+            seen = set()
+            for tup in results:
+                if tup[0] in seen:
+                    # found duplicate
+                    print(tup)
+                seen.add(tup[0])
+            sorted_results = []
+        return sorted_results
     
 
     def retrieve_by_context(self, context) -> [str]:
@@ -138,11 +150,16 @@ class MemoryStore:
     def save(self, filename: str):
         json_data = {"version": 0.1, "memories": []}
         for uid, memory in self._memories.items():
+
+            summary_embedding = memory.summary_embedding
+            if summary_embedding is not None:
+                summary_embedding = summary_embedding.tolist()
+
             json_data["memories"].append({"uid": str(uid), 
                                           "text": memory.text, 
                                           "keywords": memory.keywords,
                                           "summary": memory.summary_sentence,
-                                          "summary_embedding": memory.summary_embedding.tolist()})
+                                          "summary_embedding": summary_embedding})
         with open(filename, "w") as f:
             json.dump(json_data, f, indent=2)
 
@@ -152,10 +169,15 @@ class MemoryStore:
             json_data = json.load(f)
         for memory_data in json_data["memories"]:
             loaded_uid = uuid.UUID(memory_data["uid"])
+
+            summary_embedding = memory_data["summary_embedding"]
+            if summary_embedding is not None:
+                summary_embedding = np.array(summary_embedding)
+
             memory = Memory(memory_data["text"], 
                             uid=loaded_uid, 
                             summary_sentence=memory_data["summary"],
-                            summary_embedding=np.array(memory_data["summary_embedding"]),
+                            summary_embedding=summary_embedding,
                             keywords=memory_data["keywords"])
             
             self._memories[memory.uid] = memory

@@ -18,6 +18,7 @@ import queue
 from typing import Callable
 from llm import LLMRequest
 from prompt import LiteralPrompt
+from utils import strip_and_unquote
 
 class CommandListener:
     def __init__(self, session: "Session"):
@@ -30,16 +31,15 @@ class CommandListener:
 
     def parse_user_command(self, command_text: str):
         system = """
-You are monitoring user input TEXT that has been transcribed from voice audio by a speech to text system.
-You also know a set of COMMANDS that you can execute. Carefully examine the TEXT below, and determine
+You are monitoring user input TEXT, looking for a COMMAND from the set of COMMANDS you know.
+You also know a set of COMMANDS that you can execute. Carefully examine the TEXT, and determine
 whether the user is asking you to perform a command from your set of COMMANDS. If so, then respond with
 the command only. No other characters. If the user is not asking you to perform a command, then respond with
-the empty string. You must also respond with the empty string if you are not sure whether the user is asking
-you to perform a command.
+the empty string. Do not provide any other commentary or rationale. You must also respond with the empty string 
+if you are not sure whether the user is asking you to perform a command.
 --------
 COMMANDS:
 stop_listening
-create_new_chat_with_llm
 create_new_text_area
 create_new_label(label_text)
 pan_screen_left(number_of_pixels)
@@ -91,8 +91,14 @@ EXAMPLES:
             logging.debug(f"**** COMMAND DETECTION: Chat completion done. Result: '{self._completion_text}'")
             self.detected_command = self._completion_text.strip()
             self._completion_text = None
+
+            # output cleaning...
+            # @todo Make better validation routines...
+            self.detected_command = strip_and_unquote(self.detected_command)
             if len(self.detected_command) > 0:
                 signal('channel_command').send(self.detected_command)
+            else:
+                signal('channel_user_text_message').send(command_text)
 
         llm_request = LLMRequest(prompt=LiteralPrompt(system + "\n" + user),  # @todo make template
                                  handlers=[("start", on_completion_start),

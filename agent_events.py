@@ -12,7 +12,7 @@ class AgentEvents:
             "version": 0.1,
             "type": event_type,
             **AgentEvents.get_time_metadata(),
-            **AgentEvents._get_user_metadata(),
+            **AgentEvents.get_user_metadata(),
             **kwargs
         }
         return event
@@ -33,7 +33,7 @@ class AgentEvents:
 
 
     @staticmethod
-    def _get_user_metadata():
+    def get_user_metadata():
         return {
             "user": getpass.getuser(),
             "client_platform": str(platform.platform()),

@@ -56,11 +56,15 @@ class CommandConsole(GUIContainer):
             if keysym in (sdl2.SDLK_RETURN, sdl2.SDLK_KP_ENTER):
                 # Enter/Return key was pressed, process the command
                 command = self.console_area.get_text()
+                self.hide()
                 self.process_command(command)
                 return True
         
         return super().handle_event(event)
 
+    def hide(self):
+        self.gui.set_focus(self.console_area, False)
+        self._visible = False
 
     def process_command(self, command):
         # Placeholder for the command processing logic
