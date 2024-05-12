@@ -23,6 +23,7 @@ from gui.fonts import FontRegistry
 import os
 from text_edit_buffer import TextEditBuffer
 import queue
+from platform_utils import is_cmd_pressed
 
 
 class TextArea(GUIControl):
@@ -182,7 +183,7 @@ class TextArea(GUIControl):
                 return True
         
         elif event.type == sdl2.SDL_KEYDOWN:
-            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            cmdPressed: bool = is_cmd_pressed(event)
             keySymbol = event.key.keysym.sym
 
             # Esc: If if there is a text selection, then clear selection.

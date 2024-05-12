@@ -1,7 +1,7 @@
 AISH (AI Shell) -- AI Agent with Memories 
 ==
 
-![Screenshot showing a black screen with blue-bordered text areas, white labels, and LLM chat controls](./res/img/aish3-screenshot.png)
+![Screenshot showing a black screen with white text labels, and LLM chat controls](./docs/Screenshot%202024-05-12%20115610.png)
 
 This is a Python GUI (SDL) application. You can chat with AISH, an AI agent with memory.
 You can also open multiple basic LLM chats, or create text notes. All of this is on a
@@ -22,15 +22,15 @@ So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 |Cmd+S|Ctrl+S|Save workspace to file named by --workspace command-line param (default aish_workspace.json). Saving the workspace also saves agent memories to agent_memories.json, and saves the agent's perception of past events to agent_percepts.json|
 |Cmd+L|Ctrl+L|Load workspace from file named by --workspace command-line param (default aish_workspace.json)
 |Cmd+B|Ctrl+B|Add a new Label at the current cursor position|
-|Cmd+G|Ctrl+G|Send messages to GPT-4 for chat completion when you have an LLM Chat control focused|
+|Cmd+T|Ctrl+T|Create a new TextArea (use it like a post-it note)|
 |Cmd+N|Ctrl+N|Create a new GPT-4 chat|
-|Cmd+T|Ctrl+V|Create a new TextArea (use it like a post-it note)|
+|Cmd+G|Ctrl+G|Send messages to GPT-4 for chat completion when you have an LLM Chat control focused|
+|Cmd+U|Ctrl+U|Add another "user" message text field when an LLMChatContainer is focused|
+|Cmd+Delete|Ctrl+Backspace|Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
 
 #### Verified only on macOS
 |Mac|Windows|Description|
 |-------|-----|-----------|
-|Cmd+U| |Add another "user" message text field|
-|Cmd+Delete| |Delete the currently selected chat message (inside a chat), or the current chat (if whole chat is focused). Also works for other controls|
 |Cmd+R| |Use Voice out to say some sample text|
 |Cmd+Enter| |Toggle active listening mode (speech to text transcription)|
 |Cmd+V| |Paste text from clipboard into focused TextArea|

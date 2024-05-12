@@ -25,6 +25,7 @@ from label import Label
 from textarea import TextArea
 from gui_layout import ColumnLayout
 from llm import LLMRequest
+from platform_utils import is_cmd_pressed
 from prompt import LiteralPrompt
 
 
@@ -176,7 +177,7 @@ class LLMChatContainer(GUIContainer):
 
         if event.type == sdl2.SDL_KEYDOWN:
             shiftPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LSHIFT | sdl2.KMOD_RSHIFT)
-            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            cmdPressed: bool = is_cmd_pressed(event)
             ctrlPressed: bool = 0 != event.key.keysym.mod & (sdl2.KMOD_LCTRL | sdl2.KMOD_RCTRL)
             keySymbol = event.key.keysym.sym
 

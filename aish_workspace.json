@@ -1,17 +1,17 @@
 {
   "version": "0.2",
-  "saved_at_utc": "2024-05-11T19:15:54.756611+00:00",
-  "saved_at_local": "2024-05-11T15:15:54.756611-04:00",
+  "saved_at_utc": "2024-05-12T15:55:05.123909+00:00",
+  "saved_at_local": "2024-05-12T11:55:05.123909-04:00",
   "gui": {
     "class": "GUI",
     "content": {
       "class": "GUIContainer",
       "uid": "ee1f2fce-c07c-4c6c-8fec-82bae118f9d2",
       "bounding_rect": [
-        19,
+        21,
         105,
-        1357,
-        674
+        1362,
+        698
       ],
       "layout": null,
       "name": "GUI Content Root",
@@ -24,7 +24,7 @@
           "class": "Label",
           "uid": "86da028e-81c7-400d-95bb-09b7f0a6f1bb",
           "bounding_rect": [
-            4,
+            2,
             0,
             240,
             30
@@ -37,11 +37,11 @@
           "uid": "d77904dc-0530-4462-9610-34fdae7d5901",
           "bounding_rect": [
             0,
-            40,
-            1230,
+            29,
+            1290,
             30
           ],
-          "text": "Press the backtick/tilde (`/~) key to open command console to chat with AISH Agent",
+          "text": "Press the backtick/tilde (`/~) key to open the command console to chat with AISH Agent",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
@@ -49,7 +49,7 @@
           "uid": "94ff03f6-cf19-47a6-ae50-e79d2d4dacef",
           "bounding_rect": [
             0,
-            73,
+            58,
             645,
             30
           ],
@@ -60,8 +60,8 @@
           "class": "LLMChatContainer",
           "uid": "4dbc54f0-3f97-461a-943b-c14d092d3b37",
           "bounding_rect": [
-            698,
-            362,
+            706,
+            383,
             608,
             312
           ],
@@ -172,7 +172,7 @@
           "class": "LLMChatContainer",
           "uid": "2e95ff92-65ad-4272-8c8f-0a55ef132025",
           "bounding_rect": [
-            9,
+            7,
             254,
             608,
             312
@@ -284,8 +284,8 @@
           "class": "Label",
           "uid": "646c7f07-ee30-4e1d-9b03-6aac28065d93",
           "bounding_rect": [
-            7,
-            173,
+            10,
+            178,
             570,
             30
           ],
@@ -296,7 +296,7 @@
           "class": "Label",
           "uid": "0afdc52f-96f4-476d-a1b7-9c6a45702e32",
           "bounding_rect": [
-            11,
+            9,
             211,
             930,
             30
@@ -308,24 +308,95 @@
           "class": "Label",
           "uid": "a4f70f41-9a17-4fb1-8463-a0a6945e72a0",
           "bounding_rect": [
-            698,
-            289,
-            390,
+            696,
+            308,
+            525,
             30
           ],
-          "text": "You can have more than one",
+          "text": "You can have more than one LLM chat",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         },
         {
           "class": "Label",
           "uid": "f167dfed-b2d3-42c8-b6a2-41de9b8d2569",
           "bounding_rect": [
-            697,
-            322,
+            702,
+            340,
             660,
             30
           ],
           "text": "Ctrl+N (Windows) or Cmd+N (Mac) to make more",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "TextArea",
+          "uid": "da6135fa-590c-45a2-8093-78ed577ee5ec",
+          "bounding_rect": [
+            1059,
+            170,
+            240,
+            100
+          ],
+          "text": "This is a TextArea\n- create them with Ctrl+T (Win)\n  or Cmd+T (Mac)"
+        },
+        {
+          "class": "Label",
+          "uid": "5e9d08ca-e45d-4942-8afc-2e9b8d6a1904",
+          "bounding_rect": [
+            2,
+            638,
+            540,
+            30
+          ],
+          "text": "Press Cmd+G or Ctrl+G to send to LLM",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "uid": "bcff5742-d7c7-43ba-b9c4-aa646c668b60",
+          "bounding_rect": [
+            0,
+            668,
+            615,
+            30
+          ],
+          "text": "Press Cmd+U or Ctrl+U to add new user msg",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "uid": "27f86496-597c-495b-b480-50172301deee",
+          "bounding_rect": [
+            3,
+            607,
+            480,
+            30
+          ],
+          "text": "Click to select LLM Chat and ...",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "uid": "6d613a30-35c7-4d69-a9e1-f4ecce871584",
+          "bounding_rect": [
+            6,
+            102,
+            375,
+            30
+          ],
+          "text": "Click to select a control",
+          "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
+        },
+        {
+          "class": "Label",
+          "uid": "bb61550e-9f6f-46a4-bb7e-8607d337f294",
+          "bounding_rect": [
+            5,
+            129,
+            600,
+            30
+          ],
+          "text": "Cmd+Backspace to delete selected control",
           "font_descriptor": "{\"font_descriptor\": \"large-label\"}"
         }
       ]
@@ -333,7 +404,7 @@
   },
   "viewport_bookmarks": {},
   "viewport_pos": [
-    6,
-    12
+    13,
+    11
   ]
 }

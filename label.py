@@ -22,6 +22,7 @@ from gui.fonts import json_str_from_font_descriptor
 from draw import draw_text, get_char_width
 from gui import GUI, GUIControl
 from gui.fonts import FontDescriptor, font_descriptor_from_json_str
+from platform_utils import is_cmd_pressed
 from textarea import TextArea
 
 
@@ -167,7 +168,7 @@ class LabelEditor(TextArea):
             return True
 
         if event.type == sdl2.SDL_KEYDOWN:
-            cmdPressed = (event.key.keysym.mod & (sdl2.KMOD_LGUI | sdl2.KMOD_RGUI))
+            cmdPressed: bool = is_cmd_pressed(event)
             keySymbol = event.key.keysym.sym
 
             if cmdPressed:
