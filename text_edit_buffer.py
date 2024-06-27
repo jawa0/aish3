@@ -104,6 +104,20 @@ class TextEditBuffer(object):
             return self.TEXT_BUFFER.split('\n')
 
 
+    def get_wrapped_lines(self, width, font_metrics):
+        """
+        Returns the text wrapped to fit within the specified width.
+        """
+        lines = self.get_lines(expand_tabs=True)
+        wrapped_lines = []
+        for line in lines:
+            while len(line) > 0:
+                wrap_at = font_metrics.get_wrap_position(line, width)
+                wrapped_lines.append(line[:wrap_at])
+                line = line[wrap_at:]
+        return wrapped_lines
+
+
     def get_tab_spaces(self):
         return self.TAB_SPACES
 
@@ -218,16 +232,14 @@ class TextEditBuffer(object):
             self.desired_col = col
 
 
-    def move_point_up(self):
+    def move_point_up(self, font_metrics, width):
         row, col = self.get_row_col(self.POINT)
+        wrapped_lines = self.get_wrapped_lines(width, font_metrics)
         if row > 0:
-            from_line_length = len(self.get_line(row))
-
-            to_line = self.get_line(row - 1, expand_tabs=False)
-            to_line_length = len(to_line)
+            from_line_length = len(wrapped_lines[row])
+            to_line_length = len(wrapped_lines[row - 1])
             to_col = min(self.desired_col, to_line_length)
-
-            new_point = self.POINT - col - 1 - len(to_line) + to_col  # The -1 is for the newline char
+            new_point = self.POINT - from_line_length - 1 + to_col
             self.set_point(new_point)
 
     
@@ -239,17 +251,14 @@ class TextEditBuffer(object):
         self.set_point(len(self.TEXT_BUFFER))
 
 
-    def move_point_down(self):
+    def move_point_down(self, font_metrics, width):
         row, col = self.get_row_col(self.POINT)
-        num_rows = len(self.get_lines())
-        if row < num_rows - 1:
-            from_line_length = len(self.get_line(row, expand_tabs=False))
-
-            to_line = self.get_line(row + 1)
-            to_line_length = len(to_line)
+        wrapped_lines = self.get_wrapped_lines(width, font_metrics)
+        if row < len(wrapped_lines) - 1:
+            from_line_length = len(wrapped_lines[row])
+            to_line_length = len(wrapped_lines[row + 1])
             to_col = min(self.desired_col, to_line_length)
-
-            new_point = self.POINT - col + from_line_length + 1 + to_col  # +1 is for the newline char
+            new_point = self.POINT + from_line_length + 1 + to_col
             self.set_point(new_point)
             
             return True   

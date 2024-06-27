@@ -303,7 +303,7 @@ class TextArea(GUIControl):
                             self.text_buffer.set_mark()
                     else:
                         self.text_buffer.clear_mark()
-                    self.text_buffer.move_point_up()
+                    self.text_buffer.move_point_up(self.gui.font_manager.get_font_metrics(self.font_descriptor), self.bounding_rect.w)
 
                 self.set_needs_redraw()    
                 return True
@@ -318,7 +318,7 @@ class TextArea(GUIControl):
                             self.text_buffer.set_mark()
                     else:
                         self.text_buffer.clear_mark()
-                    self.text_buffer.move_point_down()
+                    self.text_buffer.move_point_down(self.gui.font_manager.get_font_metrics(self.font_descriptor), self.bounding_rect.w)
 
                 self.set_needs_redraw()        
                 return True
@@ -538,7 +538,8 @@ class TextArea(GUIControl):
 
 
     def draw(self):
-        lines = self.text_buffer.get_lines()
+        font_metrics = self.gui.font_manager.get_font_metrics(self.font_descriptor)
+        lines = self.text_buffer.get_wrapped_lines(self.bounding_rect.w, font_metrics)
         
         vr = self.get_view_rect()
 
