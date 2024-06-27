@@ -462,19 +462,6 @@ class TextArea(GUIControl):
             return True
         return False
 
-    def _get_edge(self, wx, wy):
-        rect = self.get_world_rect()
-        edges = []
-        if abs(wx - rect.x) <= 1:
-            edges.append('left')
-        if abs(wx - (rect.x + rect.w)) <= 1:
-            edges.append('right')
-        if abs(wy - rect.y) <= 1:
-            edges.append('top')
-        if abs(wy - (rect.y + rect.h)) <= 1:
-            edges.append('bottom')
-        return edges
-
     def _resize(self, wx, wy):
         start_w, start_h = self._resize_start_size
         start_x, start_y = self._resize_start_pos
