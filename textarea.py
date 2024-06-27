@@ -83,6 +83,10 @@ class TextArea(GUIControl):
         self.combined_text_texture = None
         self._was_last_event_mousewheel = False
         self.input_q = None
+        self._resizing = False
+        self._resize_start_pos = None
+        self._resize_start_size = None
+        self._resize_edge = None
 
         # @hack @todo FontManager is deprecated. Should use sdl2.ext.ttf.FontTTF
         fm = FontRegistry().get_fontmanager(self.font_descriptor)
@@ -172,7 +176,33 @@ class TextArea(GUIControl):
         current_was_last_event_mousewheel = self._was_last_event_mousewheel
         self._was_last_event_mousewheel = False
 
-        if event.type == sdl2.SDL_MOUSEWHEEL:
+        if event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+            if event.button.button == sdl2.SDL_BUTTON_LEFT:
+                mx, my = event.button.x, event.button.y
+                wx, wy = self.gui.view_to_world(mx, my)
+                if self._is_on_edge(wx, wy):
+                    self._resizing = True
+                    self._resize_start_pos = (wx, wy)
+                    self._resize_start_size = self.get_size()
+                    self._resize_edge = self._get_edge(wx, wy)
+                    return True
+
+        elif event.type == sdl2.SDL_MOUSEBUTTONUP:
+            if event.button.button == sdl2.SDL_BUTTON_LEFT and self._resizing:
+                self._resizing = False
+                self._resize_start_pos = None
+                self._resize_start_size = None
+                self._resize_edge = None
+                return True
+
+        elif event.type == sdl2.SDL_MOUSEMOTION:
+            if self._resizing:
+                mx, my = event.motion.x, event.motion.y
+                wx, wy = self.gui.view_to_world(mx, my)
+                self._resize(wx, wy)
+                return True
+
+        elif event.type == sdl2.SDL_MOUSEWHEEL:
             # Scroll this TextArea, but only if it has focus.
 
             GAIN = 8
@@ -383,6 +413,50 @@ class TextArea(GUIControl):
 
         return self.parent_handle_event(event)
     
+
+    def _is_on_edge(self, wx, wy):
+        rect = self.get_world_rect()
+        leeway = 1
+        if (rect.x - leeway <= wx <= rect.x + rect.w + leeway and
+            rect.y - leeway <= wy <= rect.y + rect.h + leeway):
+            return True
+        return False
+
+    def _get_edge(self, wx, wy):
+        rect = self.get_world_rect()
+        edges = []
+        if abs(wx - rect.x) <= 1:
+            edges.append('left')
+        if abs(wx - (rect.x + rect.w)) <= 1:
+            edges.append('right')
+        if abs(wy - rect.y) <= 1:
+            edges.append('top')
+        if abs(wy - (rect.y + rect.h)) <= 1:
+            edges.append('bottom')
+        return edges
+
+    def _resize(self, wx, wy):
+        start_w, start_h = self._resize_start_size
+        start_x, start_y = self._resize_start_pos
+        dx = wx - start_x
+        dy = wy - start_y
+
+        new_w = start_w
+        new_h = start_h
+
+        if 'right' in self._resize_edge:
+            new_w = max(20, start_w + dx)
+        if 'bottom' in self._resize_edge:
+            new_h = max(20, start_h + dy)
+        if 'left' in self._resize_edge:
+            new_w = max(20, start_w - dx)
+            self.set_position(self.bounding_rect.x + dx, self.bounding_rect.y)
+        if 'top' in self._resize_edge:
+            new_h = max(20, start_h - dy)
+            self.set_position(self.bounding_rect.x, self.bounding_rect.y + dy)
+
+        self.set_size(new_w, new_h)
+
 
     def set_needs_redraw(self):
         if self.combined_text_texture is not None:
