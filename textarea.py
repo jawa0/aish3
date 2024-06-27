@@ -89,9 +89,9 @@ class TextArea(GUIControl):
         self._resize_edge = None
 
         # @hack @todo FontManager is deprecated. Should use sdl2.ext.ttf.FontTTF
-        fm = FontRegistry().get_fontmanager(self.font_descriptor)
-        assert(fm is not None)
-        font_size_px = fm.size
+        self.font_manager = FontRegistry().get_fontmanager(self.font_descriptor)  # Initialize font_manager
+        assert(self.font_manager is not None)
+        font_size_px = self.font_manager.size
 
         # print('__file__:', __file__)
         app_path = os.path.dirname(os.path.abspath(__file__))  # @todo DRY if this file location changes, then we'll need to update computation of app_path
@@ -538,7 +538,7 @@ class TextArea(GUIControl):
 
 
     def draw(self):
-        font_metrics = self.gui.font_manager.get_font_metrics(self.font_descriptor)
+        font_metrics = self.font_manager.get_font_metrics(self.font_descriptor)
         lines = self.text_buffer.get_wrapped_lines(self.bounding_rect.w, font_metrics)
         
         vr = self.get_view_rect()
