@@ -456,6 +456,46 @@ class TextArea(GUIControl):
             self.set_position(self.bounding_rect.x, self.bounding_rect.y + dy)
 
         self.set_size(new_w, new_h)
+        leeway = 1
+        if (rect.x - leeway <= wx <= rect.x + rect.w + leeway and
+            rect.y - leeway <= wy <= rect.y + rect.h + leeway):
+            return True
+        return False
+
+    def _get_edge(self, wx, wy):
+        rect = self.get_world_rect()
+        edges = []
+        if abs(wx - rect.x) <= 1:
+            edges.append('left')
+        if abs(wx - (rect.x + rect.w)) <= 1:
+            edges.append('right')
+        if abs(wy - rect.y) <= 1:
+            edges.append('top')
+        if abs(wy - (rect.y + rect.h)) <= 1:
+            edges.append('bottom')
+        return edges
+
+    def _resize(self, wx, wy):
+        start_w, start_h = self._resize_start_size
+        start_x, start_y = self._resize_start_pos
+        dx = wx - start_x
+        dy = wy - start_y
+
+        new_w = start_w
+        new_h = start_h
+
+        if 'right' in self._resize_edge:
+            new_w = max(20, start_w + dx)
+        if 'bottom' in self._resize_edge:
+            new_h = max(20, start_h + dy)
+        if 'left' in self._resize_edge:
+            new_w = max(20, start_w - dx)
+            self.set_position(self.bounding_rect.x + dx, self.bounding_rect.y)
+        if 'top' in self._resize_edge:
+            new_h = max(20, start_h - dy)
+            self.set_position(self.bounding_rect.x, self.bounding_rect.y + dy)
+
+        self.set_size(new_w, new_h)
 
 
     def set_needs_redraw(self):
