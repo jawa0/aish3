@@ -457,6 +457,22 @@ class TextArea(GUIControl):
 
         self.set_size(new_w, new_h)
 
+        new_w = start_w
+        new_h = start_h
+
+        if 'right' in self._resize_edge:
+            new_w = max(20, start_w + dx)
+        if 'bottom' in self._resize_edge:
+            new_h = max(20, start_h + dy)
+        if 'left' in self._resize_edge:
+            new_w = max(20, start_w - dx)
+            self.set_position(self.bounding_rect.x + dx, self.bounding_rect.y)
+        if 'top' in self._resize_edge:
+            new_h = max(20, start_h - dy)
+            self.set_position(self.bounding_rect.x, self.bounding_rect.y + dy)
+
+        self.set_size(new_w, new_h)
+
     def set_needs_redraw(self):
         if self.combined_text_texture is not None:
             sdl2.SDL_DestroyTexture(self.combined_text_texture)
