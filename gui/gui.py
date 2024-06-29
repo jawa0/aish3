@@ -86,7 +86,8 @@ class GUI:
                 client_session=None, 
                 enable_voice_in=False, 
                 enable_voice_out=False,
-                create_hook: Optional[callable]=None):        
+                create_hook: Optional[callable]=None,
+                scroll_speed: float=2.0):  # Add scroll_speed parameter with a default value
         
         if enable_voice_in:
             from voice_wakeup import PhraseListener
@@ -100,6 +101,7 @@ class GUI:
 
         self.renderer = renderer
         self.font_descriptor = font_descriptor
+        self.scroll_speed = scroll_speed  # Initialize scroll speed
 
         # Makes unit testing harder.
         # assert(self.renderer)
@@ -535,9 +537,9 @@ class GUI:
                     return True
                 
             elif event.type == sdl2.SDL_MOUSEWHEEL:
-                # We're going to to pan the viewport on track-pad / mouse wheel
+                # We're going to pan the viewport on track-pad / mouse wheel
 
-                GAIN = 8  # pixels per wheel click
+                GAIN = 8 * self.scroll_speed  # Use the scroll speed parameter
                 dx = event.wheel.x * GAIN
                 dy = -event.wheel.y * GAIN
 
@@ -632,6 +634,11 @@ class GUI:
         """Returns mouse position in viewport (window) coordinates."""
         x = ctypes.c_int()
         y = ctypes.c_int()                
+
+
+    def set_scroll_speed(self, speed: float) -> None:
+        """Set the scroll speed for the canvas."""
+        self.scroll_speed = speed
         sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         return int(x.value), int(y.value)
     
@@ -857,6 +864,16 @@ class GUI:
 
                 self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
                 # self.say("Okay")
+
+        # Adjust panning logic based on elapsed time
+        if hasattr(self, '_last_update_time'):
+            elapsed_time = time.time() - self._last_update_time
+        else:
+            elapsed_time = dt
+        self._last_update_time = time.time()
+
+        # Adjust the panning speed based on elapsed time
+        self.scroll_speed *= elapsed_time
 
         # Update components
         for c in self.content():
