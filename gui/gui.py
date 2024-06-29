@@ -631,7 +631,7 @@ class GUI:
     def get_mouse_position(self) -> "tuple[int, int]":
         """Returns mouse position in viewport (window) coordinates."""
         x = ctypes.c_int()
-        y = ctypes.c_int()                
+        y = ctypes.c_int()
         sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         return int(x.value), int(y.value)
     
@@ -647,7 +647,10 @@ class GUI:
         # print(f'keySym: {keySym}, cmdPressed: {cmdPressed}, shiftPressed: {shiftPressed}, altPressed: {altPressed}, ctrlPressed: {ctrlPressed}')
 
         if cmdPressed:
-            vx, vy = self.get_mouse_position()
+            mouse_pos = self.get_mouse_position()
+            if mouse_pos is None:
+                return False
+            vx, vy = mouse_pos
             # print('******** handle_keydown() ********')
             # print(f'gui.viewport_pos = {self._viewport_pos}')
             # print(f'gui.content().bounding_rect: {self.content().bounding_rect}')
