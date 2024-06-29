@@ -180,6 +180,7 @@ class GUIContainer(GUIControl):
 
         child.parent = self
         self.children.append(child)
+        child.z_order = len(self.children)  # Set z-order based on the number of children
 
         if updateLayout:
             self.updateLayout()
@@ -189,6 +190,9 @@ class GUIContainer(GUIControl):
         self.children.remove(child)
         if self.gui.get_focus() == child:
             self.gui.set_focus(child, False)
+
+        child.parent = None
+        self._update_z_order()  # Update z-order after removing a child
 
         child.parent = None
         self.updateLayout()
@@ -204,6 +208,15 @@ class GUIContainer(GUIControl):
         if self.parent is not None:
             self.parent.updateLayout()
 
+    def _update_z_order(self):
+        for index, child in enumerate(self.children):
+            child.z_order = index
+
+    def bring_to_front(self, child):
+        if child in self.children:
+            self.children.remove(child)
+            self.children.append(child)
+            self._update_z_order()
 
     # I've had so many problems with this sizeToChildren code.
     # Frankly, as a linear-algebra-comfortable game developer, it's a bit embarassing

@@ -61,6 +61,7 @@ class GUIControl:
         json["class"] = self.__class__.__name__
         json["uid"] = self._uid
         json["bounding_rect"] = (self.bounding_rect.x, self.bounding_rect.y, self.bounding_rect.w, self.bounding_rect.h)
+        json["z_order"] = self.z_order  # Add this line
         return json
 
 

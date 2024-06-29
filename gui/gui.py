@@ -485,6 +485,10 @@ class GUI:
                                 self._drag_control = hit_control
 
                             self.set_focus(hit_control)
+                            
+                            # Bring the clicked control to the front
+                            if hit_control.parent:
+                                hit_control.parent.bring_to_front(hit_control)
 
                             if is_double_click and hasattr(hit_control, "on_double_click"):
                                 hit_control.on_double_click(event.button.x, event.button.y)
