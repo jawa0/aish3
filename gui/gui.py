@@ -540,8 +540,8 @@ class GUI:
                 # We're going to pan the viewport on track-pad / mouse wheel
 
                 GAIN = 8 * self.scroll_speed  # Use the scroll speed parameter
-                dx = event.wheel.x * GAIN
-                dy = -event.wheel.y * GAIN
+                dx = int(event.wheel.x * GAIN)
+                dy = int(-event.wheel.y * GAIN)
 
                 wx, wy = self.get_view_pos()
                 self.set_view_pos(wx + dx, wy + dy)
@@ -638,10 +638,9 @@ class GUI:
 
     def set_scroll_speed(self, speed: float) -> None:
         """Set the scroll speed for the canvas."""
-        self.scroll_speed = speed
+        self.scroll_speed = max(speed, 1.0)  # Ensure scroll_speed does not go below 1.0
         sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         return int(x.value), int(y.value)
-    
     
     def handle_keydown(self, event):
         vr = self.content().get_view_rect()
@@ -874,6 +873,7 @@ class GUI:
 
         # Adjust the panning speed based on elapsed time
         self.scroll_speed *= elapsed_time
+        self.scroll_speed = max(self.scroll_speed, 1.0)  # Ensure scroll_speed does not go below 1.0
 
         # Update components
         for c in self.content():

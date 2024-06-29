@@ -277,8 +277,8 @@ class GUIControl:
                 return vr
             else:
                 wr = self.get_world_rect()
-                vx, vy = self.gui.world_to_view(wr.x, wr.y)
-                vr = sdl2.SDL_Rect(vx, vy, wr.w, wr.h)
+                vx, vy = self.gui.world_to_view(int(wr.x), int(wr.y))
+                vr = sdl2.SDL_Rect(vx, vy, int(wr.w), int(wr.h))
                 return vr        
         
 
