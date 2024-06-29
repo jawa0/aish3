@@ -468,70 +468,24 @@ class GUI:
                 return self.handle_keydown(event)
             
             elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
-                # Do we have a stroke for this button?
-                if event.button.button not in self._strokes:
-                    # We do not.  Add this event to the stroke.
-                    stroke = [(event.button.x, event.button.y)]                    
-                    self._strokes[event.button.button] = stroke
-                    # print(f"STROKE (button {event.button.button}) start at {stroke[0]}")
-
-                    # If it's the left mouse button, then check for a hit on a control.
-                    if event.button.button == sdl2.SDL_BUTTON_LEFT:
-                        wx, wy = self.view_to_world(event.button.x, event.button.y)
-                        hit_control = self.check_hit(wx, wy, only_draggable=False)
-                        # logging.debug(f'GUI.check_hit({wx}, {wy}) returned {hit_control}')
-                        if hit_control:
-                            if hit_control._draggable:
-                                self._drag_control = hit_control
-
-                            self.set_focus(hit_control)
-
-                            if is_double_click and hasattr(hit_control, "on_double_click"):
-                                hit_control.on_double_click(event.button.x, event.button.y)
-
-                        else:  
-                            # No control was hit                            
-                            # Clear focus when clicking on nothing
-                            if focused_control is not None:
-                                self.set_focus(focused_control, False)
-
+                if event.button.button == sdl2.SDL_BUTTON_LEFT:
+                    wx, wy = self.view_to_world(event.button.x, event.button.y)
+                    hit_control = self.check_hit(wx, wy, only_draggable=True)
+                    if hit_control:
+                        self._drag_control = hit_control
+                        self.set_focus(hit_control)
                     return True
 
             elif event.type == sdl2.SDL_MOUSEBUTTONUP:
-                # Do we have a stroke for this button?
-                if event.button.button in self._strokes:
-                    # We do.  Remove this stroke.
-                    del self._strokes[event.button.button]
-                    # print(f"STROKE (button {event.button.button}) end")
-
-                    # If it's the left mouse button, then check if we're dragging and release drag.
-                    if self._drag_control and event.button.button == sdl2.SDL_BUTTON_LEFT:
-                        self._drag_control = None
+                if event.button.button == sdl2.SDL_BUTTON_LEFT:
+                    self._drag_control = None
                     return True
 
             elif event.type == sdl2.SDL_MOUSEMOTION:
-                # Do we have a stroke for this button?
-                # @bug @todo only seems to work for L button
-                # Maybe macOS two finger swipe is showing up as a trackpad gesture that gets handled first?
-                if event.button.button in self._strokes:
-                    # print(f"STROKE (button {event.button.button}) motion to {(event.motion.x, event.motion.y)}")
-
-                    xy0 = self._strokes[event.button.button][-1]
-                    self._strokes[event.button.button].append((event.motion.x, event.motion.y))
-                    xy1 = self._strokes[event.button.button][-1]
-
-                    dx = xy1[0] - xy0[0]
-                    dy = xy1[1] - xy0[1]
-
-                    if self._drag_control:
-                        new_r = sdl2.SDL_Rect(self._drag_control.bounding_rect.x + dx,
-                                               self._drag_control.bounding_rect.y + dy,
-                                               self._drag_control.bounding_rect.w,
-                                               self._drag_control.bounding_rect.h)
-                        self._drag_control.bounding_rect = new_r
-                    else:
-                        self.set_view_pos(self._viewport_pos[0] - dx, self._viewport_pos[1] - dy)
-
+                if self._drag_control:
+                    dx = event.motion.xrel
+                    dy = event.motion.yrel
+                    self._drag_control.on_mouse_motion(dx, dy)
                     return True
                 
             elif event.type == sdl2.SDL_MOUSEWHEEL:

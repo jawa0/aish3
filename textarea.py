@@ -201,6 +201,11 @@ class TextArea(GUIControl):
                 wx, wy = self.gui.view_to_world(mx, my)
                 self._resize(wx, wy)
                 return True
+            elif self.gui._drag_control is self:
+                dx = event.motion.xrel
+                dy = event.motion.yrel
+                self.on_mouse_motion(dx, dy)
+                return True
 
         elif event.type == sdl2.SDL_MOUSEWHEEL:
             # Scroll this TextArea, but only if it has focus.
