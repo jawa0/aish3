@@ -101,7 +101,7 @@ class GUI:
 
         self.renderer = renderer
         self.font_descriptor = font_descriptor
-        self.scroll_speed = scroll_speed  # Initialize scroll speed
+        self.set_scroll_speed(scroll_speed)  # Use set_scroll_speed method
 
         # Makes unit testing harder.
         # assert(self.renderer)
@@ -540,11 +540,11 @@ class GUI:
                 # We're going to pan the viewport on track-pad / mouse wheel
 
                 GAIN = 8 * self.scroll_speed  # Use the scroll speed parameter
-                dx = int(event.wheel.x * GAIN)
-                dy = int(-event.wheel.y * GAIN)
+                dx = event.wheel.x * GAIN
+                dy = -event.wheel.y * GAIN
 
                 wx, wy = self.get_view_pos()
-                self.set_view_pos(wx + dx, wy + dy)
+                self.set_view_pos(wx + int(dx), wy + int(dy))
                 return True
                                 
         return handled
@@ -638,9 +638,7 @@ class GUI:
 
     def set_scroll_speed(self, speed: float) -> None:
         """Set the scroll speed for the canvas."""
-        self.scroll_speed = max(speed, 1.0)  # Ensure scroll_speed does not go below 1.0
-        sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        return int(x.value), int(y.value)
+        self.scroll_speed = speed
     
     def handle_keydown(self, event):
         vr = self.content().get_view_rect()
@@ -870,10 +868,6 @@ class GUI:
         else:
             elapsed_time = dt
         self._last_update_time = time.time()
-
-        # Adjust the panning speed based on elapsed time
-        self.scroll_speed *= elapsed_time
-        self.scroll_speed = max(self.scroll_speed, 1.0)  # Ensure scroll_speed does not go below 1.0
 
         # Update components
         for c in self.content():
