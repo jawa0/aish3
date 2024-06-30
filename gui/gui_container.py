@@ -194,7 +194,6 @@ class GUIContainer(GUIControl):
         child.parent = None
         self._update_z_order()  # Update z-order after removing a child
 
-        child.parent = None
         self.updateLayout()
 
 
