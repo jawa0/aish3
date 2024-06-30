@@ -20,8 +20,10 @@ import json
 import logging
 import matplotlib
 import os
-import openai
+import litellm
 from typing import Optional
+
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 from agent import Agent
 from agent_events import AgentEvents

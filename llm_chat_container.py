@@ -18,7 +18,8 @@ import json
 import logging
 import matplotlib
 import os
-import openai
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+import litellm
 from typing import Optional
 from gui import GUI, GUIContainer
 from label import Label
