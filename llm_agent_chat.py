@@ -20,7 +20,7 @@ import json
 import logging
 import matplotlib
 import os
-import openai
+import litellm
 from typing import Optional
 
 from agent import Agent

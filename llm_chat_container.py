@@ -18,7 +18,7 @@ import json
 import logging
 import matplotlib
 import os
-import openai
+import litellm
 from typing import Optional
 from gui import GUI, GUIContainer
 from label import Label

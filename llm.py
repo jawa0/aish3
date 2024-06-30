@@ -1,5 +1,5 @@
 import asyncio
-from openai import BadRequestError, OpenAI, chat
+import litellm
 import os
 from prompt import LiteralPrompt, Prompt
 from typing import Callable, Dict, List, Literal, Optional, Tuple
@@ -15,8 +15,8 @@ class LLMRequest:
                  respond_with_json: bool = False,
                  custom_data: Dict = {}):
         
-        self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self._completion: chat.completion = None
+        self._litellm_client = litellm.Client(api_key=os.getenv("LITELLM_API_KEY"))
+        self._completion: litellm.Completion = None
         self._task = None
         self._s_response = ""
         self._previous_messages = previous_messages
@@ -84,7 +84,7 @@ class LLMRequest:
             args["tools"] = self._tools
 
         try:
-            self._completion = self._openai_client.chat.completions.create(**args)
+            self._completion = self._litellm_client.completions.create(**args)
             try:
                 while True:
                     # print('**** LLMRequest.go() calling next()')
@@ -105,7 +105,7 @@ class LLMRequest:
                     cb(self)
                 # print('**** LLMRequest.go() done')
         
-        except BadRequestError as e:
+        except litellm.BadRequestError as e:
             error_message = \
 f"""
 ERROR: {e.type}
