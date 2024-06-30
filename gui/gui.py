@@ -486,7 +486,6 @@ class GUI:
 
                             if is_double_click and hasattr(hit_control, "on_double_click"):
                                 hit_control.on_double_click(event.button.x, event.button.y)
-
                         else:  
                             # No control was hit                            
                             # Clear focus when clicking on nothing
