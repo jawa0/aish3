@@ -105,7 +105,7 @@ class GUI:
         # assert(self.renderer)
         # assert(self.font_descriptor)
 
-        self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root", can_focus=False)
+        self._content = GUIContainer(gui=self, inset=(0, 0), name="GUI Content Root", can_focus=False, z_order=0)
                 
         # May be self.content or any depth of descendant of self.content
         self._focused_control = None
