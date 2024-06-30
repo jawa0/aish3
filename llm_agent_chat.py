@@ -23,6 +23,8 @@ import os
 import litellm
 from typing import Optional
 
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
 from agent import Agent
 from agent_events import AgentEvents
 from gui import GUI, GUIContainer
