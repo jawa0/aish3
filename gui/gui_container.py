@@ -39,9 +39,8 @@ class GUIContainer(GUIControl):
         assert(json["class"] == cls.__name__)
         kwargs = cls._enrich_kwargs(json, **kwargs)
 
-        # kwargs["inset"] = json
-
         instance = super().from_json(json, **kwargs)
+        instance.z_order = json.get('z_order', 0)  # Set z_order during deserialization
         for child_json in json["children"]:
             # print(f'child_json: {child_json}')
             if child_json is None:
@@ -73,9 +72,8 @@ class GUIContainer(GUIControl):
         self.draw_bounds = False  #kwargs.get('draw_bounds', True)
         
         self.children = children if children is not None else []
-
         self.set_layout(layout)
-
+        self.z_order = kwargs.get('z_order', 0)  # Initialize z_order attribute
 
     def __iter__(self):
         self._iter_index = 0
@@ -97,9 +95,10 @@ class GUIContainer(GUIControl):
             return None
 
         json["class"] = self.__class__.__name__
-        json["layout"] =  self.layout.__class__.__name__ if self.layout else None
+        json["layout"] = self.layout.__class__.__name__ if self.layout else None
         json["name"] = self._name
         json["inset"] = self._inset
+        json["z_order"] = self.z_order  # Add z_order to JSON serialization
 
         json["children"] = []
         for child in self.children:
