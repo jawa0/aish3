@@ -144,6 +144,19 @@ class TestTextEditBuffer(unittest.TestCase):
         self.assertEqual(obj.get_text(), "helloworld")
         self.assertEqual(obj.get_point(), 5)
 
+    def test_home_key_navigation(self):
+        text = "some text\nanother line"
+        obj = TextEditBuffer(text)
+        obj.set_point(10)  # Set point somewhere in the second line
+        obj.move_point_start_of_line()
+        self.assertEqual(obj.get_point(), 10 - len("another line"))
+
+    def test_end_key_navigation(self):
+        text = "some text\nanother line"
+        obj = TextEditBuffer(text)
+        obj.set_point(0)  # Set point at the beginning
+        obj.move_point_end_of_line()
+        self.assertEqual(obj.get_point(), len("some text"))
 
 if __name__ == '__main__':
     unittest.main()
