@@ -295,13 +295,13 @@ class TextArea(GUIControl):
                 return True
             
             # Home key - beginning of line (Windows and Linux)
-            elif (keySymbol == sdl2.SDLK_HOME or keySymbol == sdl2.SDLK_KP_HOME) and sys.platform != 'darwin':
+            elif (keySymbol == sdl2.SDLK_HOME or keySymbol == sdl2.SDL_SCANCODE_KP_7) and sys.platform != 'darwin':
                 self.text_buffer.move_point_start_of_line()
                 self.set_needs_redraw()
                 return True
 
             # End key - end of line (Windows and Linux)
-            elif (keySymbol == sdl2.SDLK_END or keySymbol == sdl2.SDLK_KP_END) and sys.platform != 'darwin':
+            elif (keySymbol == sdl2.SDLK_END or keySymbol == sdl2.SDL_SCANCODE_KP_1) and sys.platform != 'darwin':
                 self.text_buffer.move_point_end_of_line()
                 self.set_needs_redraw()
                 return True
