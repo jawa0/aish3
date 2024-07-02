@@ -24,6 +24,7 @@ import os
 from text_edit_buffer import TextEditBuffer
 import queue
 from platform_utils import is_cmd_pressed
+import sys
 
 
 class TextArea(GUIControl):
