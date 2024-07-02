@@ -1,8 +1,8 @@
 import asyncio
-from openai import BadRequestError, OpenAI, chat
-import os
 from prompt import LiteralPrompt, Prompt
 from typing import Callable, Dict, List, Literal, Optional, Tuple
+
+from litellm import acompletion
 
 
 class LLMRequest:
@@ -15,8 +15,7 @@ class LLMRequest:
                  respond_with_json: bool = False,
                  custom_data: Dict = {}):
         
-        self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self._completion: chat.completion = None
+        self._completion = None
         self._task = None
         self._s_response = ""
         self._previous_messages = previous_messages
@@ -83,40 +82,18 @@ class LLMRequest:
         if self._tools is not None and len(self._tools) > 0:
             args["tools"] = self._tools
 
-        try:
-            self._completion = self._openai_client.chat.completions.create(**args)
-            try:
-                while True:
-                    # print('**** LLMRequest.go() calling next()')
-                    chunk = next(self._completion)  # Could raise StopIteration
-                    # print('**** LLMRequest.go() got chunk')
-                    delta = chunk.choices[0].delta
-                    if hasattr(delta, 'content'):
-                        chunk_text = chunk.choices[0].delta.content
-                        if chunk_text is not None:
-                            self._s_response += chunk_text
-                            for cb in self._handlers["next"]:
-                                cb(self, chunk_text)
-                    await asyncio.sleep(0.001)
-            except StopIteration:
-                # This means the completion we tried to call next() on is done.
-                # Call all done handlers for that completion
-                for cb in self._handlers["stop"]:
-                    cb(self)
-                # print('**** LLMRequest.go() done')
-        
-        except BadRequestError as e:
-            error_message = \
-f"""
-ERROR: {e.type}
-  code: {e.code}
-  param: {e.param}
-  message: '{e.message}'
-"""
-            print(error_message)
+        self._completion = await acompletion(**args)
+        async for chunk in self._completion:
+            # print(f"\n**** {chunk}\n")
+            delta = chunk.choices[0].delta
+            # print(f"\n**** {delta}\n")
+            if hasattr(delta, 'content'):
+                chunk_text = chunk.choices[0].delta.content
+                if chunk_text is not None:
+                    self._s_response += chunk_text
+                    for cb in self._handlers["next"]:
+                        cb(self, chunk_text)
+            await asyncio.sleep(0.001)
 
-            # Call error handlers or perform any necessary cleanup
-            for cb in self._handlers["error"]:
-                cb(self, error_message)
-                    
-        # print('**** LLMRequest.go() done')
+        for cb in self._handlers["stop"]:
+            cb(self)
