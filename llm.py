@@ -68,7 +68,8 @@ class LLMRequest:
         for cb in self._handlers["start"]:
             cb(self)
 
-        model = 'gpt-4-1106-preview'
+        model = 'gpt-4o'
+        # model = 'claude-3-opus-20240229'
         if not self._previous_messages:
             chat_messages = [{'role': 'system', 'content': ''},
                             {'role': 'user', 'content': self._prompt.get_prompt_text()}]

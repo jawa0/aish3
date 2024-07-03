@@ -279,8 +279,8 @@ class LLMChatContainer(GUIContainer):
 
         self.pulse_busy = True
         self._t_busy = 0.0
-        model = 'gpt-4-1106-preview'
-        # model = 'gpt-4'
+        model = 'gpt-4o'
+
         # Add Answer TextArea
         answer = self.gui.create_control("ChatMessageUI", role="Assistant", text='')
         # Shrink previous messages
