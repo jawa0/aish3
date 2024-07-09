@@ -17,7 +17,7 @@ import ctypes
 import sdl2
 from sdl2.ext.ttf import FontTTF
 from sdl2.sdlttf import TTF_FontHeight
-from draw import draw_cursor, draw_text, set_color
+from draw import draw_cursor, draw_rectangle, draw_text, set_color
 from gui import GUI, GUIControl
 from gui.fonts import FontRegistry
 import os
@@ -531,7 +531,7 @@ class TextArea(GUIControl):
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
 
         # Draw the bounding rectangle
-        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+        draw_rectangle(self.renderer.sdlrenderer, vr)
 
         # Reset to the old color
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])

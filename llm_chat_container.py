@@ -27,6 +27,7 @@ from gui_layout import ColumnLayout
 from llm import LLMRequest
 from platform_utils import is_cmd_pressed
 from prompt import LiteralPrompt
+from draw import draw_rectangle
 
 
 PANEL_WIDTH = 600
@@ -354,7 +355,7 @@ class LLMChatContainer(GUIContainer):
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
 
         # Draw the bounding rectangle
-        sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+        draw_rectangle(self.renderer.sdlrenderer, vr)
 
         # Reset to the old color
         sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])

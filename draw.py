@@ -46,6 +46,10 @@ def get_char_width(font_descriptor: FontDescriptor, char: str) -> int:
     return char_width
 
 
+def draw_rectangle(renderer: 'sdl2.ext.Renderer', rect: sdl2.SDL_Rect) -> None:
+    sdl2.SDL_RenderDrawRect(renderer, rect)
+
+
 def draw_text(renderer, font_descriptor, text, x, y, bounding_rect=None, dst_surface=None, selection_start=None, selection_end=None, color=(255, 255, 255, 255)):
     if len(text.strip()) == 0:
         return

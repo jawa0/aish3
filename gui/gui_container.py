@@ -24,6 +24,7 @@ import gui
 from gui_layout import ColumnLayout
 from .gui_control import GUIControl
 from rect_utils import rect_union
+from draw import draw_rectangle
 
 
 class GUIContainer(GUIControl):
@@ -144,13 +145,13 @@ class GUIContainer(GUIControl):
             # Draw border
             border_color = (0, 127, 255) if self.has_focus() else (100, 100, 100)
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, *border_color, 255)
-            sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, vr)
+            draw_rectangle(self.renderer.sdlrenderer, vr)
 
             # # Draw insets
             # r, g, b = (255, 0, 0)
             # sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, r, g, b, 255)
             # inset_rect = sdl2.SDL_Rect(vr.x + self._inset[0], vr.y + self._inset[1], vr.w - 2 * self._inset[0], vr.h - 2 * self._inset[1])
-            # sdl2.SDL_RenderDrawRect(self.renderer.sdlrenderer, inset_rect)
+            # draw_rectangle(self.renderer.sdlrenderer, inset_rect)
 
             # Reset to the old color
             sdl2.SDL_SetRenderDrawColor(self.renderer.sdlrenderer, old_color[0], old_color[1], old_color[2], old_color[3])
