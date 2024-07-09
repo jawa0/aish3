@@ -109,7 +109,7 @@ class LLMChatContainer(GUIContainer):
         self.utterances = []
         default_setup = kwargs.get('default_setup', True)
         if default_setup:
-            self.title = Label(text="LLM Chat [gpt-4]",
+            self.title = Label(text="LLM Chat [gpt-4o]",
                                 w=PANEL_WIDTH, h=20,
                                 draggable=False,
                                 editable=False,
