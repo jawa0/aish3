@@ -81,7 +81,7 @@
                 600,
                 20
               ],
-              "text": "LLM Chat [gpt-4]",
+              "text": "LLM Chat [gpt-4o]",
               "font_descriptor": "{\"font_descriptor\": \"default\"}"
             },
             {
@@ -193,7 +193,7 @@
                 600,
                 20
               ],
-              "text": "LLM Chat [gpt-4]",
+              "text": "LLM Chat [gpt-4o]",
               "font_descriptor": "{\"font_descriptor\": \"default\"}"
             },
             {
