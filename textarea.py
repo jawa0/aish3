@@ -24,6 +24,7 @@ import os
 from text_edit_buffer import TextEditBuffer
 import queue
 from platform_utils import is_cmd_pressed
+import sys
 
 
 class TextArea(GUIControl):
@@ -264,8 +265,8 @@ class TextArea(GUIControl):
                 if event.key.keysym.mod & sdl2.KMOD_ALT:
                     # move to start of word
                     self.text_buffer.move_point_word_left()
-                # Cmd - beginning of line
-                elif cmdPressed:
+                # Cmd - beginning of line (only on Mac)
+                elif cmdPressed and sys.platform == 'darwin':
                     self.text_buffer.move_point_start_of_line()
                 else:
                     self.text_buffer.move_point_left()
@@ -284,13 +285,25 @@ class TextArea(GUIControl):
                 # Option/Alt - start of next word
                 if event.key.keysym.mod & sdl2.KMOD_ALT:
                     self.text_buffer.move_point_word_right()
-                # Cmd - end of line
-                elif cmdPressed:
+                # Cmd - end of line (only on Mac)
+                elif cmdPressed and sys.platform == 'darwin':
                     self.text_buffer.move_point_end_of_line()
                 else:
                     self.text_buffer.move_point_right()
 
                 self.set_needs_redraw()    
+                return True
+            
+            # Home key - beginning of line (Windows and Linux)
+            elif (keySymbol == sdl2.SDLK_HOME or keySymbol == sdl2.SDL_SCANCODE_KP_7) and sys.platform != 'darwin':
+                self.text_buffer.move_point_start_of_line()
+                self.set_needs_redraw()
+                return True
+
+            # End key - end of line (Windows and Linux)
+            elif (keySymbol == sdl2.SDLK_END or keySymbol == sdl2.SDL_SCANCODE_KP_1) and sys.platform != 'darwin':
+                self.text_buffer.move_point_end_of_line()
+                self.set_needs_redraw()
                 return True
             
             elif keySymbol == sdl2.SDLK_UP:  # up arrow key
