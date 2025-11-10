@@ -49,6 +49,11 @@ So, Prometheus and Dr. Faustus. It captures the promise and the peril of AI.
 |Delete| |Remove previous char in TextArea|
 |Other keys| |Insert text char into focused TextArea|
 
+#### Windows voice input
+
+- Wake word detection is not currently supported on Windows.
+- To use voice input, launch with `--voice-in` and toggle listening manually with Ctrl+Enter.
+
 ### Running it
 
 `python aish3.py`

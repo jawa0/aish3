@@ -89,7 +89,14 @@ class GUI:
                 create_hook: Optional[callable]=None):        
         
         if enable_voice_in:
-            from voice_wakeup import PhraseListener
+            try:
+                from voice_wakeup import PhraseListener
+                self._phrase_listener_cls = PhraseListener
+            except Exception as e:
+                logging.warning(f'Voice wakeword unavailable: {e}')
+                self._phrase_listener_cls = None
+        else:
+            self._phrase_listener_cls = None
 
         assert(client_session is not None)
         self.session = client_session
@@ -132,6 +139,10 @@ class GUI:
         self.voice_in_enabled = enable_voice_in
         self._voice_wakeup = None
         self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD  # trigger start in update()
+
+        # If wakeword class isn't available, don't try to enter wakeword mode
+        if enable_voice_in and self._phrase_listener_cls is None:
+            self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
 
         if self.voice_in_enabled:
             self._voice_in = VoiceTranscriber(session=self.session)
@@ -190,13 +201,34 @@ class GUI:
         
         assert(self._voice_wakeup is None)
 
-        self._voice_wakeup = PhraseListener(detected_callback=self._on_voice_wakeup)
-        self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
-        self._voice_wakeup.start()
-        logging.info('Listening for wakeup phrase.')
+        # If wakeword isn't available (e.g., unsupported platform), disable wakeword mode
+        if self._phrase_listener_cls is None:
+            logging.warning('Wakeword listener not available on this platform. Use Cmd+Enter to toggle voice recording.')
+            self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+            if self.listening_indicator is not None:
+                self.listening_indicator.set_text("")
+            return
 
-        if self.listening_indicator is not None:
-            self.listening_indicator.set_text("Listening for WAKEUP")
+        try:
+            self._voice_wakeup = self._phrase_listener_cls(detected_callback=self._on_voice_wakeup)
+            self._voice_in_state = GUI.VOICE_IN_STATE_LISTENING_FOR_WAKEWORD
+            self._voice_wakeup.start()
+            logging.info('Listening for wakeup phrase.')
+
+            if self.listening_indicator is not None:
+                self.listening_indicator.set_text("Listening for WAKEUP")
+        except NotImplementedError as e:
+            logging.warning(f'Wakeword not supported on this platform: {e}')
+            self._voice_wakeup = None
+            self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+            if self.listening_indicator is not None:
+                self.listening_indicator.set_text("")
+        except Exception as e:
+            logging.error(f'Failed to start wakeword listener: {e}')
+            self._voice_wakeup = None
+            self._voice_in_state = GUI.VOICE_IN_STATE_NOT_LISTENING
+            if self.listening_indicator is not None:
+                self.listening_indicator.set_text("")
 
 
     def _stop_listening_wakeword(self):
