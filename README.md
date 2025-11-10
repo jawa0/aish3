@@ -123,3 +123,23 @@ Run it as:
 
 This requires the pyinstaller Python module
 `pip3 install pyinstaller`
+
+### Running tests
+
+- Run the full test suite:
+
+```bash
+python -m unittest discover -s test
+```
+
+- Run a single test module:
+
+```bash
+python -m unittest test.test_gui_coordinates
+```
+
+- On macOS (via Makefile):
+
+```bash
+make tests
+```

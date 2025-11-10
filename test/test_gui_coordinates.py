@@ -280,13 +280,13 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         # We've added c0 to the GUI.content(), so we expect that its local coordinates
         # relative to its parent (5, 7) are the same as its world coordinates.
 
-        self.assertEquals((wr0.x, wr0.y), (5, 7))
+        self.assertEqual((wr0.x, wr0.y), (5, 7))
 
         # Since we haven't moved the viewport, we expect its view coordinates to
         # be the same as its world coordinates.
 
         vr0 = c0.get_view_rect()
-        self.assertEquals(vr0, wr0)
+        self.assertEqual(vr0, wr0)
 
         # Now, let's add another control. This will cause a call to sizeToChildren(),
         # which will update the parent's bounding_rect. Make sure all updates are valid.
@@ -310,7 +310,7 @@ class TestGUICoordinateTransforms(unittest.TestCase):
         # Verify that c1's world position is where we wanted it.
         
         wr1 = c1.get_world_rect()
-        self.assertEquals((wr1.x, wr1.y), (wx1, wy1))
+        self.assertEqual((wr1.x, wr1.y), (wx1, wy1))
 
 
     def test_local_to_world_inset_0(self):
