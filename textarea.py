@@ -107,6 +107,12 @@ class TextArea(GUIControl):
         del ttf_font
         font.close()
 
+    def on_mouse_motion(self, dx, dy):
+        new_r = sdl2.SDL_Rect(self.bounding_rect.x + dx,
+                              self.bounding_rect.y + dy,
+                              self.bounding_rect.w,
+                              self.bounding_rect.h)
+        self.bounding_rect = new_r
 
     def __json__(self):
         json = super().__json__()
@@ -200,6 +206,11 @@ class TextArea(GUIControl):
                 mx, my = event.motion.x, event.motion.y
                 wx, wy = self.gui.view_to_world(mx, my)
                 self._resize(wx, wy)
+                return True
+            elif self.gui._drag_control is self:
+                dx = event.motion.xrel
+                dy = event.motion.yrel
+                self.on_mouse_motion(dx, dy)
                 return True
 
         elif event.type == sdl2.SDL_MOUSEWHEEL:
